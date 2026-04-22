@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -43,19 +42,19 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-logout{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
 /* MAIN */
-.pro-wrap{max-width:960px;margin:0 auto;padding:28px 20px 60px;}
-.page-title{font-family:'Instrument Serif',serif;font-size:26px;font-weight:400;margin-bottom:4px;}
-.page-sub{font-size:14px;color:var(--ink-dim);margin-bottom:24px;}
-.link-card{background:var(--green);border-radius:var(--radius);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap;box-shadow:0 4px 20px rgba(45,125,95,.25);}
+.pro-wrap{max-width:960px;margin:0 auto;padding:12px 20px 16px;}
+.page-title{font-family:'Instrument Serif',serif;font-size:20px;font-weight:400;margin-bottom:2px;}
+.page-sub{font-size:12px;color:var(--ink-dim);margin-bottom:10px;}
+.link-card{background:var(--green);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 20px rgba(45,125,95,.25);}
 .link-card-left{display:flex;flex-direction:column;gap:3px;}
 .link-card-left span{font-size:11px;font-weight:600;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.6px;}
 .link-url{font-size:14px;font-weight:500;color:#fff;word-break:break-all;}
 .btn-copy{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .btn-copy:hover{background:rgba(255,255,255,.3);}
-.pro-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;}
+.pro-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;}
 @media(max-width:720px){.pro-grid{grid-template-columns:1fr;}}
 .card{background:var(--white);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;}
-.card-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.card-head{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .card-head h3{font-size:15px;font-weight:600;}
 .nav-row{display:flex;gap:4px;align-items:center;}
 .icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:14px;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;transition:all .15s;}
@@ -63,7 +62,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-add{background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;margin-left:6px;transition:opacity .15s;white-space:nowrap;}
 .btn-add:hover{opacity:.88;}
 /* CALENDAR */
-.cal-grid{padding:16px 16px 20px;}
+.cal-grid{padding:10px 12px 12px;}
 .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:8px;}
 .cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
@@ -80,7 +79,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .cal-day.selected{background:var(--green)!important;color:#fff!important;}
 .cal-day.selected .dot{background:rgba(255,255,255,.6)!important;}
 /* DAY DETAIL */
-.day-slots{padding:16px 20px;}
+.day-slots{padding:10px 16px;}
 .day-slots-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap;}
 .day-slots-title{font-size:13px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;}
 .btn-block{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);font-family:'Outfit',sans-serif;transition:all .15s;}
@@ -101,11 +100,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .badge-new{background:var(--amber-bg);color:var(--amber);}
 .slot-link-btn{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;white-space:nowrap;}
 .slot-link-btn:hover{border-color:var(--green);color:var(--green);}
-.no-day-selected{text-align:center;padding:40px 20px;font-size:14px;color:var(--ink-dim);}
+.no-day-selected{text-align:center;padding:24px 20px;font-size:14px;color:var(--ink-dim);}
 .no-day-selected .big{font-size:32px;margin-bottom:8px;}
 /* REQUESTS */
 .req-list{padding:0;}
-.req-item{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px;}
+.req-item{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px;}
 .req-item:last-child{border-bottom:none;}
 .req-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 .req-name{font-size:14px;font-weight:600;}
@@ -116,7 +115,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-confirm:hover{opacity:.85;}
 .btn-decline{flex:1;background:transparent;color:var(--ink-soft);border:1px solid var(--line);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:6px 0;border-radius:6px;cursor:pointer;transition:all .15s;}
 .btn-decline:hover{border-color:var(--red);color:var(--red);}
-.empty-req{padding:40px 20px;text-align:center;font-size:13px;color:var(--ink-dim);}
+.empty-req{padding:24px 16px;text-align:center;font-size:13px;color:var(--ink-dim);}
 .empty-req .big{font-size:28px;margin-bottom:8px;}
 .new-badge{display:inline-block;background:var(--amber-bg);color:var(--amber);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
