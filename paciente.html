@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedí tu turno</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--red:#dc2626;--shadow-md:0 4px 24px rgba(0,0,0,.10);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+.loader-overlay{position:fixed;inset:0;background:rgba(247,245,242,.9);display:flex;align-items:center;justify-content:center;z-index:200;transition:opacity .2s;}
+.loader-overlay.hide{opacity:0;pointer-events:none;}
+.spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--green);animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 20px 60px;}
+.card{background:var(--white);border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow-md);width:100%;max-width:440px;overflow:hidden;}
+.card-header{background:var(--green);padding:24px 28px 20px;}
+.header-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+.header-name{font-family:'Instrument Serif',serif;font-size:22px;color:#fff;}
+.header-sub{font-size:13px;color:rgba(255,255,255,.7);margin-top:2px;}
+.card-body{padding:24px 28px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:9px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--green);background:var(--white);}
+.divider{border:none;border-top:1px solid var(--line);margin:20px 0;}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-month{font-size:14px;font-weight:600;}
+.cal-nav-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:13px;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;}
+.days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+.day-name{text-align:center;font-size:10px;font-weight:600;color:var(--ink-dim);padding:3px 0;}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--ink);transition:all .12s;}
+.day:hover:not(.empty):not(.past):not(.no-slot){background:var(--bg);}
+.day.empty{pointer-events:none;opacity:0;}
+.day.past{color:var(--ink-dim);pointer-events:none;}
+.day.no-slot{color:var(--line);pointer-events:none;}
+.day.today{font-weight:700;color:var(--green);}
+.day.selected{background:var(--green);color:#fff!important;}
+.slots-section{margin-top:16px;}
+.slots-title{font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.time-btn{padding:10px 4px;border:1.5px solid var(--line);border-radius:8px;background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--ink-soft);cursor:pointer;transition:all .12s;text-align:center;}
+.time-btn:hover{border-color:var(--green);color:var(--green);}
+.time-btn.selected{background:var(--green);border-color:var(--green);color:#fff;}
+.time-btn.taken{opacity:.35;pointer-events:none;text-decoration:line-through;}
+.submit-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;border-radius:10px;margin-top:20px;transition:all .15s;}
+.submit-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(45,125,95,.3);}
+.submit-btn:disabled{opacity:.45;pointer-events:none;transform:none;}
+.error-msg{font-size:12px;color:var(--red);margin-top:8px;text-align:center;display:none;}
+.error-msg.show{display:block;}
+.success{display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 28px;}
+.success.show{display:flex;}
+.success-circle{width:64px;height:64px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:20px;box-shadow:0 8px 28px rgba(45,125,95,.3);animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success h3{font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:8px;}
+.success p{font-size:14px;color:var(--ink-dim);line-height:1.6;}
+.success-detail{background:var(--green-bg);border-radius:10px;padding:14px 18px;margin-top:20px;text-align:left;width:100%;}
+.success-detail div{font-size:13px;color:var(--ink-soft);padding:3px 0;}
+.success-detail strong{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="loader-overlay" id="loader"><div class="spinner"></div></div>
+<div class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="header-label">Reserva tu turno con</div>
+      <div class="header-name">Dr. Alejandro Martinez</div>
+      <div class="header-sub">Clinica General - Corrientes</div>
+    </div>
+    <div id="form-body" class="card-body">
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input type="text" class="form-input" id="p-name" placeholder="Tu nombre y apellido" oninput="checkSubmit()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefono</label>
+        <input type="tel" class="form-input" id="p-phone" placeholder="+54 9 362 ..." oninput="checkSubmit()">
+      </div>
+      <hr class="divider">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8249;</button>
+        <span class="cal-month" id="cal-month"></span>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">&#8250;</button>
+      </div>
+      <div class="days-header">
+        <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div>
+        <div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
+      </div>
+      <div class="days-grid" id="days-grid"></div>
+      <div class="slots-section" id="slots-section" style="display:none;">
+        <div class="slots-title" id="slots-title"></div>
+        <div class="time-grid" id="time-grid"></div>
+      </div>
+      <div class="error-msg" id="error-msg">Hubo un error. Por favor intenta de nuevo.</div>
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Solicitar turno</button>
+    </div>
+    <div class="success" id="success-screen">
+      <div class="success-circle">&#10003;</div>
+      <h3>Turno solicitado!</h3>
+      <p>Tu solicitud fue enviada al Dr. Martinez.<br>Te vamos a contactar para confirmar.</p>
+      <div class="success-detail" id="success-detail"></div>
+    </div>
+  </div>
+</div>
+<script>
+const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
+const PRO_SLUG='martinez';
+const BASE_SLOTS=['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'];
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const today=new Date();today.setHours(0,0,0,0);
+const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DAYS=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+let currentMonth=new Date(today.getFullYear(),today.getMonth(),1);
+let selectedDay=null,selectedTime=null,takenSlots={};
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function parseDate(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function isPast(d){return d<today;}
+function isWeekend(d){return d.getDay()===0||d.getDay()===6;}
+function showLoader(v){document.getElementById('loader').classList.toggle('hide',!v);}
+async function loadTaken(){
+  showLoader(true);
+  try{
+    var r=await sb.from('turnos').select('fecha,hora').eq('profesional_slug',PRO_SLUG);
+    if(r.error)throw r.error;
+    takenSlots={};
+    (r.data||[]).forEach(function(t){if(!takenSlots[t.fecha])takenSlots[t.fecha]=[];takenSlots[t.fecha].push(t.hora);});
+  }catch(e){console.error(e);}
+  showLoader(false);renderCal();
+}
+function renderCal(){
+  document.getElementById('cal-month').textContent=MONTHS[currentMonth.getMonth()]+' '+currentMonth.getFullYear();
+  var grid=document.getElementById('days-grid');grid.innerHTML='';
+  var first=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),1);
+  var last=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,0);
+  for(var i=0;i<first.getDay();i++){var e=document.createElement('div');e.className='day empty';grid.appendChild(e);}
+  for(var d=1;d<=last.getDate();d++){
+    var date=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),d);
+    var key=fmt(date);var div=document.createElement('div');div.className='day';div.textContent=d;
+    if(date.getTime()===today.getTime())div.classList.add('today');
+    if(isPast(date)||isWeekend(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    var taken=takenSlots[key]||[];
+    if(BASE_SLOTS.filter(function(s){return !taken.includes(s);}).length===0){div.classList.add('no-slot');grid.appendChild(div);continue;}
+    if(selectedDay===key)div.classList.add('selected');
+    (function(k,dt){div.onclick=function(){selectDay(k,dt);};})(key,date);
+    grid.appendChild(div);
+  }
+}
+function selectDay(key,date){
+  selectedDay=key;selectedTime=null;renderCal();
+  var taken=takenSlots[key]||[];
+  document.getElementById('slots-title').textContent=DAYS[date.getDay()]+' '+date.getDate()+' de '+MONTHS[date.getMonth()];
+  document.getElementById('time-grid').innerHTML=BASE_SLOTS.map(function(t){return '<button class="time-btn'+(taken.includes(t)?' taken':'')+'" onclick="selectTime(\''+t+'\',this)">'+t+'</button>';}).join('');
+  document.getElementById('slots-section').style.display='block';checkSubmit();
+}
+function selectTime(time,btn){document.querySelectorAll('.time-btn').forEach(function(b){b.classList.remove('selected');});btn.classList.add('selected');selectedTime=time;checkSubmit();}
+function changeMonth(dir){currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+dir,1);selectedDay=null;selectedTime=null;document.getElementById('slots-section').style.display='none';renderCal();checkSubmit();}
+function checkSubmit(){var n=document.getElementById('p-name').value.trim();var p=document.getElementById('p-phone').value.trim();document.getElementById('submit-btn').disabled=!(n&&p&&selectedDay&&selectedTime);}
+async function submitForm(){
+  var name=document.getElementById('p-name').value.trim();var phone=document.getElementById('p-phone').value.trim();
+  var errEl=document.getElementById('error-msg');errEl.classList.remove('show');
+  var btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='Enviando...';
+  try{
+    var r=await sb.from('turnos').insert([{profesional_slug:PRO_SLUG,nombre_paciente:name,telefono:phone,fecha:selectedDay,hora:selectedTime,estado:'pending'}]);
+    if(r.error)throw r.error;
+    document.getElementById('form-body').style.display='none';
+    document.getElementById('success-screen').classList.add('show');
+    var d=parseDate(selectedDay);
+    document.getElementById('success-detail').innerHTML='<div><strong>Paciente:</strong> '+name+'</div><div><strong>Fecha:</strong> '+DAYS[d.getDay()]+' '+d.getDate()+' de '+MONTHS[d.getMonth()]+'</div><div><strong>Hora:</strong> '+selectedTime+'</div><div><strong>Estado:</strong> Pendiente de confirmacion</div>';
+  }catch(e){errEl.classList.add('show');btn.disabled=false;btn.textContent='Solicitar turno';console.error(e);}
+}
+loadTaken();
+</script>
+</body>
+</html>
