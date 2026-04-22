@@ -221,8 +221,17 @@ function renderCal(){
 function selectDay(key,date){
   selectedDay=key;selectedTime=null;renderCal();
   const taken=takenSlots[key]||[];
+  const isToday=date.getTime()===today.getTime();
+  const nowHour=new Date().getHours();
+  const nowMin=new Date().getMinutes();
   document.getElementById('slots-title').textContent=DAYS[date.getDay()]+' '+date.getDate()+' de '+MONTHS[date.getMonth()];
-  document.getElementById('time-grid').innerHTML=BASE_SLOTS.map(t=>'<button class="time-btn'+(taken.includes(t)?' taken':'')+'" onclick="selectTime(\''+t+'\',this)">'+t+'</button>').join('');
+  document.getElementById('time-grid').innerHTML=BASE_SLOTS.map(t=>{
+    const slotHour=parseInt(t.split(':')[0]);
+    const slotMin=parseInt(t.split(':')[1]);
+    const isPastSlot=isToday&&(slotHour<nowHour||(slotHour===nowHour&&slotMin<=nowMin));
+    const isTaken=taken.includes(t);
+    return '<button class="time-btn'+((isTaken||isPastSlot)?' taken':'')+'" onclick="selectTime(\''+t+'\',this)">'+t+'</button>';
+  }).join('');
   document.getElementById('slots-section').style.display='block';
   checkSubmit();
 }
