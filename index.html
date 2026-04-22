@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TurnosApp — Panel Profesional</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--green-light:#c8e6da;--amber:#d97706;--amber-bg:#fef3cd;--red:#dc2626;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,.07);--shadow-md:0 4px 24px rgba(0,0,0,.10);}
@@ -25,7 +25,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .login-screen.show{display:flex;}
 .login-card{background:var(--white);border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow-md);width:100%;max-width:340px;overflow:hidden;}
 .login-header{background:var(--green);padding:28px;text-align:center;}
-.login-header .logo{font-family:'Instrument Serif',serif;font-size:24px;color:#fff;}
+.login-header .logo{font-family:'Playfair Display',serif;font-size:24px;color:#fff;}
 .login-header p{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px;}
 .login-body{padding:24px;}
 .login-label{font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block;}
@@ -37,13 +37,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .login-error.show{display:block;}
 /* NAV */
 .app-nav{background:var(--white);border-bottom:1px solid var(--line);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.logo{font-family:'Instrument Serif',serif;font-size:20px;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);display:flex;align-items:center;gap:8px;}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
 .btn-logout{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
 /* MAIN */
 .pro-wrap{max-width:960px;margin:0 auto;padding:12px 20px 16px;}
-.page-title{font-family:'Instrument Serif',serif;font-size:20px;font-weight:400;margin-bottom:2px;}
+.page-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:500;margin-bottom:2px;}
 .page-sub{font-size:12px;color:var(--ink-dim);margin-bottom:10px;}
 .link-card{background:var(--green);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 20px rgba(45,125,95,.25);}
 .link-card-left{display:flex;flex-direction:column;gap:3px;}
