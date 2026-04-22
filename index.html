@@ -72,11 +72,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .cal-day.empty{pointer-events:none;opacity:0;}
 .cal-day.past{color:var(--ink-dim);pointer-events:none;}
 .cal-day.today{font-weight:700;color:var(--green);}
-.dot{width:5px;height:5px;border-radius:50%;display:none;}
+.dot{width:100%;height:3px;border-radius:2px;display:none;margin-top:2px;}
 .cal-day.has-slots .dot{display:block;background:var(--green);}
 .cal-day.has-bookings .dot{display:block;background:var(--amber);}
-.cal-day.selected{background:var(--green)!important;color:#fff!important;}
-.cal-day.selected .dot{background:rgba(255,255,255,.6)!important;}
+.cal-day.selected .dot{background:rgba(255,255,255,.7)!important;}
 .day-slots{padding:16px 20px;}
 .day-slots-title{font-size:13px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
 .slots-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;}
@@ -241,7 +240,7 @@ const SUPABASE_URL = 'https://sqqetiycodpfhoeqwguv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
 const PRO_SLUG = 'arauz';
 const PIN = '1234'; // ← Cambiá este PIN antes de subir
-const BASE_SLOTS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'];
+const BASE_SLOTS = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const today = new Date(); today.setHours(0,0,0,0);
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -297,14 +296,14 @@ async function loadAll(){
 async function confirmBooking(id){
   showLoader(true);
   const{error}=await sb.from('turnos').update({estado:'confirmed'}).eq('id',id);
-  if(error){showToast('Error al confirmar');showLoader(false);return;}
+  if(error){showToast('Error al confirmar: '+error.message);console.error(error);showLoader(false);return;}
   showToast('Turno confirmado ✓');await loadAll();
 }
 
 async function declineBooking(id){
   showLoader(true);
   const{error}=await sb.from('turnos').delete().eq('id',id);
-  if(error){showToast('Error al rechazar');showLoader(false);return;}
+  if(error){showToast('Error al rechazar: '+error.message);console.error(error);showLoader(false);return;}
   showToast('Turno rechazado');await loadAll();
 }
 
@@ -319,7 +318,8 @@ function renderProCal(){
     const key=fmt(date);const div=document.createElement('div');div.className='cal-day';
     div.innerHTML=`${d}<div class="dot"></div>`;
     if(date.getTime()===today.getTime())div.classList.add('today');
-    if(isPast(date)||isWeekend(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    const maxDate=new Date(today);maxDate.setDate(today.getDate()+60);
+    if(isPast(date)||isWeekend(date)||date>maxDate){div.classList.add('past');grid.appendChild(div);continue;}
     if(allBookings[key]&&allBookings[key].length>0)div.classList.add('has-bookings');
     else div.classList.add('has-slots');
     if(proSelectedDay===key)div.classList.add('selected');
@@ -396,6 +396,10 @@ if(sessionStorage.getItem('auth')==='ok'){
   document.getElementById('panel').style.display='block';
   document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html';
   loadAll();
+  // Tiempo real — escucha cambios en la tabla turnos
+  sb.channel('turnos-changes')
+    .on('postgres_changes',{event:'*',schema:'public',table:'turnos',filter:`profesional_slug=eq.${PRO_SLUG}`},()=>{loadAll();})
+    .subscribe();
 }
 </script>
 </body>
