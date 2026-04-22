@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TurnosApp</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #f7f5f2;
+  --white: #ffffff;
+  --ink: #1a1a1a;
+  --ink-soft: #555;
+  --ink-dim: #999;
+  --line: #e8e4df;
+  --green: #2d7d5f;
+  --green-bg: #edf5f1;
+  --green-light: #c8e6da;
+  --amber: #d97706;
+  --amber-bg: #fef3cd;
+  --red: #dc2626;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,.07);
+  --shadow-md: 0 4px 24px rgba(0,0,0,.10);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+.app-nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  padding: 0 24px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.app-nav .logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px; color: var(--ink);
+  display: flex; align-items: center; gap: 8px;
+}
+.logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.nav-tabs { display: flex; background: var(--bg); border-radius: 8px; padding: 3px; gap: 2px; }
+.nav-tab {
+  border: none; background: transparent; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
+  padding: 5px 14px; border-radius: 6px; color: var(--ink-dim);
+  transition: all .15s;
+}
+.nav-tab.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── LOADER ── */
+.loader-overlay {
+  position: fixed; inset: 0; background: rgba(247,245,242,.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; backdrop-filter: blur(2px);
+  transition: opacity .2s;
+}
+.loader-overlay.hide { opacity: 0; pointer-events: none; }
+.spinner {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 3px solid var(--line);
+  border-top-color: var(--green);
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── PRO VIEW ── */
+.pro-wrap { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
+.page-title { font-family: 'Instrument Serif', serif; font-size: 26px; font-weight: 400; margin-bottom: 4px; }
+.page-sub { font-size: 14px; color: var(--ink-dim); margin-bottom: 24px; }
+
+.link-card {
+  background: var(--green); border-radius: var(--radius);
+  padding: 18px 22px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 28px; flex-wrap: wrap;
+  box-shadow: 0 4px 20px rgba(45,125,95,.25);
+}
+.link-card-left { display: flex; flex-direction: column; gap: 3px; }
+.link-card-left span { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.65); text-transform: uppercase; letter-spacing: .6px; }
+.link-url { font-size: 14px; font-weight: 500; color: #fff; }
+.link-actions { display: flex; gap: 8px; }
+.btn-copy {
+  background: rgba(255,255,255,.2); border: 1.5px solid rgba(255,255,255,.3);
+  color: #fff; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+  padding: 7px 14px; border-radius: 7px; cursor: pointer; transition: all .15s;
+}
+.btn-copy:hover { background: rgba(255,255,255,.3); }
+.btn-preview {
+  background: #fff; border: none;
+  color: var(--green); font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+  padding: 7px 14px; border-radius: 7px; cursor: pointer;
+}
+
+.pro-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+@media (max-width: 720px) { .pro-grid { grid-template-columns: 1fr; } }
+
+.card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); overflow: hidden; }
+.card-head { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.card-head h3 { font-size: 15px; font-weight: 600; }
+.nav-row { display: flex; gap: 4px; }
+.icon-btn {
+  width: 30px; height: 30px; border-radius: 7px;
+  border: 1px solid var(--line); background: transparent;
+  cursor: pointer; font-size: 14px; color: var(--ink-soft);
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.icon-btn:hover { background: var(--bg); }
+
+.cal-grid { padding: 16px 16px 20px; }
+.cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 8px; }
+.cal-day-name { text-align: center; font-size: 11px; font-weight: 600; color: var(--ink-dim); text-transform: uppercase; letter-spacing: .5px; padding: 4px 0; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-day {
+  aspect-ratio: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+  border-radius: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--ink);
+  transition: all .12s; position: relative;
+}
+.cal-day:hover:not(.empty):not(.past) { background: var(--bg); }
+.cal-day.empty { pointer-events: none; opacity: 0; }
+.cal-day.past { color: var(--ink-dim); pointer-events: none; }
+.cal-day.today { font-weight: 700; color: var(--green); }
+.dot { width: 5px; height: 5px; border-radius: 50%; display: none; }
+.cal-day.has-slots .dot { display: block; background: var(--green); }
+.cal-day.has-bookings .dot { display: block; background: var(--amber); }
+.cal-day.selected { background: var(--green) !important; color: #fff !important; }
+.cal-day.selected .dot { background: rgba(255,255,255,.6) !important; }
+
+.day-slots { padding: 16px 20px; }
+.day-slots-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+.slots-list { display: flex; flex-direction: column; gap: 6px; }
+.slot-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; background: var(--bg); border: 1.5px solid transparent; }
+.slot-row.booked { background: var(--green-bg); border-color: var(--green-light); }
+.slot-time { font-size: 13px; font-weight: 600; width: 48px; flex-shrink: 0; }
+.slot-patient { flex: 1; }
+.slot-patient strong { font-size: 13px; font-weight: 600; display: block; }
+.slot-patient span { font-size: 11px; color: var(--ink-dim); }
+.slot-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
+.badge-free { background: var(--white); color: var(--ink-dim); border: 1px solid var(--line); }
+.badge-booked { background: var(--green-light); color: var(--green); }
+.badge-new { background: var(--amber-bg); color: var(--amber); }
+.no-day-selected { text-align: center; padding: 40px 20px; font-size: 14px; color: var(--ink-dim); }
+.no-day-selected .big { font-size: 32px; margin-bottom: 8px; }
+
+.req-list { padding: 0; }
+.req-item { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.req-item:last-child { border-bottom: none; }
+.req-header { display: flex; align-items: center; justify-content: space-between; }
+.req-name { font-size: 14px; font-weight: 600; }
+.req-time { font-size: 11px; font-weight: 600; color: var(--green); background: var(--green-bg); padding: 2px 7px; border-radius: 5px; }
+.req-phone { font-size: 12px; color: var(--ink-dim); }
+.req-actions { display: flex; gap: 6px; margin-top: 6px; }
+.btn-confirm { flex: 1; background: var(--green); color: #fff; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 0; border-radius: 6px; transition: opacity .15s; }
+.btn-confirm:hover { opacity: .85; }
+.btn-decline { flex: 1; background: transparent; color: var(--ink-soft); border: 1px solid var(--line); font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; padding: 6px 0; border-radius: 6px; cursor: pointer; transition: all .15s; }
+.btn-decline:hover { border-color: var(--red); color: var(--red); }
+.empty-req { padding: 40px 20px; text-align: center; font-size: 13px; color: var(--ink-dim); }
+.empty-req .big { font-size: 28px; margin-bottom: 8px; }
+.new-badge { display: inline-block; background: var(--amber-bg); color: var(--amber); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: .4px; margin-left: 6px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.6 } }
+
+/* ── PATIENT VIEW ── */
+.patient-view { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 32px 20px 60px; }
+.patient-card { background: var(--white); border-radius: 18px; border: 1px solid var(--line); box-shadow: var(--shadow-md); width: 100%; max-width: 440px; overflow: hidden; }
+.patient-header { background: var(--green); padding: 24px 28px 20px; }
+.ph-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.ph-name { font-family: 'Instrument Serif', serif; font-size: 22px; color: #fff; }
+.ph-sub { font-size: 13px; color: rgba(255,255,255,.7); margin-top: 2px; }
+.patient-body { padding: 24px 28px; }
+
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px; }
+.form-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 9px; font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--ink); background: var(--bg); outline: none; transition: border-color .15s; }
+.form-input:focus { border-color: var(--green); background: var(--white); }
+.divider { border: none; border-top: 1px solid var(--line); margin: 20px 0; }
+
+.mini-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.mini-month { font-size: 14px; font-weight: 600; }
+.mini-icon-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--line); background: transparent; cursor: pointer; font-size: 13px; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; }
+.mini-days-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.mini-day-name { text-align: center; font-size: 10px; font-weight: 600; color: var(--ink-dim); padding: 3px 0; }
+.mini-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.mini-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink); transition: all .12s; }
+.mini-day:hover:not(.empty):not(.past):not(.no-slot) { background: var(--bg); }
+.mini-day.empty { pointer-events: none; opacity: 0; }
+.mini-day.past { color: var(--ink-dim); pointer-events: none; }
+.mini-day.no-slot { color: var(--line); pointer-events: none; }
+.mini-day.today { font-weight: 700; color: var(--green); }
+.mini-day.selected { background: var(--green); color: #fff !important; }
+
+.slot-section { margin-top: 16px; }
+.slot-section-title { font-size: 12px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
+.time-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.time-btn { padding: 10px 4px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all .12s; text-align: center; }
+.time-btn:hover { border-color: var(--green); color: var(--green); }
+.time-btn.selected { background: var(--green); border-color: var(--green); color: #fff; }
+.time-btn.taken { opacity: .35; pointer-events: none; text-decoration: line-through; }
+
+.submit-btn { width: 100%; padding: 13px; background: var(--green); color: #fff; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 10px; margin-top: 20px; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.submit-btn:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,125,95,.3); }
+.submit-btn:disabled { opacity: .5; pointer-events: none; transform: none; }
+
+.success-screen { display: none; flex-direction: column; align-items: center; text-align: center; padding: 48px 28px; }
+.success-screen.show { display: flex; }
+.success-circle { width: 64px; height: 64px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; margin-bottom: 20px; box-shadow: 0 8px 28px rgba(45,125,95,.3); animation: popIn .4s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-screen h3 { font-family: 'Instrument Serif', serif; font-size: 22px; margin-bottom: 8px; }
+.success-screen p { font-size: 14px; color: var(--ink-dim); line-height: 1.6; }
+.success-detail { background: var(--green-bg); border-radius: 10px; padding: 14px 18px; margin-top: 20px; text-align: left; width: 100%; }
+.success-detail div { font-size: 13px; color: var(--ink-soft); padding: 3px 0; }
+.success-detail strong { color: var(--ink); }
+
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 200; background: var(--ink); color: #fff; border-radius: 12px; padding: 12px 18px; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,.2); transform: translateY(80px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); max-width: 300px; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+.error-msg { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+.error-msg.show { display: block; }
+
+/* ── MODAL CARGA MANUAL ── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 80; padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-bg.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--white); border-radius: 16px;
+  width: 100%; max-width: 400px;
+  box-shadow: var(--shadow-md);
+  transform: translateY(16px); transition: transform .25s;
+  overflow: hidden;
+}
+.modal-bg.open .modal-box { transform: translateY(0); }
+.modal-head {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-head h3 { font-size: 16px; font-weight: 600; }
+.modal-close {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: 1px solid var(--line); background: transparent;
+  cursor: pointer; font-size: 16px; color: var(--ink-dim);
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-label { font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px; display: block; }
+.modal-input {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid var(--line); border-radius: 8px;
+  font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--ink);
+  background: var(--bg); outline: none; transition: border-color .15s;
+}
+.modal-input:focus { border-color: var(--green); background: var(--white); }
+.modal-footer { padding: 0 20px 18px; display: flex; gap: 8px; }
+.btn-modal-cancel {
+  flex: 1; padding: 10px; border: 1.5px solid var(--line);
+  border-radius: 8px; background: transparent; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink-soft);
+  transition: all .15s;
+}
+.btn-modal-cancel:hover { border-color: var(--ink); color: var(--ink); }
+.btn-modal-save {
+  flex: 2; padding: 10px; border: none;
+  border-radius: 8px; background: var(--green); cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: #fff;
+  transition: opacity .15s;
+}
+.btn-modal-save:hover { opacity: .88; }
+.btn-modal-save:disabled { opacity: .45; pointer-events: none; }
+.btn-add-turno {
+  background: var(--green); color: #fff; border: none; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+  padding: 6px 14px; border-radius: 7px;
+  display: flex; align-items: center; gap: 5px; transition: opacity .15s;
+}
+.btn-add-turno:hover { opacity: .88; }
+
+/* time slot grid in modal */
+.modal-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.modal-slot-btn {
+  padding: 8px 4px; border: 1.5px solid var(--line); border-radius: 7px;
+  background: var(--white); font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 500; color: var(--ink-soft);
+  cursor: pointer; transition: all .12s; text-align: center;
+}
+.modal-slot-btn:hover { border-color: var(--green); color: var(--green); }
+.modal-slot-btn.selected { background: var(--green); border-color: var(--green); color: #fff; }
+.modal-slot-btn.taken { opacity: .3; pointer-events: none; text-decoration: line-through; }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loader">
+  <div class="spinner"></div>
+</div>
+
+<!-- NAV -->
+<header class="app-nav">
+  <div class="logo"><div class="logo-dot"></div><span>TurnosApp</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('pro', this)">Mi Panel</button>
+    <button class="nav-tab" onclick="switchView('patient', this)">Vista Paciente</button>
+  </div>
+</header>
+
+<!-- ══ PROFESIONAL ══ -->
+<div id="view-pro" class="view active">
+  <div class="pro-wrap">
+    <h1 class="page-title">Hola, Dr. Martínez 👋</h1>
+    <p class="page-sub">Tu agenda del mes. Compartí tu link para recibir turnos.</p>
+
+    <div class="link-card">
+      <div class="link-card-left">
+        <span>Tu link público de turnos</span>
+        <div class="link-url" id="public-link-text">turnosapp.vercel.app/?p=martinez</div>
+      </div>
+      <div class="link-actions">
+        <button class="btn-copy" onclick="copyLink(this)">📋 Copiar link</button>
+        <button class="btn-preview" onclick="switchView('patient', document.querySelectorAll(\'.nav-tab\')[1])">Ver formulario →</button>
+      </div>
+    </div>
+
+    <div class="pro-grid">
+      <div class="card">
+        <div class="card-head">
+          <h3 id="pro-month-label"></h3>
+          <div class="nav-row">
+            <button class="icon-btn" onclick="proChangeMonth(-1)">‹</button>
+            <button class="icon-btn" onclick="proChangeMonth(1)">›</button>
+            <button class="btn-add-turno" onclick="openModal()" style="margin-left:6px;">＋ Cargar turno</button>
+          </div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-days-header">
+            <div class="cal-day-name">D</div><div class="cal-day-name">L</div>
+            <div class="cal-day-name">M</div><div class="cal-day-name">X</div>
+            <div class="cal-day-name">J</div><div class="cal-day-name">V</div>
+            <div class="cal-day-name">S</div>
+          </div>
+          <div class="cal-days" id="pro-cal-days"></div>
+        </div>
+        <div id="pro-day-detail" style="border-top:1px solid var(--line);">
+          <div class="no-day-selected"><div class="big">📅</div>Seleccioná un día para ver los turnos</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <div class="card-head">
+            <h3>Solicitudes <span id="req-badge" class="new-badge" style="display:none">0</span></h3>
+            <button class="icon-btn" onclick="loadAll()" title="Actualizar">↻</button>
+          </div>
+          <div id="req-list" class="req-list">
+            <div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PACIENTE ══ -->
+<div id="view-patient" class="view">
+  <div class="patient-view">
+    <div class="patient-card">
+      <div class="patient-header">
+        <div class="ph-label">Reservá tu turno con</div>
+        <div class="ph-name">Dr. Alejandro Martínez</div>
+        <div class="ph-sub">Clínica General · Corrientes</div>
+      </div>
+      <div class="patient-body" id="patient-form-body">
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input type="text" class="form-input" id="p-name" placeholder="Tu nombre y apellido" oninput="checkSubmit()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="tel" class="form-input" id="p-phone" placeholder="+54 9 362 ···" oninput="checkSubmit()">
+        </div>
+        <hr class="divider">
+
+        <div class="mini-cal-nav">
+          <button class="mini-icon-btn" onclick="patChangeMonth(-1)">‹</button>
+          <span class="mini-month" id="pat-month-label"></span>
+          <button class="mini-icon-btn" onclick="patChangeMonth(1)">›</button>
+        </div>
+        <div class="mini-days-header">
+          <div class="mini-day-name">D</div><div class="mini-day-name">L</div>
+          <div class="mini-day-name">M</div><div class="mini-day-name">X</div>
+          <div class="mini-day-name">J</div><div class="mini-day-name">V</div>
+          <div class="mini-day-name">S</div>
+        </div>
+        <div class="mini-days" id="pat-cal-days"></div>
+
+        <div class="slot-section" id="time-slot-section" style="display:none;">
+          <div class="slot-section-title" id="slot-date-title"></div>
+          <div class="time-buttons" id="time-buttons"></div>
+        </div>
+
+        <div class="error-msg" id="form-error">Hubo un error al enviar. Intentá de nuevo.</div>
+        <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Solicitar turno</button>
+      </div>
+      <div class="success-screen" id="success-screen">
+        <div class="success-circle">✓</div>
+        <h3>¡Turno solicitado!</h3>
+        <p>Tu solicitud fue enviada al Dr. Martínez.<br>Te contactaremos para confirmar.</p>
+        <div class="success-detail" id="success-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<!-- ══ MODAL CARGA MANUAL ══ -->
+<div class="modal-bg" id="modal-bg" onclick="closeModalBg(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Cargar turno manualmente</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div>
+          <label class="modal-label">Nombre</label>
+          <input type="text" class="modal-input" id="m-name" placeholder="Nombre y apellido" oninput="checkModal()">
+        </div>
+        <div>
+          <label class="modal-label">Teléfono</label>
+          <input type="tel" class="modal-input" id="m-phone" placeholder="+54 9 362 ···" oninput="checkModal()">
+        </div>
+      </div>
+      <div>
+        <label class="modal-label">Fecha</label>
+        <input type="date" class="modal-input" id="m-date" oninput="onModalDateChange()">
+      </div>
+      <div id="modal-slots-wrap" style="display:none;">
+        <label class="modal-label">Horario</label>
+        <div class="modal-slots" id="modal-slots"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-modal-save" id="modal-save-btn" onclick="saveManualTurno()" disabled>Guardar turno</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// CONFIGURACIÓN — pegá tus credenciales
+// ══════════════════════════════════════
+const SUPABASE_URL = 'https://sqqetiycodpfhoeqwguv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
+const PRO_SLUG    = 'martinez';
+const BASE_SLOTS  = ['09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30'];
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── STATE ──
+const today = new Date(); today.setHours(0,0,0,0);
+let proMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+let patMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+let proSelectedDay = null;
+let patSelectedDay = null;
+let patSelectedTime = null;
+let allBookings = {}; // { 'YYYY-MM-DD': [{...}] }
+
+// ── HELPERS ──
+function fmt(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function parseDate(s) { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function isWeekend(d) { const w=d.getDay(); return w===0||w===6; }
+function isPast(d) { return d<today; }
+function showLoader(v) { document.getElementById('loader').classList.toggle('hide', !v); }
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+// ══════════════════════════════════════
+// SUPABASE — cargar todos los turnos
+// ══════════════════════════════════════
+async function loadAll() {
+  showLoader(true);
+  try {
+    const { data, error } = await sb
+      .from('turnos')
+      .select('*')
+      .eq('profesional_slug', PRO_SLUG)
+      .order('fecha').order('hora');
+    if (error) throw error;
+    // agrupar por fecha
+    allBookings = {};
+    (data || []).forEach(t => {
+      if (!allBookings[t.fecha]) allBookings[t.fecha] = [];
+      allBookings[t.fecha].push(t);
+    });
+    renderProCal();
+    renderRequests();
+    renderPatCal();
+    if (proSelectedDay) renderProDayDetail(proSelectedDay, parseDate(proSelectedDay));
+  } catch(e) {
+    showToast('Error al cargar turnos');
+    console.error(e);
+  }
+  showLoader(false);
+}
+
+// ══════════════════════════════════════
+// SUPABASE — guardar turno nuevo
+// ══════════════════════════════════════
+async function saveTurno(nombre, telefono, fecha, hora) {
+  const { data, error } = await sb.from('turnos').insert([{
+    profesional_slug: PRO_SLUG,
+    nombre_paciente: nombre,
+    telefono,
+    fecha,
+    hora,
+    estado: 'pending'
+  }]).select();
+  if (error) throw error;
+  return data[0];
+}
+
+// ══════════════════════════════════════
+// SUPABASE — confirmar / rechazar
+// ══════════════════════════════════════
+async function confirmBooking(id) {
+  showLoader(true);
+  const { error } = await sb.from('turnos').update({ estado: 'confirmed' }).eq('id', id);
+  if (error) { showToast('Error al confirmar'); showLoader(false); return; }
+  showToast('Turno confirmado ✓');
+  await loadAll();
+}
+
+async function declineBooking(id) {
+  showLoader(true);
+  const { error } = await sb.from('turnos').delete().eq('id', id);
+  if (error) { showToast('Error al rechazar'); showLoader(false); return; }
+  showToast('Turno rechazado');
+  await loadAll();
+}
+
+// ── CALENDARIOS ──
+function renderProCal() {
+  document.getElementById('pro-month-label').textContent = `${MONTHS[proMonth.getMonth()]} ${proMonth.getFullYear()}`;
+  const grid = document.getElementById('pro-cal-days');
+  grid.innerHTML = '';
+  const first = new Date(proMonth.getFullYear(), proMonth.getMonth(), 1);
+  const last  = new Date(proMonth.getFullYear(), proMonth.getMonth()+1, 0);
+  for (let i=0;i<first.getDay();i++) {
+    const e=document.createElement('div'); e.className='cal-day empty'; grid.appendChild(e);
+  }
+  for (let d=1;d<=last.getDate();d++) {
+    const date=new Date(proMonth.getFullYear(),proMonth.getMonth(),d);
+    const key=fmt(date);
+    const div=document.createElement('div');
+    div.className='cal-day';
+    div.innerHTML=`${d}<div class="dot"></div>`;
+    if (date.getTime()===today.getTime()) div.classList.add('today');
+    if (isPast(date)||isWeekend(date)) { div.classList.add('past'); grid.appendChild(div); continue; }
+    if (allBookings[key]&&allBookings[key].length>0) div.classList.add('has-bookings');
+    else div.classList.add('has-slots');
+    if (proSelectedDay===key) div.classList.add('selected');
+    div.onclick=()=>selectProDay(key,date);
+    grid.appendChild(div);
+  }
+}
+
+function selectProDay(key, date) {
+  proSelectedDay=key;
+  renderProCal();
+  renderProDayDetail(key,date);
+}
+
+function renderProDayDetail(key, date) {
+  const detail=document.getElementById('pro-day-detail');
+  const dayB=allBookings[key]||[];
+  let html=`<div class="day-slots"><div class="day-slots-title">${DAYS[date.getDay()]} ${date.getDate()} de ${MONTHS[date.getMonth()]}</div><div class="slots-list">`;
+  BASE_SLOTS.forEach(time=>{
+    const bk=dayB.find(b=>b.hora===time);
+    if (bk) {
+      const bc=bk.estado==='pending'?'badge-new':'badge-booked';
+      const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
+      html+=`<div class="slot-row booked">
+        <div class="slot-time">${time}</div>
+        <div class="slot-patient"><strong>${bk.nombre_paciente}</strong><span>${bk.telefono}</span></div>
+        <div class="slot-badge ${bc}">${bt}</div>
+      </div>`;
+    } else {
+      html+=`<div class="slot-row">
+        <div class="slot-time">${time}</div>
+        <div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div>
+        <div class="slot-badge badge-free">Libre</div>
+      </div>`;
+    }
+  });
+  html+=`</div></div>`;
+  detail.innerHTML=html;
+}
+
+function proChangeMonth(dir) {
+  proMonth=new Date(proMonth.getFullYear(),proMonth.getMonth()+dir,1);
+  renderProCal();
+}
+
+function renderRequests() {
+  const pending=[];
+  Object.entries(allBookings).forEach(([key,list])=>{
+    list.forEach(b=>{ if(b.estado==='pending') pending.push({key,...b}); });
+  });
+  const el=document.getElementById('req-list');
+  const badge=document.getElementById('req-badge');
+  if (pending.length===0) {
+    badge.style.display='none';
+    el.innerHTML=`<div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>`;
+    return;
+  }
+  badge.style.display='inline-block';
+  badge.textContent=`${pending.length} nueva${pending.length>1?'s':''}`;
+  el.innerHTML=pending.map(b=>{
+    const d=parseDate(b.fecha);
+    return `<div class="req-item">
+      <div class="req-header">
+        <span class="req-name">${b.nombre_paciente}</span>
+        <span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
+      </div>
+      <div class="req-phone">📱 ${b.telefono}</div>
+      <div class="req-actions">
+        <button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button>
+        <button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PATIENT CALENDAR ──
+function renderPatCal() {
+  document.getElementById('pat-month-label').textContent=`${MONTHS[patMonth.getMonth()]} ${patMonth.getFullYear()}`;
+  const grid=document.getElementById('pat-cal-days');
+  grid.innerHTML='';
+  const first=new Date(patMonth.getFullYear(),patMonth.getMonth(),1);
+  const last=new Date(patMonth.getFullYear(),patMonth.getMonth()+1,0);
+  for (let i=0;i<first.getDay();i++){
+    const e=document.createElement('div');e.className='mini-day empty';grid.appendChild(e);
+  }
+  for (let d=1;d<=last.getDate();d++){
+    const date=new Date(patMonth.getFullYear(),patMonth.getMonth(),d);
+    const key=fmt(date);
+    const div=document.createElement('div');
+    div.className='mini-day';
+    div.textContent=d;
+    if (date.getTime()===today.getTime()) div.classList.add('today');
+    if (isPast(date)||isWeekend(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    const taken=(allBookings[key]||[]).map(b=>b.hora);
+    const free=BASE_SLOTS.filter(s=>!taken.includes(s));
+    if (free.length===0){div.classList.add('no-slot');grid.appendChild(div);continue;}
+    if (patSelectedDay===key) div.classList.add('selected');
+    div.onclick=()=>selectPatDay(key,date);
+    grid.appendChild(div);
+  }
+}
+
+function selectPatDay(key,date){
+  patSelectedDay=key;
+  patSelectedTime=null;
+  renderPatCal();
+  const taken=(allBookings[key]||[]).map(b=>b.hora);
+  document.getElementById('slot-date-title').textContent=`${DAYS[date.getDay()]} ${date.getDate()} de ${MONTHS[date.getMonth()]}`;
+  const btns=document.getElementById('time-buttons');
+  btns.innerHTML=BASE_SLOTS.map(t=>`<button class="time-btn${taken.includes(t)?' taken':''}" onclick="selectTime('${t}',this)">${t}</button>`).join('');
+  document.getElementById('time-slot-section').style.display='block';
+  checkSubmit();
+}
+
+function selectTime(time,btn){
+  document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  patSelectedTime=time;
+  checkSubmit();
+}
+
+function patChangeMonth(dir){
+  patMonth=new Date(patMonth.getFullYear(),patMonth.getMonth()+dir,1);
+  patSelectedDay=null; patSelectedTime=null;
+  document.getElementById('time-slot-section').style.display='none';
+  renderPatCal(); checkSubmit();
+}
+
+function checkSubmit(){
+  const name=document.getElementById('p-name').value.trim();
+  const phone=document.getElementById('p-phone').value.trim();
+  document.getElementById('submit-btn').disabled=!(name&&phone&&patSelectedDay&&patSelectedTime);
+}
+
+async function submitForm(){
+  const name=document.getElementById('p-name').value.trim();
+  const phone=document.getElementById('p-phone').value.trim();
+  const errEl=document.getElementById('form-error');
+  errEl.classList.remove('show');
+  document.getElementById('submit-btn').disabled=true;
+  document.getElementById('submit-btn').textContent='Enviando...';
+  try {
+    await saveTurno(name, phone, patSelectedDay, patSelectedTime);
+    // Éxito
+    document.getElementById('patient-form-body').style.display='none';
+    document.getElementById('success-screen').classList.add('show');
+    const d=parseDate(patSelectedDay);
+    document.getElementById('success-detail').innerHTML=`
+      <div><strong>Paciente:</strong> ${name}</div>
+      <div><strong>Fecha:</strong> ${DAYS[d.getDay()]} ${d.getDate()} de ${MONTHS[d.getMonth()]}</div>
+      <div><strong>Hora:</strong> ${patSelectedTime}</div>
+      <div><strong>Estado:</strong> Pendiente de confirmación</div>`;
+    await loadAll();
+    showToast(`📩 Nueva solicitud de ${name}`);
+  } catch(e) {
+    errEl.classList.add('show');
+    document.getElementById('submit-btn').disabled=false;
+    document.getElementById('submit-btn').textContent='Solicitar turno';
+    console.error(e);
+  }
+}
+
+function switchView(view, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function copyLink(btn){
+  const url=document.getElementById('public-link-text').textContent;
+  navigator.clipboard.writeText(url).catch(()=>{});
+  btn.textContent='✓ Copiado!';
+  setTimeout(()=>btn.textContent='📋 Copiar link',2000);
+}
+
+// ══════════════════════════════════════
+// MODAL — CARGA MANUAL
+// ══════════════════════════════════════
+let modalSelectedTime = null;
+
+function openModal() {
+  // Pre-fill date with selected day or today
+  const d = proSelectedDay || fmt(today);
+  document.getElementById('m-date').value = d;
+  document.getElementById('m-name').value = '';
+  document.getElementById('m-phone').value = '';
+  modalSelectedTime = null;
+  document.getElementById('modal-slots-wrap').style.display = 'none';
+  document.getElementById('modal-save-btn').disabled = true;
+  onModalDateChange();
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(() => document.getElementById('m-name').focus(), 200);
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+function closeModalBg(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
+}
+
+function onModalDateChange() {
+  const dateVal = document.getElementById('m-date').value;
+  if (!dateVal) { document.getElementById('modal-slots-wrap').style.display='none'; return; }
+  const taken = (allBookings[dateVal] || []).map(b => b.hora);
+  const wrap = document.getElementById('modal-slots-wrap');
+  const grid = document.getElementById('modal-slots');
+  modalSelectedTime = null;
+  wrap.style.display = 'block';
+  grid.innerHTML = BASE_SLOTS.map(t => {
+    const isTaken = taken.includes(t);
+    return `<button class="modal-slot-btn${isTaken?' taken':''}" onclick="selectModalTime('${t}',this)">${t}</button>`;
+  }).join('');
+  checkModal();
+}
+
+function selectModalTime(time, btn) {
+  document.querySelectorAll('.modal-slot-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  modalSelectedTime = time;
+  checkModal();
+}
+
+function checkModal() {
+  const name  = document.getElementById('m-name').value.trim();
+  const phone = document.getElementById('m-phone').value.trim();
+  const date  = document.getElementById('m-date').value;
+  document.getElementById('modal-save-btn').disabled = !(name && phone && date && modalSelectedTime);
+}
+
+async function saveManualTurno() {
+  const name  = document.getElementById('m-name').value.trim();
+  const phone = document.getElementById('m-phone').value.trim();
+  const date  = document.getElementById('m-date').value;
+  const btn   = document.getElementById('modal-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+  try {
+    const { error } = await sb.from('turnos').insert([{
+      profesional_slug: PRO_SLUG,
+      nombre_paciente: name,
+      telefono: phone,
+      fecha: date,
+      hora: modalSelectedTime,
+      estado: 'confirmed'   // carga manual = confirmado directo
+    }]);
+    if (error) throw error;
+    closeModal();
+    showToast(`✓ Turno cargado — ${name}`);
+    await loadAll();
+    // Seleccionar el día recién cargado en el calendario
+    selectProDay(date, parseDate(date));
+  } catch(e) {
+    showToast('Error al guardar el turno');
+    console.error(e);
+  }
+  btn.disabled = false;
+  btn.textContent = 'Guardar turno';
+}
+
+// ── INIT ──
+loadAll();
+</script>
+</body>
+</html>
