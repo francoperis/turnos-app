@@ -389,12 +389,20 @@ function renderProDayDetail(key,date){
   let html=`<div class="day-slots"><div class="day-slots-header"><div class="day-slots-title">${DAYS[date.getDay()]} ${date.getDate()} de ${MONTHS[date.getMonth()]}</div><button class="btn-block${isBlocked?' unblock':''}" onclick="toggleBlock('${key}')">${isBlocked?'🔓 Desbloquear':'🚫 Bloquear día'}</button></div>`;
   if(isBlocked)html+=`<div class="blocked-msg">⛔ Día bloqueado — no aparece para pacientes</div>`;
   html+=`<div class="slots-list">`;
+  const isToday=date.getTime()===today.getTime();
+  const nowHour=new Date().getHours();
+  const nowMin=new Date().getMinutes();
   BASE_SLOTS.forEach(time=>{
     const bk=dayB.find(b=>b.hora===time);
+    const slotHour=parseInt(time.split(':')[0]);
+    const slotMin=parseInt(time.split(':')[1]);
+    const isPastSlot=isToday&&(slotHour<nowHour||(slotHour===nowHour&&slotMin<=nowMin));
     if(bk){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
       html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><span>${bk.telefono}</span></div><div class="slot-badge ${bc}">${bt}</div></div>`;
+    } else if(isPastSlot){
+      html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--line)">Hora pasada</span></div></div>`;
     } else if(!isBlocked){
       html+=`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}',event)">🔗 Generar link</button></div>`;
     }
