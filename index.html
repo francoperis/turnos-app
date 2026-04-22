@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TurnosApp">
+<meta name="theme-color" content="#2d7d5f">
 <title>TurnosApp — Panel Profesional</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -464,11 +469,45 @@ function closeLinkModalBg(e){if(e.target===document.getElementById('link-modal-b
 function copyGeneratedLink(){navigator.clipboard.writeText(generatedLink).catch(()=>{});showNotif('Link copiado ✓');closeLinkModal();}
 function copyLink(btn){navigator.clipboard.writeText(document.getElementById('public-link-text').textContent).catch(()=>{});btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar link',2000);}
 
+// Registrar Service Worker para PWA y notificaciones
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').then(reg=>{
+    console.log('SW registrado:', reg.scope);
+  }).catch(err=>console.log('SW error:', err));
+}
+
+function requestNotifPermission(){
+  if('Notification' in window && Notification.permission==='default'){
+    Notification.requestPermission().then(perm=>{
+      console.log('Notificaciones:', perm);
+    });
+  }
+}
+
+function sendPushNotif(title, body){
+  if('Notification' in window && Notification.permission==='granted'){
+    // Usar service worker si está disponible (necesario para iOS)
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.ready.then(reg=>{
+        reg.showNotification(title, {
+          body: body,
+          icon: 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4c5.png',
+          tag: 'turno-nuevo',
+          renotify: true,
+          vibrate: [200, 100, 200]
+        });
+      });
+    } else {
+      new Notification(title, { body: body, tag: 'turno-nuevo', renotify: true });
+    }
+  }
+}
+
 if(sessionStorage.getItem('auth')==='ok'){
   document.getElementById('login-screen').classList.remove('show');
   document.getElementById('panel').style.display='block';
   document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html';
-  loadAll();startRealtime();
+  loadAll();startRealtime();requestNotifPermission();
 }
 </script>
 </body>
