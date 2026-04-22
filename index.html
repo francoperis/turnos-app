@@ -64,9 +64,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 /* CALENDAR */
 .cal-grid{padding:10px 12px 12px;}
 .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:8px;}
-.cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
+.cal-day-name{text-align:center;font-size:12px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);transition:all .12s;}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink);transition:all .12s;}
 .cal-day:hover:not(.empty):not(.past){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
 .cal-day.past{color:var(--ink-dim);pointer-events:none;}
@@ -402,7 +402,7 @@ function renderProDayDetail(key,date){
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
       html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><span>${bk.telefono}</span></div><div class="slot-badge ${bc}">${bt}</div></div>`;
     } else if(isPastSlot){
-      html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--line)">Hora pasada</span></div></div>`;
+      html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
     } else if(!isBlocked){
       html+=`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}',event)">🔗 Generar link</button></div>`;
     }
