@@ -74,11 +74,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
     <div id="form-body" class="card-body">
       <div class="form-group">
         <label class="form-label">Nombre completo</label>
-        <input type="text" class="form-input" id="p-name" placeholder="Tu nombre y apellido" oninput="checkSubmit()">
+        <input type="text" class="form-input" id="p-name" oninput="checkSubmit()">
       </div>
       <div class="form-group">
         <label class="form-label">Telefono</label>
-        <input type="tel" class="form-input" id="p-phone" placeholder="+54 9 362 ..." oninput="checkSubmit()">
+        <input type="tel" class="form-input" id="p-phone" oninput="checkSubmit()">
       </div>
       <hr class="divider">
       <div class="cal-nav">
@@ -110,7 +110,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
 const PRO_SLUG='arauz';
-const BASE_SLOTS=['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'];
+const BASE_SLOTS=['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const today=new Date();today.setHours(0,0,0,0);
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -120,7 +120,7 @@ let selectedDay=null,selectedTime=null,takenSlots={};
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function parseDate(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
 function isPast(d){return d<today;}
-function isWeekend(d){return d.getDay()===0||d.getDay()===6;}
+function isWeekend(d){return d.getDay()===0;} // solo domingo deshabilitado
 function showLoader(v){document.getElementById('loader').classList.toggle('hide',!v);}
 async function loadTaken(){
   showLoader(true);
@@ -143,6 +143,8 @@ function renderCal(){
     var key=fmt(date);var div=document.createElement('div');div.className='day';div.textContent=d;
     if(date.getTime()===today.getTime())div.classList.add('today');
     if(isPast(date)||isWeekend(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    var maxDate=new Date(today);maxDate.setDate(today.getDate()+60);
+    if(date>maxDate){div.classList.add('past');grid.appendChild(div);continue;}
     var taken=takenSlots[key]||[];
     if(BASE_SLOTS.filter(function(s){return !taken.includes(s);}).length===0){div.classList.add('no-slot');grid.appendChild(div);continue;}
     if(selectedDay===key)div.classList.add('selected');
