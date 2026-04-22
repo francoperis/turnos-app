@@ -324,10 +324,17 @@ async function loadAll(){
 
 function startRealtime(){
   sb.channel('turnos-rt')
-    .on('postgres_changes',{event:'*',schema:'public',table:'turnos',filter:`profesional_slug=eq.${PRO_SLUG}`},payload=>{
-      if(payload.eventType==='INSERT')showNotif('Nueva solicitud: '+payload.new.nombre_paciente);
-      loadAll();
-    }).subscribe();
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'turnos'},payload=>{
+      if(payload.new&&payload.new.profesional_slug===PRO_SLUG){
+        showNotif('Nueva solicitud: '+payload.new.nombre_paciente);
+        loadAll();
+      }
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'turnos'},payload=>{
+      if(payload.new&&payload.new.profesional_slug===PRO_SLUG)loadAll();
+    })
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'turnos'},()=>{loadAll();})
+    .subscribe(status=>{console.log('Realtime:',status);});
 }
 
 async function confirmBooking(id){
@@ -389,7 +396,7 @@ function renderProDayDetail(key,date){
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
       html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><span>${bk.telefono}</span></div><div class="slot-badge ${bc}">${bt}</div></div>`;
     } else if(!isBlocked){
-      html+=`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}')">🔗 Generar link</button></div>`;
+      html+=`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}',event)">🔗 Generar link</button></div>`;
     }
   });
   html+=`</div></div>`;
@@ -436,10 +443,13 @@ async function saveManualTurno(){
   btn.disabled=false;btn.textContent='Guardar turno';
 }
 
-function generateLink(fecha,hora){
+function generateLink(fecha,hora,e){
+  if(e){e.preventDefault();e.stopPropagation();}
   generatedLink=window.location.origin+'/paciente.html?fecha='+fecha+'&hora='+encodeURIComponent(hora)+'&p='+PRO_SLUG;
   document.getElementById('link-result').textContent=generatedLink;
   document.getElementById('link-modal-bg').classList.add('open');
+  // prevent any navigation
+  event.preventDefault();event.stopPropagation();
 }
 function closeLinkModal(){document.getElementById('link-modal-bg').classList.remove('open');}
 function closeLinkModalBg(e){if(e.target===document.getElementById('link-modal-bg'))closeLinkModal();}
