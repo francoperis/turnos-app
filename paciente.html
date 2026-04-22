@@ -132,7 +132,19 @@ async function loadTaken(){
   }catch(e){console.error(e);}
   showLoader(false);renderCal();
 }
+function getMaxDate(){var m=new Date(today);m.setDate(today.getDate()+60);return m;}
 function renderCal(){
+  var maxDate=getMaxDate();
+  // Ocultar flechas si no hay más meses disponibles
+  var prevBtn=document.querySelector('.cal-nav-btn:first-child');
+  var nextBtn=document.querySelector('.cal-nav-btn:last-child');
+  var prevMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);
+  var nextMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);
+  // prev: ocultar si el mes anterior es antes del mes actual de hoy
+  prevBtn.style.visibility=(currentMonth<=new Date(today.getFullYear(),today.getMonth(),1))?'hidden':'visible';
+  // next: ocultar si el inicio del siguiente mes supera maxDate
+  nextBtn.style.visibility=(nextMonth>maxDate)?'hidden':'visible';
+
   document.getElementById('cal-month').textContent=MONTHS[currentMonth.getMonth()]+' '+currentMonth.getFullYear();
   var grid=document.getElementById('days-grid');grid.innerHTML='';
   var first=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),1);
@@ -142,9 +154,7 @@ function renderCal(){
     var date=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),d);
     var key=fmt(date);var div=document.createElement('div');div.className='day';div.textContent=d;
     if(date.getTime()===today.getTime())div.classList.add('today');
-    if(isPast(date)||isWeekend(date)){div.classList.add('past');grid.appendChild(div);continue;}
-    var maxDate=new Date(today);maxDate.setDate(today.getDate()+60);
-    if(date>maxDate){div.classList.add('past');grid.appendChild(div);continue;}
+    if(isPast(date)||isWeekend(date)||date>maxDate){div.classList.add('past');grid.appendChild(div);continue;}
     var taken=takenSlots[key]||[];
     if(BASE_SLOTS.filter(function(s){return !taken.includes(s);}).length===0){div.classList.add('no-slot');grid.appendChild(div);continue;}
     if(selectedDay===key)div.classList.add('selected');
@@ -160,7 +170,15 @@ function selectDay(key,date){
   document.getElementById('slots-section').style.display='block';checkSubmit();
 }
 function selectTime(time,btn){document.querySelectorAll('.time-btn').forEach(function(b){b.classList.remove('selected');});btn.classList.add('selected');selectedTime=time;checkSubmit();}
-function changeMonth(dir){currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+dir,1);selectedDay=null;selectedTime=null;document.getElementById('slots-section').style.display='none';renderCal();checkSubmit();}
+function changeMonth(dir){
+  var next=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+dir,1);
+  var maxDate=getMaxDate();
+  var minMonth=new Date(today.getFullYear(),today.getMonth(),1);
+  if(next<minMonth||next>maxDate)return;
+  currentMonth=next;selectedDay=null;selectedTime=null;
+  document.getElementById('slots-section').style.display='none';
+  renderCal();checkSubmit();
+}
 function checkSubmit(){var n=document.getElementById('p-name').value.trim();var p=document.getElementById('p-phone').value.trim();document.getElementById('submit-btn').disabled=!(n&&p&&selectedDay&&selectedTime);}
 async function submitForm(){
   var name=document.getElementById('p-name').value.trim();var phone=document.getElementById('p-phone').value.trim();
