@@ -100,6 +100,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .slot-patient{flex:1;}
 .slot-patient strong{font-size:13px;font-weight:600;display:block;}
 .slot-patient span{font-size:11px;color:var(--ink-dim);}
+.slot-patient .phone-row{display:flex;align-items:center;gap:6px;}
 .slot-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;flex-shrink:0;}
 .badge-free{background:var(--white);color:var(--ink-dim);border:1px solid var(--line);}
 .badge-booked{background:var(--green-light);color:var(--green);}
@@ -115,7 +116,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .req-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 .req-name{font-size:14px;font-weight:600;}
 .req-time{font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);padding:2px 7px;border-radius:5px;white-space:nowrap;}
-.req-phone{font-size:12px;color:var(--ink-dim);}
+.req-phone{font-size:12px;color:var(--ink-dim);display:flex;align-items:center;gap:8px;}
+.btn-copy-phone{font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
+.btn-copy-phone:hover{border-color:var(--green);color:var(--green);}
 .req-actions{display:flex;gap:6px;margin-top:6px;}
 .btn-confirm{flex:1;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 0;border-radius:6px;transition:opacity .15s;}
 .btn-confirm:hover{opacity:.85;}
@@ -406,7 +409,7 @@ function renderProDayDetail(key,date){
     if(bk){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
-      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><span>${bk.telefono}</span></div><div class="slot-badge ${bc}">${bt}</div></div>`;
+      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div></div>`;
     } else if(isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
     } else if(!isBlocked){
@@ -424,7 +427,7 @@ function renderRequests(){
   const el=document.getElementById('req-list');const badge=document.getElementById('req-badge');
   if(pending.length===0){badge.style.display='none';el.innerHTML=`<div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>`;return;}
   badge.style.display='inline-block';badge.textContent=`${pending.length} nueva${pending.length>1?'s':''}`;
-  el.innerHTML=pending.map(b=>{const d=parseDate(b.fecha);return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone">📱 ${b.telefono}</div><div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;}).join('');
+  el.innerHTML=pending.map(b=>{const d=parseDate(b.fecha);return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone">📱 ${b.telefono}<button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button></div><div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;}).join('');
 }
 
 function openModal(){
@@ -468,6 +471,14 @@ function generateLink(fecha,hora,e){
 function closeLinkModal(){document.getElementById('link-modal-bg').classList.remove('open');}
 function closeLinkModalBg(e){if(e.target===document.getElementById('link-modal-bg'))closeLinkModal();}
 function copyGeneratedLink(){navigator.clipboard.writeText(generatedLink).catch(()=>{});showNotif('Link copiado ✓');closeLinkModal();}
+function copyPhone(phone, btn){
+  navigator.clipboard.writeText(phone).catch(()=>{});
+  btn.textContent='✓';
+  btn.style.borderColor='var(--green)';
+  btn.style.color='var(--green)';
+  setTimeout(()=>{btn.textContent='Copiar';btn.style.borderColor='';btn.style.color='';},2000);
+}
+
 function copyLink(btn){navigator.clipboard.writeText(document.getElementById('public-link-text').textContent).catch(()=>{});btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar link',2000);}
 
 // Registrar Service Worker para PWA y notificaciones
