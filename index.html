@@ -485,21 +485,21 @@ function requestNotifPermission(){
 }
 
 function sendPushNotif(title, body){
-  if('Notification' in window && Notification.permission==='granted'){
-    // Usar service worker si está disponible (necesario para iOS)
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.ready.then(reg=>{
-        reg.showNotification(title, {
-          body: body,
-          icon: 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4c5.png',
-          tag: 'turno-nuevo',
-          renotify: true,
-          vibrate: [200, 100, 200]
-        });
-      });
-    } else {
-      new Notification(title, { body: body, tag: 'turno-nuevo', renotify: true });
-    }
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  const options = {
+    body: body,
+    tag: 'turno-nuevo',
+    renotify: true,
+    vibrate: [200, 100, 200]
+  };
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+    navigator.serviceWorker.ready.then(reg=>{
+      reg.showNotification(title, options);
+    }).catch(()=>{
+      new Notification(title, options);
+    });
+  } else {
+    new Notification(title, options);
   }
 }
 
