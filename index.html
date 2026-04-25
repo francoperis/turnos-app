@@ -105,6 +105,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .badge-free{background:var(--white);color:var(--ink-dim);border:1px solid var(--line);}
 .badge-booked{background:var(--green-light);color:var(--green);}
 .badge-new{background:var(--amber-bg);color:var(--amber);}
+.btn-delete-slot{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin-left:6px;flex-shrink:0;}
+.btn-delete-slot:hover{border-color:var(--red);color:var(--red);background:#fef2f2;}
 .slot-link-btn{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;white-space:nowrap;}
 .slot-link-btn:hover{border-color:var(--green);color:var(--green);}
 .no-day-selected{text-align:center;padding:24px 20px;font-size:14px;color:var(--ink-dim);}
@@ -409,7 +411,7 @@ function renderProDayDetail(key,date){
     if(bk){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
-      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div></div>`;
+      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div><button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
     } else if(isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
     } else if(!isBlocked){
@@ -471,6 +473,14 @@ function generateLink(fecha,hora,e){
 function closeLinkModal(){document.getElementById('link-modal-bg').classList.remove('open');}
 function closeLinkModalBg(e){if(e.target===document.getElementById('link-modal-bg'))closeLinkModal();}
 function copyGeneratedLink(){navigator.clipboard.writeText(generatedLink).catch(()=>{});showNotif('Link copiado ✓');closeLinkModal();}
+async function deleteBooking(id, nombre){
+  if(!confirm('¿Eliminás el turno de ' + nombre + '? Esta acción no se puede deshacer.')) return;
+  showLoader(true);
+  const{error}=await sb.from('turnos').delete().eq('id',id);
+  if(error){showNotif('Error al eliminar','red');console.error(error);showLoader(false);return;}
+  showNotif('Turno eliminado','red');await loadAll();
+}
+
 function copyPhone(phone, btn){
   navigator.clipboard.writeText(phone).catch(()=>{});
   btn.textContent='✓';
