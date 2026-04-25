@@ -64,6 +64,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .submit-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(45,125,95,.3);}
 .submit-btn:disabled{opacity:.45;pointer-events:none;transform:none;}
 .error-msg{font-size:12px;color:var(--red);margin-top:8px;text-align:center;display:none;}
+.field-error{border-color:var(--red)!important;background:#fef2f2!important;}
+.field-hint{font-size:11px;color:var(--red);margin-top:4px;display:none;}
+.field-hint.show{display:block;}
 .error-msg.show{display:block;}
 
 /* SUCCESS */
@@ -92,11 +95,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
     <div id="form-body" class="card-body">
       <div class="form-group">
         <label class="form-label">Nombre completo</label>
-        <input type="text" class="form-input" id="p-name" oninput="checkSubmit()">
+        <input type="text" class="form-input" id="p-name" oninput="validateName(this);checkSubmit()" maxlength="60">
+        <div class="field-hint" id="hint-name">Solo se permiten letras y espacios</div>
       </div>
       <div class="form-group">
         <label class="form-label">Teléfono</label>
-        <input type="tel" class="form-input" id="p-phone" oninput="checkSubmit()">
+        <input type="tel" class="form-input" id="p-phone" oninput="validatePhone(this);checkSubmit()" maxlength="20">
+        <div class="field-hint" id="hint-phone">Solo se permiten números, espacios y +</div>
       </div>
       <hr class="divider">
 
@@ -253,10 +258,38 @@ function changeMonth(dir){
   renderCal();checkSubmit();
 }
 
+function validateName(input){
+  const val=input.value;
+  const clean=val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ ]/g,'');
+  if(val!==clean){input.value=clean;}
+  const hint=document.getElementById('hint-name');
+  if(clean.trim().length>0&&clean.trim().length<2){
+    input.classList.add('field-error');hint.classList.add('show');
+  } else {
+    input.classList.remove('field-error');hint.classList.remove('show');
+  }
+}
+
+function validatePhone(input){
+  const val=input.value;
+  const clean=val.replace(/[^0-9+\s\-]/g,'');
+  if(val!==clean){input.value=clean;}
+  const hint=document.getElementById('hint-phone');
+  const digits=clean.replace(/\D/g,'');
+  if(clean.length>0&&digits.length<6){
+    input.classList.add('field-error');hint.classList.add('show');
+  } else {
+    input.classList.remove('field-error');hint.classList.remove('show');
+  }
+}
+
 function checkSubmit(){
   const n=document.getElementById('p-name').value.trim();
   const p=document.getElementById('p-phone').value.trim();
-  document.getElementById('submit-btn').disabled=!(n&&p&&selectedDay&&selectedTime);
+  const digits=p.replace(/\D/g,'');
+  const nameOk=n.length>=2&&/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ ]+$/.test(n);
+  const phoneOk=digits.length>=6;
+  document.getElementById('submit-btn').disabled=!(nameOk&&phoneOk&&selectedDay&&selectedTime);
 }
 
 async function submitForm(){
