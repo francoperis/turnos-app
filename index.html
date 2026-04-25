@@ -505,10 +505,12 @@ function closeConfirmModal(){
 }
 
 async function confirmDelete(){
-  if(!pendingDeleteId)return;
-  closeConfirmModal();
+  const idToDelete=pendingDeleteId;
+  if(!idToDelete)return;
+  document.getElementById('confirm-modal-bg').classList.remove('open');
+  pendingDeleteId=null;
   showLoader(true);
-  const{error}=await sb.from('turnos').delete().eq('id',pendingDeleteId);
+  const{error}=await sb.from('turnos').delete().eq('id',idToDelete);
   if(error){showNotif('Error al eliminar','red');console.error(error);showLoader(false);return;}
   showNotif('Turno eliminado','red');await loadAll();
 }
