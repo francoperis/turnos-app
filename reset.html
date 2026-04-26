@@ -1,1 +1,157 @@
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TurnosApp — Nueva contrasena</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--red:#dc2626;--shadow-md:0 4px 24px rgba(0,0,0,.10);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:var(--white);border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow-md);width:100%;max-width:380px;overflow:hidden;}
+.card-header{background:var(--green);padding:28px;text-align:center;}
+.logo{font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-bottom:4px;}
+.card-header p{font-size:13px;color:rgba(255,255,255,.7);}
+.card-body{padding:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;text-align:left;}
+.field-wrap{position:relative;}
+.inp{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:9px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.inp:focus{border-color:var(--green);background:var(--white);}
+.inp::placeholder{font-size:14px;color:var(--ink-dim);}
+.toggle-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-dim);font-family:'Outfit',sans-serif;}
+.btn{width:100%;padding:12px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;border-radius:9px;margin-top:6px;transition:opacity .15s;}
+.btn:hover{opacity:.88;}
+.btn:disabled{opacity:.45;pointer-events:none;}
+.error{font-size:12px;color:var(--red);margin-bottom:12px;padding:8px 12px;background:#fef2f2;border:0.5px solid #fca5a5;border-radius:8px;display:none;}
+.error.show{display:block;}
+.success{display:none;flex-direction:column;align-items:center;text-align:center;padding:32px 28px;}
+.success.show{display:flex;}
+.success-circle{width:56px;height:56px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin-bottom:16px;box-shadow:0 6px 20px rgba(45,125,95,.25);}
+.success h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;}
+.success p{font-size:13px;color:var(--ink-dim);line-height:1.6;margin-bottom:20px;}
+.strength{height:4px;border-radius:2px;margin-top:6px;transition:all .3s;}
+.hint{font-size:11px;margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <div class="logo">TurnosApp</div>
+    <p>Crear nueva contrasena</p>
+  </div>
+  <div id="form-body" class="card-body">
+    <div class="error" id="error-msg"></div>
+    <div class="field">
+      <label>Nueva contrasena</label>
+      <div class="field-wrap">
+        <input type="password" class="inp" id="new-pass" placeholder="Minimo 8 caracteres" oninput="checkStrength();checkForm()">
+        <button type="button" class="toggle-btn" onclick="togglePass('new-pass',this)">VER</button>
+      </div>
+      <div class="strength" id="strength-bar" style="background:var(--line);width:0%;"></div>
+      <div class="hint" id="strength-hint"></div>
+    </div>
+    <div class="field">
+      <label>Repetir contrasena</label>
+      <div class="field-wrap">
+        <input type="password" class="inp" id="confirm-pass" placeholder="Repeti la contrasena" oninput="checkForm()">
+        <button type="button" class="toggle-btn" onclick="togglePass('confirm-pass',this)">VER</button>
+      </div>
+    </div>
+    <button class="btn" id="save-btn" onclick="savePassword()" disabled>Guardar nueva contrasena</button>
+  </div>
+  <div class="success" id="success-screen">
+    <div class="success-circle">&#10003;</div>
+    <h3>Contrasena actualizada!</h3>
+    <p>Tu contrasena fue cambiada correctamente. Ya podes iniciar sesion.</p>
+    <button class="btn" onclick="window.location.href='/'">Ir al login</button>
+  </div>
+</div>
+<script>
+const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+ 
+// Leer token del hash y establecer sesion
+window.addEventListener('load', async function(){
+  var hash=window.location.hash.substring(1);
+  var params={};
+  hash.split('&').forEach(function(p){
+    var parts=p.split('=');
+    params[parts[0]]=decodeURIComponent(parts[1]||'');
+  });
+  if(params.access_token&&params.refresh_token){
+    var result=await sb.auth.setSession({
+      access_token:params.access_token,
+      refresh_token:params.refresh_token
+    });
+    if(result.error){
+      var errEl=document.getElementById('error-msg');
+      errEl.textContent='El link expiró o no es válido. Pedí uno nuevo.';
+      errEl.classList.add('show');
+      document.getElementById('save-btn').disabled=true;
+    }
+  } else {
+    var errEl=document.getElementById('error-msg');
+    errEl.textContent='Link inválido. Pedí un nuevo link de recuperación.';
+    errEl.classList.add('show');
+    document.getElementById('save-btn').disabled=true;
+  }
+});
+ 
+function togglePass(id,btn){
+  var inp=document.getElementById(id);
+  if(inp.type==='password'){inp.type='text';btn.textContent='OCULTAR';}
+  else{inp.type='password';btn.textContent='VER';}
+}
+ 
+function checkStrength(){
+  var pass=document.getElementById('new-pass').value;
+  var bar=document.getElementById('strength-bar');
+  var hint=document.getElementById('strength-hint');
+  var strength=0;
+  if(pass.length>=8)strength++;
+  if(/[A-Z]/.test(pass))strength++;
+  if(/[0-9]/.test(pass))strength++;
+  if(/[^A-Za-z0-9]/.test(pass))strength++;
+  var colors=['#dc2626','#d97706','#2d7d5f','#2d7d5f'];
+  var labels=['Muy debil','Regular','Buena','Muy segura'];
+  var widths=['25%','50%','75%','100%'];
+  if(pass.length===0){bar.style.width='0%';hint.textContent='';return;}
+  bar.style.background=colors[strength-1]||colors[0];
+  bar.style.width=widths[strength-1]||'25%';
+  hint.textContent=labels[strength-1]||labels[0];
+  hint.style.color=colors[strength-1]||colors[0];
+}
+ 
+function checkForm(){
+  var pass=document.getElementById('new-pass').value;
+  var confirm=document.getElementById('confirm-pass').value;
+  document.getElementById('save-btn').disabled=!(pass.length>=8&&pass===confirm);
+}
+ 
+async function savePassword(){
+  var pass=document.getElementById('new-pass').value;
+  var confirm=document.getElementById('confirm-pass').value;
+  var errEl=document.getElementById('error-msg');
+  var btn=document.getElementById('save-btn');
+  errEl.classList.remove('show');
+  if(pass!==confirm){errEl.textContent='Las contrasenas no coinciden.';errEl.classList.add('show');return;}
+  if(pass.length<8){errEl.textContent='Minimo 8 caracteres.';errEl.classList.add('show');return;}
+  btn.textContent='Guardando...';btn.disabled=true;
+  var result=await sb.auth.updateUser({password:pass});
+  if(result.error){
+    errEl.textContent='Error al actualizar. El link puede haber expirado.';
+    errEl.classList.add('show');
+    btn.textContent='Guardar nueva contrasena';btn.disabled=false;
+    return;
+  }
+  document.getElementById('form-body').style.display='none';
+  document.getElementById('success-screen').classList.add('show');
+}
+</script>
+</body>
+</html>
+ 
