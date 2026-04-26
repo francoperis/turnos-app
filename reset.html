@@ -73,40 +73,58 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
- 
-// Leer token del hash y establecer sesion
+
+// Manejar token — soporta hash (implicit) y code (PKCE)
 window.addEventListener('load', async function(){
+  var errEl=document.getElementById('error-msg');
+  var btn=document.getElementById('save-btn');
+
+  // Caso 1: token en el hash (implicit flow)
   var hash=window.location.hash.substring(1);
-  var params={};
-  hash.split('&').forEach(function(p){
-    var parts=p.split('=');
-    params[parts[0]]=decodeURIComponent(parts[1]||'');
-  });
-  if(params.access_token&&params.refresh_token){
+  var hashParams={};
+  if(hash){
+    hash.split('&').forEach(function(p){
+      var parts=p.split('=');
+      hashParams[decodeURIComponent(parts[0])]=decodeURIComponent(parts[1]||'');
+    });
+  }
+
+  // Caso 2: code en query string (PKCE flow)
+  var urlParams=new URLSearchParams(window.location.search);
+  var code=urlParams.get('code');
+
+  if(hashParams.access_token && hashParams.refresh_token){
+    // Implicit flow
     var result=await sb.auth.setSession({
-      access_token:params.access_token,
-      refresh_token:params.refresh_token
+      access_token:hashParams.access_token,
+      refresh_token:hashParams.refresh_token
     });
     if(result.error){
-      var errEl=document.getElementById('error-msg');
-      errEl.textContent='El link expiró o no es válido. Pedí uno nuevo.';
+      errEl.textContent='El link expiró. Pedí uno nuevo.';
       errEl.classList.add('show');
-      document.getElementById('save-btn').disabled=true;
+      btn.disabled=true;
+    }
+  } else if(code){
+    // PKCE flow
+    var result=await sb.auth.exchangeCodeForSession(code);
+    if(result.error){
+      errEl.textContent='El link expiró. Pedí uno nuevo.';
+      errEl.classList.add('show');
+      btn.disabled=true;
     }
   } else {
-    var errEl=document.getElementById('error-msg');
     errEl.textContent='Link inválido. Pedí un nuevo link de recuperación.';
     errEl.classList.add('show');
-    document.getElementById('save-btn').disabled=true;
+    btn.disabled=true;
   }
 });
- 
+
 function togglePass(id,btn){
   var inp=document.getElementById(id);
   if(inp.type==='password'){inp.type='text';btn.textContent='OCULTAR';}
   else{inp.type='password';btn.textContent='VER';}
 }
- 
+
 function checkStrength(){
   var pass=document.getElementById('new-pass').value;
   var bar=document.getElementById('strength-bar');
@@ -125,13 +143,13 @@ function checkStrength(){
   hint.textContent=labels[strength-1]||labels[0];
   hint.style.color=colors[strength-1]||colors[0];
 }
- 
+
 function checkForm(){
   var pass=document.getElementById('new-pass').value;
   var confirm=document.getElementById('confirm-pass').value;
   document.getElementById('save-btn').disabled=!(pass.length>=8&&pass===confirm);
 }
- 
+
 async function savePassword(){
   var pass=document.getElementById('new-pass').value;
   var confirm=document.getElementById('confirm-pass').value;
