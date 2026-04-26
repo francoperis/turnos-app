@@ -201,7 +201,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
       <label class="login-label">Email</label>
       <input type="email" class="login-input" id="recover-email" placeholder="tu@email.com" required autocomplete="email" >
       <button class="login-btn" onclick="doRecover()" id="recover-btn">Enviar link</button>
-      <div class="login-error" id="recover-error">No encontramos ese email.</div>
+      <div class="login-error" id="recover-error"></div>
       <div class="login-error" id="recover-success" style="color:#2d7d5f;">Te enviamos el link al email.</div>
       <div style="text-align:center;margin-top:12px;"><span style="font-size:12px;color:#2d7d5f;cursor:pointer;" onclick="showLogin()">← Volver al login</span></div>
     </div>
@@ -374,8 +374,8 @@ async function doRecover(){
     redirectTo:window.location.origin+'/reset'
   });
   btn.innerHTML='Enviar link';btn.disabled=false;
-  if(error){errEl.textContent='No encontramos ese email.';errEl.classList.add('show');}
-  else{sucEl.classList.add('show');}
+  if(error){errEl.textContent='Ocurrió un error. Intentá de nuevo.';errEl.classList.add('show');}
+  else{sucEl.textContent='Te enviamos el link al email. Revisá tu bandeja.';sucEl.classList.add('show');}
 }
 
 function showRecover(){
