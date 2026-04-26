@@ -33,10 +33,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .login-logo{font-family:'Playfair Display',serif;font-size:28px;font-weight:500;color:#fff;letter-spacing:-.3px;text-align:center;}
 .login-header p{font-size:13px;color:rgba(255,255,255,.7);margin-top:6px;font-family:'Outfit',sans-serif;font-weight:400;}
 .login-body{padding:28px;}
-.login-label{font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:block;text-align:center;}
-.login-input{width:100%;padding:14px;border:1.5px solid var(--line);border-radius:10px;font-family:'Outfit',sans-serif;font-size:24px;font-weight:600;letter-spacing:8px;text-align:center;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.login-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;text-align:left;}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:9px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:400;letter-spacing:normal;text-align:left;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
 .login-input:focus{border-color:var(--green);background:var(--white);}
-.login-input::placeholder{letter-spacing:4px;font-size:18px;color:var(--ink-dim);}
+.login-input::placeholder{font-size:14px;letter-spacing:normal;color:var(--ink-dim);}
 .login-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;border-radius:10px;margin-top:16px;transition:opacity .15s;letter-spacing:.2px;}
 .login-btn:hover{opacity:.88;}
 .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;display:none;font-weight:500;}
@@ -172,16 +172,38 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 </div>
 
 <div class="login-screen show" id="login-screen">
-  <div class="login-card">
+  <div id="login-card-wrap"><div class="login-card">
     <div class="login-header">
       <div class="login-logo">TurnosApp</div>
       <p>Panel del profesional</p>
     </div>
     <div class="login-body">
-      <label class="login-label">Ingresá tu PIN</label>
-      <input type="password" class="login-input" id="pin-input" maxlength="6" placeholder="····" onkeydown="if(event.key==='Enter')checkPin()">
-      <button class="login-btn" onclick="checkPin()">Entrar</button>
-      <div class="login-error" id="login-error">PIN incorrecto. Intentá de nuevo.</div>
+      <label class="login-label">Email</label>
+      <input type="email" class="login-input" id="login-email" placeholder="tu@email.com" required autocomplete="email"  onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <label class="login-label" style="margin-top:12px;">Contraseña</label>
+      <div style="position:relative;">
+      <input type="password" class="login-input" id="login-pass" placeholder="Tu contraseña" required autocomplete="current-password" style="padding-right:44px;" onkeydown="if(event.key==='Enter')doLogin()">
+      <button type="button" onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-dim);font-family:'Outfit',sans-serif;letter-spacing:.3px;" id="pass-eye">VER</button>
+      </div>
+      <button class="login-btn" onclick="doLogin()" id="login-btn">Entrar</button>
+      <div class="login-error" id="login-error">Email o contraseña incorrectos.</div>
+      <div style="text-align:center;margin-top:12px;"><span style="font-size:12px;color:#2d7d5f;cursor:pointer;" onclick="showRecover()">¿Olvidaste tu contraseña?</span></div>
+    </div>
+  </div></div>
+
+  <!-- Recover -->
+  <div class="login-card" id="recover-card" style="display:none;">
+    <div class="login-header">
+      <div class="login-logo">TurnosApp</div>
+      <p>Recuperar contraseña</p>
+    </div>
+    <div class="login-body">
+      <label class="login-label">Email</label>
+      <input type="email" class="login-input" id="recover-email" placeholder="tu@email.com" required autocomplete="email" >
+      <button class="login-btn" onclick="doRecover()" id="recover-btn">Enviar link</button>
+      <div class="login-error" id="recover-error">No encontramos ese email.</div>
+      <div class="login-error" id="recover-success" style="color:#2d7d5f;">Te enviamos el link al email.</div>
+      <div style="text-align:center;margin-top:12px;"><span style="font-size:12px;color:#2d7d5f;cursor:pointer;" onclick="showLogin()">← Volver al login</span></div>
     </div>
   </div>
 </div>
@@ -314,24 +336,70 @@ function showNotif(msg,type='green'){
   clearTimeout(p._t);p._t=setTimeout(()=>p.classList.remove('show'),3200);
 }
 
-function checkPin(){
-  if(document.getElementById('pin-input').value===PIN){
-    sessionStorage.setItem('auth','ok');
-    document.getElementById('login-screen').classList.remove('show');
-    document.getElementById('panel').style.display='block';
-    document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html';
-    loadAll();startRealtime();
-  } else {
-    document.getElementById('login-error').classList.add('show');
-    document.getElementById('pin-input').value='';
-    document.getElementById('pin-input').focus();
-  }
+function togglePass(){
+  const inp=document.getElementById('login-pass');
+  const eye=document.getElementById('pass-eye');
+  if(inp.type==='password'){inp.type='text';eye.textContent='OCULTAR';}
+  else{inp.type='password';eye.textContent='VER';}
 }
-function logout(){
-  sessionStorage.removeItem('auth');
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const btn=document.getElementById('login-btn');
+  const errEl=document.getElementById('login-error');
+  errEl.classList.remove('show');
+  if(!email||!pass){errEl.textContent='Completá email y contraseña.';errEl.classList.add('show');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='El email no tiene un formato válido.';errEl.classList.add('show');return;}
+  btn.textContent='Entrando...';btn.disabled=true;
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){
+    errEl.textContent='Email o contraseña incorrectos.';
+    errEl.classList.add('show');
+    btn.textContent='Entrar';btn.disabled=false;
+    return;
+  }
+  showPanel();
+}
+
+async function doRecover(){
+  const email=document.getElementById('recover-email').value.trim();
+  const errEl=document.getElementById('recover-error');
+  const sucEl=document.getElementById('recover-success');
+  errEl.classList.remove('show');sucEl.classList.remove('show');
+  if(!email)return;
+  const btn=document.getElementById('recover-btn');
+  btn.textContent='Enviando...';btn.disabled=true;
+  const{error}=await sb.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.origin+'/reset'
+  });
+  btn.textContent='Enviar link';btn.disabled=false;
+  if(error){errEl.classList.add('show');}
+  else{sucEl.classList.add('show');}
+}
+
+function showRecover(){
+  document.getElementById('login-card-wrap').style.display='none';
+  document.getElementById('recover-card').style.display='block';
+}
+function showLogin(){
+  document.getElementById('recover-card').style.display='none';
+  document.getElementById('login-card-wrap').style.display='block';
+}
+
+function showPanel(){
+  document.getElementById('login-screen').classList.remove('show');
+  document.getElementById('panel').style.display='block';
+  document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html';
+  loadAll();startRealtime();
+}
+
+async function logout(){
+  await sb.auth.signOut();
   document.getElementById('panel').style.display='none';
   document.getElementById('login-screen').classList.add('show');
-  document.getElementById('pin-input').value='';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pass').value='';
   document.getElementById('login-error').classList.remove('show');
 }
 
