@@ -351,12 +351,12 @@ async function doLogin(){
   errEl.classList.remove('show');
   if(!email||!pass){errEl.textContent='Completá email y contraseña.';errEl.classList.add('show');return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='El email no tiene un formato válido.';errEl.classList.add('show');return;}
-  btn.textContent='Entrando...';btn.disabled=true;
+  btn.innerHTML='<div class="spinner-sm show"></div>Entrando...';btn.disabled=true;
   const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){
     errEl.textContent='Email o contraseña incorrectos.';
     errEl.classList.add('show');
-    btn.textContent='Entrar';btn.disabled=false;
+    btn.innerHTML='Entrar';btn.disabled=false;
     return;
   }
   showPanel();
@@ -369,12 +369,12 @@ async function doRecover(){
   errEl.classList.remove('show');sucEl.classList.remove('show');
   if(!email)return;
   const btn=document.getElementById('recover-btn');
-  btn.textContent='Enviando...';btn.disabled=true;
+  btn.innerHTML='<div class="spinner-sm show"></div>Enviando...';btn.disabled=true;
   const{error}=await sb.auth.resetPasswordForEmail(email,{
     redirectTo:window.location.origin+'/reset'
   });
-  btn.textContent='Enviar link';btn.disabled=false;
-  if(error){errEl.classList.add('show');}
+  btn.innerHTML='Enviar link';btn.disabled=false;
+  if(error){errEl.textContent='No encontramos ese email.';errEl.classList.add('show');}
   else{sucEl.classList.add('show');}
 }
 
@@ -391,6 +391,7 @@ function showPanel(){
   document.getElementById('login-screen').classList.remove('show');
   document.getElementById('panel').style.display='block';
   document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html';
+  showLoader(true);
   loadAll();startRealtime();
 }
 
