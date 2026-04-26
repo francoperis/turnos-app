@@ -1,6 +1,8 @@
 {
+  "redirects": [
+    { "source": "/reset", "destination": "/reset.html", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/reset", "destination": "/reset.html" },
     { "source": "/paciente", "destination": "/paciente.html" }
   ]
 }
