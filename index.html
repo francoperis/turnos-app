@@ -438,13 +438,13 @@ function renderProDayDetail(key,date){
     if(bk){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
-      const modalidadIcon=bk.modalidad==='virtual'?'📱':'🏢';
+      const modalidadText=bk.modalidad==='virtual'?'Virtual':'Presencial';
       const pagadoStyle=bk.pagado
         ?'font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#edf5f1;color:#0f6e56;flex-shrink:0;cursor:pointer;border:none;font-family:Outfit,sans-serif;'
         :'font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;';
-      const pagadoText=bk.pagado?'💰 Pagado':'Marcar pagado';
+      const pagadoText=bk.pagado?'Pagado':'Sin pagar';
       const pagadoBadge='<button style="'+pagadoStyle+'" onclick="togglePagado(this)" data-id="'+bk.id+'" data-pagado="'+bk.pagado+'">'+pagadoText+'</button>';
-      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente} <span style="font-weight:400;font-size:11px;color:var(--ink-dim);">${modalidadIcon}</span></strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}<button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
+      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span style="font-size:11px;color:var(--ink-dim);">${modalidadText}</span></div><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}<button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
     } else if(isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
     } else if(!isBlocked){
@@ -462,7 +462,7 @@ function renderRequests(){
   const el=document.getElementById('req-list');const badge=document.getElementById('req-badge');
   if(pending.length===0){badge.style.display='none';el.innerHTML=`<div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>`;return;}
   badge.style.display='inline-block';badge.textContent=`${pending.length} nueva${pending.length>1?'s':''}`;
-  el.innerHTML=pending.map(b=>{const d=parseDate(b.fecha);const modIcon=b.modalidad==='virtual'?'📱 Virtual':'🏢 Presencial';return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>📞 ${b.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button><span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);">${modIcon}</span></div><div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;}).join('');
+  el.innerHTML=pending.map(b=>{const d=parseDate(b.fecha);const modIcon=b.modalidad==='virtual'?'📱 Virtual':'🏢 Presencial';return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>📞 ${b.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button><span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);">${b.modalidad==='virtual'?'Virtual':'Presencial'}</span></div><div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;}).join('');
 }
 
 function openModal(){
