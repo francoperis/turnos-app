@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -94,13 +95,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-block.unblock:hover{background:var(--green-bg);}
 .blocked-msg{background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);text-align:center;margin-bottom:8px;}
 .slots-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;}
-.slot-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:var(--bg);border:1.5px solid transparent;}
+.slot-row{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:9px;background:var(--bg);border:1.5px solid transparent;flex-wrap:wrap;}
 .slot-row.booked{background:var(--green-bg);border-color:var(--green-light);}
-.slot-time{font-size:13px;font-weight:600;width:48px;flex-shrink:0;}
-.slot-patient{flex:1;}
-.slot-patient strong{font-size:13px;font-weight:600;display:block;}
+.slot-time{font-size:13px;font-weight:600;width:44px;flex-shrink:0;padding-top:2px;}
+.slot-patient{flex:1;min-width:120px;}
+.slot-patient strong{font-size:13px;font-weight:600;display:block;word-break:break-word;}
 .slot-patient span{font-size:11px;color:var(--ink-dim);}
-.slot-patient .phone-row{display:flex;align-items:center;gap:6px;}
+.slot-patient .phone-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px;}
+.slot-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;width:100%;padding-left:52px;}
 .slot-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;flex-shrink:0;}
 .badge-free{background:var(--white);color:var(--ink-dim);border:1px solid var(--line);}
 .badge-booked{background:var(--green-light);color:var(--green);}
@@ -240,6 +242,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL CARGA MANUAL -->
+
 <div class="modal-bg" id="modal-bg" onclick="closeModalBg(event)">
   <div class="modal-box">
     <div class="modal-head"><h3>Cargar turno</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -266,7 +269,9 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL LINK FIJO -->
+
 <!-- MODAL CONFIRMAR ELIMINAR -->
+
 <div class="modal-bg" id="confirm-modal-bg">
   <div class="modal-box" style="max-width:360px;">
     <div class="modal-head" style="border-bottom:none;padding-bottom:8px;">
@@ -444,7 +449,7 @@ function renderProDayDetail(key,date){
         :'font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;';
       const pagadoText=bk.pagado?'Pagado':'Sin pagar';
       const pagadoBadge='<button style="'+pagadoStyle+'" onclick="togglePagado(this)" data-id="'+bk.id+'" data-pagado="'+bk.pagado+'">'+pagadoText+'</button>';
-      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span style="font-size:11px;color:var(--ink-dim);">${modalidadText}</span></div><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}<button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
+      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span style="font-size:11px;color:var(--ink-dim);">${modalidadText}</span></div><button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button><div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}</div></div>`;
     } else if(isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
     } else if(!isBlocked){
@@ -606,5 +611,6 @@ if(sessionStorage.getItem('auth')==='ok'){
   loadAll();startRealtime();requestNotifPermission();
 }
 </script>
+
 </body>
 </html>
