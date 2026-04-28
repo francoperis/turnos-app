@@ -44,7 +44,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .day-name{text-align:center;font-size:12px;font-weight:600;color:var(--ink-dim);padding:3px 0;}
 .days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink);transition:all .12s;}
-.day:hover:not(.empty):not(.past):not(.no-slot){background:var(--bg);}
+.day:hover:not(.empty):not(.past):not(.no-slot):not(.selected){background:var(--bg);}
 .day.empty{pointer-events:none;opacity:0;}
 .day.past{color:var(--ink-dim);pointer-events:none;}
 .day.no-slot{color:var(--line);pointer-events:none;}
@@ -258,6 +258,19 @@ function changeMonth(dir){
   renderCal();checkSubmit();
 }
 
+let selectedMod='presencial';
+function setMod(m){
+  selectedMod=m;
+  const bp=document.getElementById('mod-presencial');
+  const bv=document.getElementById('mod-virtual');
+  if(m==='presencial'){
+    bp.style.background='#2d7d5f';bp.style.color='#fff';bp.style.borderColor='#2d7d5f';
+    bv.style.background='#f7f5f2';bv.style.color='#888';bv.style.borderColor='#e8e4df';
+  } else {
+    bv.style.background='#2d7d5f';bv.style.color='#fff';bv.style.borderColor='#2d7d5f';
+    bp.style.background='#f7f5f2';bp.style.color='#888';bp.style.borderColor='#e8e4df';
+  }
+}
 function validateName(input){
   const val=input.value;
   const clean=val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ ]/g,'');
@@ -298,7 +311,7 @@ async function submitForm(){
   const errEl=document.getElementById('error-msg');errEl.classList.remove('show');
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='Enviando...';
   try{
-    const{error}=await sb.from('turnos').insert([{profesional_slug:PRO_SLUG,nombre_paciente:name,telefono:phone,fecha:selectedDay,hora:selectedTime,estado:'pending'}]);
+    const{error}=await sb.from('turnos').insert([{profesional_slug:PRO_SLUG,nombre_paciente:name,telefono:phone,fecha:selectedDay,hora:selectedTime,estado:'pending',modalidad:selectedMod}]);
     if(error)throw error;
     document.getElementById('form-body').style.display='none';
     document.getElementById('success-screen').classList.add('show');
