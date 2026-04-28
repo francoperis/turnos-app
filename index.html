@@ -73,7 +73,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .cal-day-name{text-align:center;font-size:12px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
 .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink);transition:all .12s;}
-.cal-day:hover:not(.empty):not(.past){background:var(--bg);}
+.cal-day:hover:not(.empty):not(.past):not(.selected){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
 .cal-day.past{color:var(--ink-dim);pointer-events:none;}
 .cal-day.today{font-weight:700;color:var(--green);}
@@ -141,7 +141,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .modal-body{padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
 .modal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .modal-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block;}
-.modal-input{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.modal-input{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;box-sizing:border-box;min-width:0;}
+input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width:100%;}
+@media(max-width:420px){.modal-row{grid-template-columns:1fr;}}
 .modal-input:focus{border-color:var(--green);background:var(--white);}
 .modal-footer{padding:0 20px 18px;display:flex;gap:8px;}
 .btn-modal-cancel{flex:1;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--ink-soft);transition:all .15s;}
@@ -248,6 +250,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
       </div>
       <div><label class="modal-label">Fecha</label><input type="date" class="modal-input" id="m-date" oninput="onModalDateChange()"></div>
       <div id="modal-slots-wrap" style="display:none;"><label class="modal-label">Horario</label><div class="modal-slots" id="modal-slots"></div></div>
+      <div>
+        <label class="modal-label">Modalidad</label>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button type="button" id="mod-presencial" onclick="setModalidad('presencial')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--green);background:var(--green);color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Presencial</button>
+          <button type="button" id="mod-virtual" onclick="setModalidad('virtual')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink-soft);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Virtual</button>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
@@ -429,7 +438,9 @@ function renderProDayDetail(key,date){
     if(bk){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
-      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div><button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
+      const modalidadIcon=bk.modalidad==='virtual'?'📱':'🏢';
+      const pagadoBadge=bk.pagado?'<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#edf5f1;color:#0f6e56;flex-shrink:0;">💰 Pagado</span>':'<button style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;" onclick="marcarPagado('${bk.id}',this)">Marcar pagado</button>';
+      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente} <span style="font-weight:400;font-size:11px;color:var(--ink-dim);">${modalidadIcon}</span></strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}<button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
     } else if(isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
     } else if(!isBlocked){
@@ -473,7 +484,7 @@ async function saveManualTurno(){
   const name=document.getElementById('m-name').value.trim(),phone=document.getElementById('m-phone').value.trim(),date=document.getElementById('m-date').value;
   const btn=document.getElementById('modal-save-btn');btn.disabled=true;btn.textContent='Guardando...';
   try{
-    const{error}=await sb.from('turnos').insert([{profesional_slug:PRO_SLUG,nombre_paciente:name,telefono:phone,fecha:date,hora:modalSelectedTime,estado:'confirmed'}]);
+    const{error}=await sb.from('turnos').insert([{profesional_slug:PRO_SLUG,nombre_paciente:name,telefono:phone,fecha:date,hora:modalSelectedTime,estado:'confirmed',modalidad:modalidadActual}]);
     if(error)throw error;
     closeModal();showNotif('Turno cargado — '+name);await loadAll();selectProDay(date,parseDate(date));
   }catch(e){showNotif('Error al guardar','red');console.error(e);}
@@ -513,6 +524,28 @@ async function confirmDelete(){
   const{error}=await sb.from('turnos').delete().eq('id',idToDelete);
   if(error){showNotif('Error al eliminar','red');console.error(error);showLoader(false);return;}
   showNotif('Turno eliminado','red');await loadAll();
+}
+
+let modalidadActual='presencial';
+
+function setModalidad(m){
+  modalidadActual=m;
+  const bp=document.getElementById('mod-presencial');
+  const bv=document.getElementById('mod-virtual');
+  if(m==='presencial'){
+    bp.style.background='var(--green)';bp.style.color='#fff';bp.style.borderColor='var(--green)';
+    bv.style.background='var(--bg)';bv.style.color='var(--ink-soft)';bv.style.borderColor='var(--line)';
+  } else {
+    bv.style.background='var(--green)';bv.style.color='#fff';bv.style.borderColor='var(--green)';
+    bp.style.background='var(--bg)';bp.style.color='var(--ink-soft)';bp.style.borderColor='var(--line)';
+  }
+}
+
+async function marcarPagado(id, btn){
+  btn.textContent='...';btn.disabled=true;
+  const{error}=await sb.from('turnos').update({pagado:true}).eq('id',id);
+  if(error){btn.textContent='Marcar pagado';btn.disabled=false;return;}
+  showNotif('Turno marcado como pagado');await loadAll();
 }
 
 function copyPhone(phone, btn){
