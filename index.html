@@ -439,12 +439,11 @@ function renderProDayDetail(key,date){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
       const modalidadIcon=bk.modalidad==='virtual'?'📱':'🏢';
-      let pagadoBadge;
-      if(bk.pagado){
-        pagadoBadge='<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#edf5f1;color:#0f6e56;flex-shrink:0;">💰 Pagado</span>';
-      } else {
-        pagadoBadge='<button style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;" onclick="marcarPagado(this)" data-id="'+bk.id+'">Marcar pagado</button>';
-      }
+      const pagadoStyle=bk.pagado
+        ?'font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#edf5f1;color:#0f6e56;flex-shrink:0;cursor:pointer;border:none;font-family:Outfit,sans-serif;'
+        :'font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;';
+      const pagadoText=bk.pagado?'💰 Pagado':'Marcar pagado';
+      const pagadoBadge='<button style="'+pagadoStyle+'" onclick="togglePagado(this)" data-id="'+bk.id+'" data-pagado="'+bk.pagado+'">'+pagadoText+'</button>';
       html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente} <span style="font-weight:400;font-size:11px;color:var(--ink-dim);">${modalidadIcon}</span></strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}<button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
     } else if(isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
@@ -546,12 +545,14 @@ function setModalidad(m){
   }
 }
 
-async function marcarPagado(btn){
+async function togglePagado(btn){
   const id=btn.getAttribute('data-id');
+  const esPagado=btn.getAttribute('data-pagado')==='true';
+  const nuevoEstado=!esPagado;
   btn.textContent='...';btn.disabled=true;
-  const{error}=await sb.from('turnos').update({pagado:true}).eq('id',id);
-  if(error){btn.textContent='Marcar pagado';btn.disabled=false;return;}
-  showNotif('Turno marcado como pagado');await loadAll();
+  const{error}=await sb.from('turnos').update({pagado:nuevoEstado}).eq('id',id);
+  if(error){btn.textContent=esPagado?'💰 Pagado':'Marcar pagado';btn.disabled=false;return;}
+  showNotif(nuevoEstado?'Marcado como pagado':'Marcado como no pagado');await loadAll();
 }
 
 function copyPhone(phone, btn){
