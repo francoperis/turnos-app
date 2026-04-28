@@ -103,6 +103,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
         <input type="tel" class="form-input" id="p-phone" oninput="validatePhone(this);checkSubmit()" maxlength="20">
         <div class="field-hint" id="hint-phone">Solo se permiten números, espacios y +</div>
       </div>
+      <div class="form-group">
+        <label class="form-label">Modalidad</label>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button type="button" id="mod-presencial" onclick="setMod('presencial')" style="flex:1;padding:10px;border-radius:9px;border:1.5px solid #2d7d5f;background:#2d7d5f;color:#fff;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Presencial</button>
+          <button type="button" id="mod-virtual" onclick="setMod('virtual')" style="flex:1;padding:10px;border-radius:9px;border:1.5px solid #e8e4df;background:#f7f5f2;color:#888;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Virtual</button>
+        </div>
+      </div>
       <hr class="divider">
 
       <!-- Modo link fijo -->
