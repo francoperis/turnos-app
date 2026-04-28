@@ -443,7 +443,7 @@ function renderProDayDetail(key,date){
       if(bk.pagado){
         pagadoBadge='<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#edf5f1;color:#0f6e56;flex-shrink:0;">💰 Pagado</span>';
       } else {
-        pagadoBadge='<button style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;" onclick="marcarPagado('+JSON.stringify(bk.id)+',this)">Marcar pagado</button>';
+        pagadoBadge='<button style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;" onclick="marcarPagado(this)" data-id="'+bk.id+'">Marcar pagado</button>';
       }
       html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente} <span style="font-weight:400;font-size:11px;color:var(--ink-dim);">${modalidadIcon}</span></strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div></div><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}<button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button></div>`;
     } else if(isPastSlot){
@@ -546,7 +546,8 @@ function setModalidad(m){
   }
 }
 
-async function marcarPagado(id, btn){
+async function marcarPagado(btn){
+  const id=btn.getAttribute('data-id');
   btn.textContent='...';btn.disabled=true;
   const{error}=await sb.from('turnos').update({pagado:true}).eq('id',id);
   if(error){btn.textContent='Marcar pagado';btn.disabled=false;return;}
