@@ -74,9 +74,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .cal-day-name{text-align:center;font-size:12px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
 .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink);transition:all .12s;}
-.cal-day:hover:not(.empty):not(.past):not(.selected){background:var(--bg);}
+.cal-day:hover:not(.empty):not(.selected){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
-.cal-day.past{color:var(--ink-dim);pointer-events:none;}
+.cal-day.past{color:var(--ink-dim);cursor:pointer;}
 .cal-day.today{font-weight:700;color:var(--green);}
 .cal-day.blocked{background:#fef2f2;color:var(--red);}
 .dot{width:8px;height:8px;border-radius:50%;display:none;}
@@ -415,7 +415,13 @@ function renderProCal(){
     const key=fmt(date);const div=document.createElement('div');div.className='cal-day';
     div.innerHTML=d+'<div class="dot"></div>';
     if(date.getTime()===today.getTime())div.classList.add('today');
-    if(isPast(date)||isSunday(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    if(isSunday(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    if(isPast(date)){
+      div.classList.add('past');
+      if(proSelectedDay===key)div.classList.add('selected');
+      div.onclick=()=>selectProDay(key,date);
+      grid.appendChild(div);continue;
+    }
     if(blockedDays.has(key))div.classList.add('blocked');
     else if(allBookings[key]&&allBookings[key].length>0)div.classList.add('has-bookings');
     else div.classList.add('has-slots');
@@ -453,7 +459,7 @@ function renderProDayDetail(key,date){
     } else if(isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
     } else if(!isBlocked){
-      html+=`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}',event)">🔗 Generar link</button></div>`;
+      html+=isPastDay?`<div class="slot-row"><div class="slot-time" style="color:var(--line)">${time}</div><div class="slot-patient"><span style="color:var(--line)">—</span></div></div>`:`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}',event)">🔗 Generar link</button></div>`;
     }
   });
   html+=`</div></div>`;
