@@ -438,6 +438,7 @@ function renderProDayDetail(key,date){
   let html=`<div class="day-slots"><div class="day-slots-header"><div class="day-slots-title">${DAYS[date.getDay()]} ${date.getDate()} de ${MONTHS[date.getMonth()]}</div><button class="btn-block${isBlocked?' unblock':''}" onclick="toggleBlock('${key}')">${isBlocked?'🔓 Desbloquear':'🚫 Bloquear día'}</button></div>`;
   if(isBlocked)html+=`<div class="blocked-msg">⛔ Día bloqueado — no aparece para pacientes</div>`;
   html+=`<div class="slots-list">`;
+  const isPastDay=date.getTime()<today.getTime();
   const isToday=date.getTime()===today.getTime();
   const nowHour=new Date().getHours();
   const nowMin=new Date().getMinutes();
