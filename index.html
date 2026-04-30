@@ -75,7 +75,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink);transition:all .12s;}
 .cal-day:hover:not(.empty):not(.past){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
-.cal-day.past{color:var(--ink-dim);pointer-events:none;}
+.cal-day.past{color:#b0b0b0;pointer-events:none;background:#f0eeeb;border-radius:8px;}
 .cal-day.today{font-weight:700;color:var(--green);}
 .cal-day.blocked{background:#fef2f2;color:var(--red);}
 .dot{width:8px;height:8px;border-radius:50%;display:none;}
@@ -480,7 +480,13 @@ function renderProCal(){
     const key=fmt(date);const div=document.createElement('div');div.className='cal-day';
     div.innerHTML=d+'<div class="dot"></div>';
     if(date.getTime()===today.getTime())div.classList.add('today');
-    if(isPast(date)||isSunday(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    if(isSunday(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    if(isPast(date)){
+      div.classList.add('past');
+      if(proSelectedDay===key)div.classList.add('selected');
+      div.onclick=()=>selectProDay(key,date);
+      grid.appendChild(div);continue;
+    }
     if(blockedDays.has(key))div.classList.add('blocked');
     else if(allBookings[key]&&allBookings[key].length>0)div.classList.add('has-bookings');
     else div.classList.add('has-slots');
@@ -494,8 +500,10 @@ function renderProDayDetail(key,date){
   const detail=document.getElementById('pro-day-detail');
   const dayB=allBookings[key]||[];
   const isBlocked=blockedDays.has(key);
-  let html=`<div class="day-slots"><div class="day-slots-header"><div class="day-slots-title">${DAYS[date.getDay()]} ${date.getDate()} de ${MONTHS[date.getMonth()]}</div><button class="btn-block${isBlocked?' unblock':''}" onclick="toggleBlock('${key}')">${isBlocked?'🔓 Desbloquear':'🚫 Bloquear día'}</button></div>`;
-  if(isBlocked)html+=`<div class="blocked-msg">⛔ Día bloqueado — no aparece para pacientes</div>`;
+  const isPastDay=isPast(date);
+  // Header: días pasados no muestran botón de bloquear
+  let html=`<div class="day-slots"><div class="day-slots-header"><div class="day-slots-title">${DAYS[date.getDay()]} ${date.getDate()} de ${MONTHS[date.getMonth()]}${isPastDay?' <span style="font-size:11px;font-weight:500;color:var(--ink-dim);margin-left:6px;">· Solo lectura</span>':''}</div>${isPastDay?'':` <button class="btn-block${isBlocked?' unblock':''}" onclick="toggleBlock('${key}')">${isBlocked?'🔓 Desbloquear':'🚫 Bloquear día'}</button>`}</div>`;
+  if(isBlocked&&!isPastDay)html+=`<div class="blocked-msg">⛔ Día bloqueado — no aparece para pacientes</div>`;
   html+=`<div class="slots-list">`;
   const isToday=date.getTime()===today.getTime();
   const nowHour=new Date().getHours();
@@ -514,9 +522,11 @@ function renderProDayDetail(key,date){
         :'font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;';
       const pagadoText=bk.pagado?'Pagado':'Sin pagar';
       const pagadoBadge='<button style="'+pagadoStyle+'" onclick="togglePagado(this)" data-id="'+bk.id+'" data-pagado="'+bk.pagado+'">'+pagadoText+'</button>';
-      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span style="font-size:11px;color:var(--ink-dim);">${modalidadText}</span></div><button class="btn-delete-slot" onclick="deleteBooking('${bk.id}','${bk.nombre_paciente}')">✕</button><div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}</div></div>`;
-    } else if(isPastSlot){
-      html+=`<div class="slot-row"><div class="slot-time" style="color:var(--ink-dim)">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">No disponible</span></div></div>`;
+      // días pasados: sin botón de eliminar
+      const deleteBtn=isPastDay?'':'<button class="btn-delete-slot" onclick="deleteBooking(\''+bk.id+'\',\''+bk.nombre_paciente+'\')">✕</button>';
+      html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span style="font-size:11px;color:var(--ink-dim);">${modalidadText}</span></div>${deleteBtn}<div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}</div></div>`;
+    } else if(isPastDay||isPastSlot){
+      html+=`<div class="slot-row"><div class="slot-time" style="color:var(--line)">${time}</div><div class="slot-patient"><span style="color:var(--line)">—</span></div></div>`;
     } else if(!isBlocked){
       html+=`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}',event)">🔗 Generar link</button></div>`;
     }
@@ -532,7 +542,7 @@ function renderRequests(){
   const el=document.getElementById('req-list');const badge=document.getElementById('req-badge');
   if(pending.length===0){badge.style.display='none';el.innerHTML=`<div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>`;return;}
   badge.style.display='inline-block';badge.textContent=`${pending.length} nueva${pending.length>1?'s':''}`;
-  el.innerHTML=pending.map(b=>{const d=parseDate(b.fecha);return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone">📱 ${b.telefono}<button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button></div><div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;}).join('');
+  el.innerHTML=pending.map(b=>{const d=parseDate(b.fecha);const modIcon=b.modalidad==='virtual'?'📱 Virtual':'🏢 Presencial';return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>📞 ${b.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button><span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);">${modIcon}</span></div><div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;}).join('');
 }
 
 function openModal(){
