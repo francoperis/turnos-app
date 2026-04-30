@@ -19,7 +19,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .loader-overlay.hide{opacity:0;pointer-events:none;}
 .spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--green);animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-/* NOTIF TOP */
 .notif-bar{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;justify-content:center;pointer-events:none;}
 .notif-pill{background:var(--green);color:#fff;font-size:13px;font-weight:500;padding:10px 22px;border-radius:0 0 14px 14px;display:flex;align-items:center;gap:8px;transform:translateY(-100%);opacity:0;transition:all .3s cubic-bezier(.34,1.2,.64,1);box-shadow:0 4px 16px rgba(0,0,0,.15);pointer-events:none;}
 .notif-pill.show{transform:translateY(0);opacity:1;}
@@ -45,6 +44,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .app-nav{background:var(--white);border-bottom:1px solid var(--line);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
 .logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);display:flex;align-items:center;gap:8px;}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.btn-settings{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
+.btn-settings:hover{border-color:var(--green);color:var(--green);}
 .btn-logout{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
 /* MAIN */
@@ -119,7 +121,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .req-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 .req-name{font-size:14px;font-weight:600;}
 .req-time{font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);padding:2px 7px;border-radius:5px;white-space:nowrap;}
-.req-phone{font-size:12px;color:var(--ink-dim);display:flex;align-items:center;gap:8px;}
+.req-phone{font-size:12px;color:var(--ink-dim);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .btn-copy-phone{font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
 .btn-copy-phone:hover{border-color:var(--green);color:var(--green);}
 .req-actions{display:flex;gap:6px;margin-top:6px;}
@@ -157,11 +159,45 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 .modal-slot-btn:hover{border-color:var(--green);color:var(--green);}
 .modal-slot-btn.selected{background:var(--green);border-color:var(--green);color:#fff;}
 .modal-slot-btn.taken{opacity:.3;pointer-events:none;text-decoration:line-through;}
-/* LINK MODAL */
 .link-modal-box{background:var(--white);border-radius:16px;width:100%;max-width:420px;box-shadow:var(--shadow-md);transform:translateY(16px);transition:transform .25s;overflow:hidden;}
 .modal-bg.open .link-modal-box{transform:translateY(0);}
 .link-result{background:var(--bg);border-radius:9px;padding:12px 14px;font-size:12px;color:var(--ink-soft);word-break:break-all;border:1.5px solid var(--line);font-family:monospace;line-height:1.5;}
 .link-info{font-size:13px;color:var(--ink-soft);line-height:1.5;background:var(--green-bg);border-radius:8px;padding:10px 12px;}
+/* SETTINGS MODAL */
+.settings-modal-box{background:var(--white);border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md);transform:translateY(16px);transition:transform .25s;}
+.modal-bg.open .settings-modal-box{transform:translateY(0);}
+.settings-section{padding:16px 20px;border-bottom:1px solid var(--line);}
+.settings-section:last-of-type{border-bottom:none;}
+.settings-section-title{font-size:11px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;}
+.settings-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:420px){.settings-row{grid-template-columns:1fr;}}
+.settings-field{display:flex;flex-direction:column;gap:5px;}
+.settings-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;}
+.settings-input{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.settings-input:focus{border-color:var(--green);background:var(--white);}
+.settings-select{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--bg);outline:none;cursor:pointer;transition:border-color .15s;}
+.settings-select:focus{border-color:var(--green);}
+.days-toggle{display:flex;gap:5px;flex-wrap:wrap;}
+.day-toggle-btn{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--line);background:var(--white);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--ink-dim);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;}
+.day-toggle-btn.on{background:var(--green);border-color:var(--green);color:#fff;}
+.os-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.os-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--line);}
+.os-item span{font-size:13px;color:var(--ink);}
+.os-remove{background:none;border:none;color:var(--ink-dim);cursor:pointer;font-size:18px;line-height:1;padding:0 4px;transition:color .15s;}
+.os-remove:hover{color:var(--red);}
+.os-add-row{display:flex;gap:8px;}
+.os-add-input{flex:1;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s;}
+.os-add-input:focus{border-color:var(--green);}
+.os-add-btn{padding:8px 14px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.os-add-btn:hover{opacity:.88;}
+.os-empty{font-size:13px;color:var(--ink-dim);padding:4px 0;}
+/* Info card */
+.info-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+.info-card-title{font-size:11px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;}
+.info-card-sep{height:1px;background:var(--line);}
+.info-card-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.info-card-label{font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+.info-card-value{font-size:13px;font-weight:500;color:var(--ink);text-align:right;}
 </style>
 </head>
 <body>
@@ -174,6 +210,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
   </div>
 </div>
 
+<!-- LOGIN -->
 <div class="login-screen show" id="login-screen">
   <div id="login-card-wrap"><div class="login-card">
     <div class="login-header">
@@ -182,11 +219,11 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
     <div class="login-body">
       <label class="login-label">Email</label>
-      <input type="email" class="login-input" id="login-email" placeholder="tu@email.com" required autocomplete="email"  onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <input type="email" class="login-input" id="login-email" placeholder="tu@email.com" required autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
       <label class="login-label" style="margin-top:12px;">Contraseña</label>
       <div style="position:relative;">
-      <input type="password" class="login-input" id="login-pass" placeholder="Tu contraseña" required autocomplete="current-password" style="padding-right:44px;" onkeydown="if(event.key==='Enter')doLogin()">
-      <button type="button" onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-dim);font-family:'Outfit',sans-serif;letter-spacing:.3px;" id="pass-eye">VER</button>
+        <input type="password" class="login-input" id="login-pass" placeholder="Tu contraseña" required autocomplete="current-password" style="padding-right:44px;" onkeydown="if(event.key==='Enter')doLogin()">
+        <button type="button" onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-dim);font-family:'Outfit',sans-serif;" id="pass-eye">VER</button>
       </div>
       <button class="login-btn" onclick="doLogin()" id="login-btn">Entrar</button>
       <div class="login-error" id="login-error">Email o contraseña incorrectos.</div>
@@ -194,7 +231,6 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
   </div></div>
 
-  <!-- Recover -->
   <div class="login-card" id="recover-card" style="display:none;">
     <div class="login-header">
       <div class="login-logo">TurnosApp</div>
@@ -202,19 +238,23 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
     <div class="login-body">
       <label class="login-label">Email</label>
-      <input type="email" class="login-input" id="recover-email" placeholder="tu@email.com" required autocomplete="email" >
+      <input type="email" class="login-input" id="recover-email" placeholder="tu@email.com" required autocomplete="email">
       <button class="login-btn" onclick="doRecover()" id="recover-btn">Enviar link</button>
       <div class="login-error" id="recover-error"></div>
-      <div class="login-error" id="recover-success" style="color:#2d7d5f;">Te enviamos el link al email.</div>
+      <div class="login-error" id="recover-success" style="color:#2d7d5f;">Te enviamos el link al email. Revisá tu bandeja.</div>
       <div style="text-align:center;margin-top:12px;"><span style="font-size:12px;color:#2d7d5f;cursor:pointer;" onclick="showLogin()">← Volver al login</span></div>
     </div>
   </div>
 </div>
 
+<!-- PANEL -->
 <div id="panel" style="display:none;">
   <header class="app-nav">
     <div class="logo"><div class="logo-dot"></div>TurnosApp</div>
-    <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+    <div class="nav-right">
+      <button class="btn-settings" onclick="openSettings()">⚙️ Ajustes</button>
+      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+    </div>
   </header>
   <div class="pro-wrap">
     <h1 class="page-title">Hola, María Teresa 👋</h1>
@@ -249,13 +289,39 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
           <div class="no-day-selected"><div class="big">📅</div>Seleccioná un día para ver los turnos</div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
         <div class="card">
           <div class="card-head">
             <h3>Solicitudes <span id="req-badge" class="new-badge" style="display:none">0</span></h3>
             <button class="icon-btn" onclick="loadAll()" title="Actualizar">↻</button>
           </div>
           <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
+        </div>
+        <div class="info-card" id="info-card" style="display:none;">
+          <div class="info-card-title">Mi configuración</div>
+          <div class="info-card-sep"></div>
+          <div class="info-card-row">
+            <span class="info-card-label">Duración</span>
+            <span class="info-card-value" id="ic-duracion">—</span>
+          </div>
+          <div class="info-card-row">
+            <span class="info-card-label">Horario</span>
+            <span class="info-card-value" id="ic-horario">—</span>
+          </div>
+          <div class="info-card-row" id="ic-precio-row" style="display:none;">
+            <span class="info-card-label">Sesión</span>
+            <span class="info-card-value" id="ic-precio">—</span>
+          </div>
+          <div class="info-card-row" id="ic-cbu-row" style="display:none;">
+            <span class="info-card-label">Alias / CBU</span>
+            <span class="info-card-value" id="ic-cbu" style="font-size:12px;word-break:break-all;">—</span>
+          </div>
+          <div id="ic-os-row" style="display:none;">
+            <div class="info-card-sep"></div>
+            <div class="info-card-label" style="margin-bottom:5px;">Obras sociales</div>
+            <div id="ic-os-list" style="font-size:12px;color:var(--ink-soft);line-height:1.7;"></div>
+          </div>
+          <button onclick="openSettings()" style="margin-top:2px;background:none;border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--ink-dim);cursor:pointer;transition:all .15s;width:100%;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--ink-dim)'">Editar ajustes</button>
         </div>
       </div>
     </div>
@@ -288,8 +354,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
   </div>
 </div>
 
-<!-- MODAL LINK FIJO -->
-<!-- MODAL CONFIRMAR ELIMINAR -->
+<!-- MODAL ELIMINAR -->
 <div class="modal-bg" id="confirm-modal-bg">
   <div class="modal-box" style="max-width:360px;">
     <div class="modal-head" style="border-bottom:none;padding-bottom:8px;">
@@ -302,11 +367,12 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
     <div class="modal-footer" style="padding-top:0;">
       <button class="btn-modal-cancel" onclick="closeConfirmModal()">Cancelar</button>
-      <button id="confirm-delete-btn" style="flex:2;padding:10px;border:none;border-radius:8px;background:var(--red);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;transition:opacity .15s;" onclick="confirmDelete()">Sí, eliminar</button>
+      <button style="flex:2;padding:10px;border:none;border-radius:8px;background:var(--red);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;" onclick="confirmDelete()">Sí, eliminar</button>
     </div>
   </div>
 </div>
 
+<!-- MODAL LINK -->
 <div class="modal-bg" id="link-modal-bg" onclick="closeLinkModalBg(event)">
   <div class="link-modal-box">
     <div class="modal-head"><h3>Link de turno generado</h3><button class="modal-close" onclick="closeLinkModal()">✕</button></div>
@@ -321,12 +387,92 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
   </div>
 </div>
 
+<!-- MODAL AJUSTES -->
+<div class="modal-bg" id="settings-modal-bg" onclick="closeSettingsBg(event)">
+  <div class="settings-modal-box">
+    <div class="modal-head">
+      <h3>⚙️ Ajustes</h3>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🗓 Agenda</div>
+      <div class="settings-row">
+        <div class="settings-field">
+          <label class="settings-label">Duración del turno</label>
+          <select class="settings-select" id="cfg-duracion">
+            <option value="30">30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60">60 minutos</option>
+            <option value="90">90 minutos</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label class="settings-label">Días sin atención</label>
+          <div style="font-size:12px;color:var(--ink-dim);margin-top:4px;line-height:1.5;">Los domingos siempre están bloqueados.</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-field">
+          <label class="settings-label">Horario inicio</label>
+          <input type="time" class="settings-input" id="cfg-inicio">
+        </div>
+        <div class="settings-field">
+          <label class="settings-label">Horario fin</label>
+          <input type="time" class="settings-input" id="cfg-fin">
+        </div>
+      </div>
+      <div class="settings-field">
+        <label class="settings-label" style="margin-bottom:8px;">Días que atendés</label>
+        <div class="days-toggle" id="cfg-dias">
+          <button class="day-toggle-btn" data-day="1" type="button">L</button>
+          <button class="day-toggle-btn" data-day="2" type="button">M</button>
+          <button class="day-toggle-btn" data-day="3" type="button">X</button>
+          <button class="day-toggle-btn" data-day="4" type="button">J</button>
+          <button class="day-toggle-btn" data-day="5" type="button">V</button>
+          <button class="day-toggle-btn" data-day="6" type="button">S</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">💰 Datos de cobro</div>
+      <div class="settings-row">
+        <div class="settings-field">
+          <label class="settings-label">Precio sesión ($)</label>
+          <input type="number" class="settings-input" id="cfg-precio" placeholder="Ej: 8000" min="0">
+        </div>
+        <div class="settings-field">
+          <label class="settings-label">Alias de transferencia</label>
+          <input type="text" class="settings-input" id="cfg-alias" placeholder="teresa.turnos">
+        </div>
+      </div>
+      <div class="settings-field">
+        <label class="settings-label">CBU (opcional)</label>
+        <input type="text" class="settings-input" id="cfg-cbu" placeholder="22 dígitos" maxlength="22">
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🏥 Obras sociales</div>
+      <div class="os-list" id="os-list"></div>
+      <div class="os-add-row">
+        <input type="text" class="os-add-input" id="os-input" placeholder="Nombre de la obra social" onkeydown="if(event.key==='Enter')addOS()">
+        <button class="os-add-btn" type="button" onclick="addOS()">+ Agregar</button>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="padding:16px 20px;">
+      <button class="btn-modal-cancel" onclick="closeSettings()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveSettings()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
 const PRO_SLUG='arauz';
-const PIN='1234';
-const BASE_SLOTS=['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const today=new Date();today.setHours(0,0,0,0);
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -334,10 +480,37 @@ const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'
 let proMonth=new Date(today.getFullYear(),today.getMonth(),1);
 let proSelectedDay=null,allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
 
+let proConfig={
+  duracion:60,
+  inicio:'08:00',
+  fin:'21:00',
+  dias:[1,2,3,4,5,6],
+  precio:null,
+  alias:null,
+  cbu:null,
+  obras_sociales:[]
+};
+
+function generateSlots(){
+  const slots=[];
+  const[ih,im]=proConfig.inicio.split(':').map(Number);
+  const[fh,fm]=proConfig.fin.split(':').map(Number);
+  let cur=ih*60+im;
+  const end=fh*60+fm;
+  while(cur<end){
+    const h=String(Math.floor(cur/60)).padStart(2,'0');
+    const m=String(cur%60).padStart(2,'0');
+    slots.push(h+':'+m);
+    cur+=Number(proConfig.duracion);
+  }
+  return slots;
+}
+
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
 function isPast(d){return d<today;}
 function isSunday(d){return d.getDay()===0;}
+function isWorkDay(d){return proConfig.dias.includes(d.getDay());}
 function showLoader(v){document.getElementById('loader').classList.toggle('hide',!v);}
 function showNotif(msg,type='green'){
   const p=document.getElementById('notif-pill');
@@ -361,12 +534,12 @@ async function doLogin(){
   errEl.classList.remove('show');
   if(!email||!pass){errEl.textContent='Completá email y contraseña.';errEl.classList.add('show');return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='El email no tiene un formato válido.';errEl.classList.add('show');return;}
-  btn.innerHTML='<div class="spinner-sm show"></div>Entrando...';btn.disabled=true;
+  btn.textContent='Entrando...';btn.disabled=true;
   const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){
     errEl.textContent='Email o contraseña incorrectos.';
     errEl.classList.add('show');
-    btn.innerHTML='Entrar';btn.disabled=false;
+    btn.textContent='Entrar';btn.disabled=false;
     return;
   }
   showPanel();
@@ -379,23 +552,15 @@ async function doRecover(){
   errEl.classList.remove('show');sucEl.classList.remove('show');
   if(!email)return;
   const btn=document.getElementById('recover-btn');
-  btn.innerHTML='<div class="spinner-sm show"></div>Enviando...';btn.disabled=true;
-  const{error}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.origin+'/reset'
-  });
-  btn.innerHTML='Enviar link';btn.disabled=false;
+  btn.textContent='Enviando...';btn.disabled=true;
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/reset'});
+  btn.textContent='Enviar link';btn.disabled=false;
   if(error){errEl.textContent='Ocurrió un error. Intentá de nuevo.';errEl.classList.add('show');}
-  else{sucEl.textContent='Te enviamos el link al email. Revisá tu bandeja.';sucEl.classList.add('show');}
+  else{sucEl.classList.add('show');}
 }
 
-function showRecover(){
-  document.getElementById('login-card-wrap').style.display='none';
-  document.getElementById('recover-card').style.display='block';
-}
-function showLogin(){
-  document.getElementById('recover-card').style.display='none';
-  document.getElementById('login-card-wrap').style.display='block';
-}
+function showRecover(){document.getElementById('login-card-wrap').style.display='none';document.getElementById('recover-card').style.display='block';}
+function showLogin(){document.getElementById('recover-card').style.display='none';document.getElementById('login-card-wrap').style.display='block';}
 
 function showPanel(){
   document.getElementById('login-screen').classList.remove('show');
@@ -417,17 +582,39 @@ async function logout(){
 async function loadAll(){
   showLoader(true);
   try{
-    const[t,b]=await Promise.all([
+    const[t,b,p]=await Promise.all([
       sb.from('turnos').select('*').eq('profesional_slug',PRO_SLUG).order('fecha').order('hora'),
-      sb.from('dias_bloqueados').select('fecha').eq('profesional_slug',PRO_SLUG)
+      sb.from('dias_bloqueados').select('fecha').eq('profesional_slug',PRO_SLUG),
+      sb.from('profesionales').select('config').eq('slug',PRO_SLUG).single()
     ]);
     allBookings={};
     (t.data||[]).forEach(r=>{if(!allBookings[r.fecha])allBookings[r.fecha]=[];allBookings[r.fecha].push(r);});
     blockedDays=new Set((b.data||[]).map(r=>r.fecha));
+    if(p.data&&p.data.config){proConfig={...proConfig,...p.data.config};}
+    updateInfoCard();
     renderProCal();renderRequests();
     if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
   }catch(e){showNotif('Error al cargar datos','red');console.error(e);}
   showLoader(false);
+}
+
+function updateInfoCard(){
+  const card=document.getElementById('info-card');
+  card.style.display='block';
+  document.getElementById('ic-duracion').textContent=proConfig.duracion+' min por turno';
+  document.getElementById('ic-horario').textContent=proConfig.inicio+' a '+proConfig.fin;
+  if(proConfig.precio){
+    document.getElementById('ic-precio').textContent='$'+Number(proConfig.precio).toLocaleString('es-AR');
+    document.getElementById('ic-precio-row').style.display='flex';
+  }else{document.getElementById('ic-precio-row').style.display='none';}
+  if(proConfig.alias||proConfig.cbu){
+    document.getElementById('ic-cbu').textContent=proConfig.alias||(proConfig.cbu?proConfig.cbu.slice(0,10)+'...':'');
+    document.getElementById('ic-cbu-row').style.display='flex';
+  }else{document.getElementById('ic-cbu-row').style.display='none';}
+  if(proConfig.obras_sociales&&proConfig.obras_sociales.length>0){
+    document.getElementById('ic-os-list').innerHTML=proConfig.obras_sociales.map(os=>`<span style="display:inline-block;background:var(--green-bg);color:var(--green);border-radius:5px;padding:1px 7px;margin:2px 3px 2px 0;font-size:11px;font-weight:600;">${os}</span>`).join('');
+    document.getElementById('ic-os-row').style.display='block';
+  }else{document.getElementById('ic-os-row').style.display='none';}
 }
 
 function startRealtime(){
@@ -454,7 +641,7 @@ async function confirmBooking(id){
 async function declineBooking(id){
   showLoader(true);
   const{error}=await sb.from('turnos').delete().eq('id',id);
-  if(error){showNotif('Error al rechazar: '+error.message,'red');console.error(error);showLoader(false);return;}
+  if(error){showNotif('Error al rechazar: '+error.message,'red');showLoader(false);return;}
   showNotif('Turno rechazado','red');await loadAll();
 }
 async function toggleBlock(key){
@@ -462,7 +649,7 @@ async function toggleBlock(key){
   if(blockedDays.has(key)){
     await sb.from('dias_bloqueados').delete().eq('profesional_slug',PRO_SLUG).eq('fecha',key);
     showNotif('Día desbloqueado');
-  } else {
+  }else{
     await sb.from('dias_bloqueados').insert([{profesional_slug:PRO_SLUG,fecha:key}]);
     showNotif('Día bloqueado','red');
   }
@@ -480,7 +667,10 @@ function renderProCal(){
     const key=fmt(date);const div=document.createElement('div');div.className='cal-day';
     div.innerHTML=d+'<div class="dot"></div>';
     if(date.getTime()===today.getTime())div.classList.add('today');
-    if(isSunday(date)){div.classList.add('past');grid.appendChild(div);continue;}
+    if(isSunday(date)||!isWorkDay(date)){
+      div.classList.add('past');div.style.opacity='0.35';div.style.cursor='default';
+      grid.appendChild(div);continue;
+    }
     if(isPast(date)){
       div.classList.add('past');
       if(proSelectedDay===key)div.classList.add('selected');
@@ -495,20 +685,22 @@ function renderProCal(){
     grid.appendChild(div);
   }
 }
+
 function selectProDay(key,date){proSelectedDay=key;renderProCal();renderProDayDetail(key,date);}
+
 function renderProDayDetail(key,date){
   const detail=document.getElementById('pro-day-detail');
   const dayB=allBookings[key]||[];
   const isBlocked=blockedDays.has(key);
   const isPastDay=isPast(date);
-  // Header: días pasados no muestran botón de bloquear
   let html=`<div class="day-slots"><div class="day-slots-header"><div class="day-slots-title">${DAYS[date.getDay()]} ${date.getDate()} de ${MONTHS[date.getMonth()]}${isPastDay?' <span style="font-size:11px;font-weight:500;color:var(--ink-dim);margin-left:6px;">· Solo lectura</span>':''}</div>${isPastDay?'':` <button class="btn-block${isBlocked?' unblock':''}" onclick="toggleBlock('${key}')">${isBlocked?'🔓 Desbloquear':'🚫 Bloquear día'}</button>`}</div>`;
   if(isBlocked&&!isPastDay)html+=`<div class="blocked-msg">⛔ Día bloqueado — no aparece para pacientes</div>`;
   html+=`<div class="slots-list">`;
+  const slots=generateSlots();
   const isToday=date.getTime()===today.getTime();
   const nowHour=new Date().getHours();
   const nowMin=new Date().getMinutes();
-  BASE_SLOTS.forEach(time=>{
+  slots.forEach(time=>{
     const bk=dayB.find(b=>b.hora===time);
     const slotHour=parseInt(time.split(':')[0]);
     const slotMin=parseInt(time.split(':')[1]);
@@ -522,18 +714,18 @@ function renderProDayDetail(key,date){
         :'font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;';
       const pagadoText=bk.pagado?'Pagado':'Sin pagar';
       const pagadoBadge='<button style="'+pagadoStyle+'" onclick="togglePagado(this)" data-id="'+bk.id+'" data-pagado="'+bk.pagado+'">'+pagadoText+'</button>';
-      // días pasados: sin botón de eliminar
       const deleteBtn=isPastDay?'':'<button class="btn-delete-slot" onclick="deleteBooking(\''+bk.id+'\',\''+bk.nombre_paciente+'\')">✕</button>';
       html+=`<div class="slot-row booked"><div class="slot-time">${time}</div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span style="font-size:11px;color:var(--ink-dim);">${modalidadText}</span></div>${deleteBtn}<div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}</div></div>`;
-    } else if(isPastDay||isPastSlot){
+    }else if(isPastDay||isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--line)">${time}</div><div class="slot-patient"><span style="color:var(--line)">—</span></div></div>`;
-    } else if(!isBlocked){
+    }else if(!isBlocked){
       html+=`<div class="slot-row"><div class="slot-time">${time}</div><div class="slot-patient"><span style="color:var(--ink-dim)">Disponible</span></div><button class="slot-link-btn" onclick="generateLink('${key}','${time}',event)">🔗 Generar link</button></div>`;
     }
   });
   html+=`</div></div>`;
   detail.innerHTML=html;
 }
+
 function proChangeMonth(dir){proMonth=new Date(proMonth.getFullYear(),proMonth.getMonth()+dir,1);renderProCal();}
 
 function renderRequests(){
@@ -558,12 +750,28 @@ function onModalDateChange(){
   const v=document.getElementById('m-date').value;
   if(!v){document.getElementById('modal-slots-wrap').style.display='none';return;}
   const taken=(allBookings[v]||[]).map(b=>b.hora);
+  const slots=generateSlots();
   document.getElementById('modal-slots-wrap').style.display='block';modalSelectedTime=null;
-  document.getElementById('modal-slots').innerHTML=BASE_SLOTS.map(t=>`<button class="modal-slot-btn${taken.includes(t)?' taken':''}" onclick="selectModalTime('${t}',this)">${t}</button>`).join('');
+  document.getElementById('modal-slots').innerHTML=slots.map(t=>`<button class="modal-slot-btn${taken.includes(t)?' taken':''}" onclick="selectModalTime('${t}',this)">${t}</button>`).join('');
   checkModal();
 }
 function selectModalTime(t,btn){document.querySelectorAll('.modal-slot-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');modalSelectedTime=t;checkModal();}
 function checkModal(){const n=document.getElementById('m-name').value.trim();const p=document.getElementById('m-phone').value.trim();const d=document.getElementById('m-date').value;document.getElementById('modal-save-btn').disabled=!(n&&p&&d&&modalSelectedTime);}
+
+let modalidadActual='presencial';
+function setModalidad(m){
+  modalidadActual=m;
+  const bp=document.getElementById('mod-presencial');
+  const bv=document.getElementById('mod-virtual');
+  if(m==='presencial'){
+    bp.style.background='var(--green)';bp.style.color='#fff';bp.style.borderColor='var(--green)';
+    bv.style.background='var(--bg)';bv.style.color='var(--ink-soft)';bv.style.borderColor='var(--line)';
+  }else{
+    bv.style.background='var(--green)';bv.style.color='#fff';bv.style.borderColor='var(--green)';
+    bp.style.background='var(--bg)';bp.style.color='var(--ink-soft)';bp.style.borderColor='var(--line)';
+  }
+}
+
 async function saveManualTurno(){
   const name=document.getElementById('m-name').value.trim(),phone=document.getElementById('m-phone').value.trim(),date=document.getElementById('m-date').value;
   const btn=document.getElementById('modal-save-btn');btn.disabled=true;btn.textContent='Guardando...';
@@ -580,26 +788,26 @@ function generateLink(fecha,hora,e){
   generatedLink=window.location.origin+'/paciente.html?fecha='+fecha+'&hora='+encodeURIComponent(hora)+'&p='+PRO_SLUG;
   document.getElementById('link-result').textContent=generatedLink;
   document.getElementById('link-modal-bg').classList.add('open');
-  // prevent any navigation
-  event.preventDefault();event.stopPropagation();
 }
 function closeLinkModal(){document.getElementById('link-modal-bg').classList.remove('open');}
 function closeLinkModalBg(e){if(e.target===document.getElementById('link-modal-bg'))closeLinkModal();}
 function copyGeneratedLink(){navigator.clipboard.writeText(generatedLink).catch(()=>{});showNotif('Link copiado ✓');closeLinkModal();}
-let pendingDeleteId=null;
-let modalidadActual='presencial';
 
-function setModalidad(m){
-  modalidadActual=m;
-  const bp=document.getElementById('mod-presencial');
-  const bv=document.getElementById('mod-virtual');
-  if(m==='presencial'){
-    bp.style.background='var(--green)';bp.style.color='#fff';bp.style.borderColor='var(--green)';
-    bv.style.background='var(--bg)';bv.style.color='var(--ink-soft)';bv.style.borderColor='var(--line)';
-  } else {
-    bv.style.background='var(--green)';bv.style.color='#fff';bv.style.borderColor='var(--green)';
-    bp.style.background='var(--bg)';bp.style.color='var(--ink-soft)';bp.style.borderColor='var(--line)';
-  }
+let pendingDeleteId=null;
+function deleteBooking(id,nombre){
+  pendingDeleteId=id;
+  document.getElementById('confirm-nombre').textContent=nombre;
+  document.getElementById('confirm-modal-bg').classList.add('open');
+}
+function closeConfirmModal(){document.getElementById('confirm-modal-bg').classList.remove('open');pendingDeleteId=null;}
+async function confirmDelete(){
+  const idToDelete=pendingDeleteId;
+  if(!idToDelete)return;
+  document.getElementById('confirm-modal-bg').classList.remove('open');pendingDeleteId=null;
+  showLoader(true);
+  const{error}=await sb.from('turnos').delete().eq('id',idToDelete);
+  if(error){showNotif('Error al eliminar','red');showLoader(false);return;}
+  showNotif('Turno eliminado','red');await loadAll();
 }
 
 async function togglePagado(btn){
@@ -612,78 +820,92 @@ async function togglePagado(btn){
   showNotif(nuevoEstado?'Marcado como pagado':'Marcado como sin pagar');await loadAll();
 }
 
-function deleteBooking(id, nombre){
-  pendingDeleteId=id;
-  document.getElementById('confirm-nombre').textContent=nombre;
-  document.getElementById('confirm-modal-bg').classList.add('open');
-}
-
-function closeConfirmModal(){
-  document.getElementById('confirm-modal-bg').classList.remove('open');
-  pendingDeleteId=null;
-}
-
-async function confirmDelete(){
-  const idToDelete=pendingDeleteId;
-  if(!idToDelete)return;
-  document.getElementById('confirm-modal-bg').classList.remove('open');
-  pendingDeleteId=null;
-  showLoader(true);
-  const{error}=await sb.from('turnos').delete().eq('id',idToDelete);
-  if(error){showNotif('Error al eliminar','red');console.error(error);showLoader(false);return;}
-  showNotif('Turno eliminado','red');await loadAll();
-}
-
-function copyPhone(phone, btn){
+function copyPhone(phone,btn){
   navigator.clipboard.writeText(phone).catch(()=>{});
-  btn.textContent='✓';
-  btn.style.borderColor='var(--green)';
-  btn.style.color='var(--green)';
+  btn.textContent='✓';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
   setTimeout(()=>{btn.textContent='Copiar';btn.style.borderColor='';btn.style.color='';},2000);
 }
-
 function copyLink(btn){navigator.clipboard.writeText(document.getElementById('public-link-text').textContent).catch(()=>{});btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar link',2000);}
 
-// Registrar Service Worker para PWA y notificaciones
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').then(reg=>{
-    console.log('SW registrado:', reg.scope);
-  }).catch(err=>console.log('SW error:', err));
+// ── AJUSTES ────────────────────────────────────────────────
+let osList=[];
+
+function openSettings(){
+  document.getElementById('cfg-duracion').value=String(proConfig.duracion);
+  document.getElementById('cfg-inicio').value=proConfig.inicio;
+  document.getElementById('cfg-fin').value=proConfig.fin;
+  document.getElementById('cfg-precio').value=proConfig.precio||'';
+  document.getElementById('cfg-alias').value=proConfig.alias||'';
+  document.getElementById('cfg-cbu').value=proConfig.cbu||'';
+  document.querySelectorAll('.day-toggle-btn').forEach(btn=>{
+    btn.classList.toggle('on',proConfig.dias.includes(parseInt(btn.getAttribute('data-day'))));
+  });
+  osList=[...(proConfig.obras_sociales||[])];
+  renderOSList();
+  document.getElementById('settings-modal-bg').classList.add('open');
 }
 
-function requestNotifPermission(){
-  if('Notification' in window && Notification.permission==='default'){
-    Notification.requestPermission().then(perm=>{
-      console.log('Notificaciones:', perm);
-    });
-  }
+function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
+function closeSettingsBg(e){if(e.target===document.getElementById('settings-modal-bg'))closeSettings();}
+
+function renderOSList(){
+  const el=document.getElementById('os-list');
+  if(osList.length===0){el.innerHTML='<div class="os-empty">Sin obras sociales cargadas todavía.</div>';return;}
+  el.innerHTML=osList.map((os,i)=>`<div class="os-item"><span>${os}</span><button class="os-remove" onclick="removeOS(${i})" type="button">×</button></div>`).join('');
 }
 
-function sendPushNotif(title, body){
-  if(!('Notification' in window) || Notification.permission!=='granted') return;
-  const options = {
-    body: body,
-    tag: 'turno-nuevo',
-    renotify: true,
-    vibrate: [200, 100, 200]
+function addOS(){
+  const inp=document.getElementById('os-input');
+  const val=inp.value.trim();
+  if(!val)return;
+  if(osList.map(o=>o.toLowerCase()).includes(val.toLowerCase())){showNotif('Ya está en la lista','red');return;}
+  osList.push(val);
+  inp.value='';
+  renderOSList();
+}
+
+function removeOS(i){osList.splice(i,1);renderOSList();}
+
+async function saveSettings(){
+  const dias=[];
+  document.querySelectorAll('.day-toggle-btn.on').forEach(btn=>{dias.push(parseInt(btn.getAttribute('data-day')));});
+  if(dias.length===0){showNotif('Seleccioná al menos un día','red');return;}
+  const inicio=document.getElementById('cfg-inicio').value;
+  const fin=document.getElementById('cfg-fin').value;
+  if(!inicio||!fin){showNotif('Completá los horarios','red');return;}
+  if(inicio>=fin){showNotif('El horario de inicio debe ser antes del fin','red');return;}
+  const newConfig={
+    duracion:parseInt(document.getElementById('cfg-duracion').value),
+    inicio,fin,dias,
+    precio:document.getElementById('cfg-precio').value?parseInt(document.getElementById('cfg-precio').value):null,
+    alias:document.getElementById('cfg-alias').value.trim()||null,
+    cbu:document.getElementById('cfg-cbu').value.trim()||null,
+    obras_sociales:[...osList]
   };
-  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
-    navigator.serviceWorker.ready.then(reg=>{
-      reg.showNotification(title, options);
-    }).catch(()=>{
-      new Notification(title, options);
-    });
-  } else {
-    new Notification(title, options);
-  }
+  const btn=document.querySelector('#settings-modal-bg .btn-modal-save');
+  btn.textContent='Guardando...';btn.disabled=true;
+  const{error}=await sb.from('profesionales').update({config:newConfig}).eq('slug',PRO_SLUG);
+  btn.textContent='Guardar cambios';btn.disabled=false;
+  if(error){showNotif('Error al guardar','red');console.error(error);return;}
+  proConfig={...newConfig};
+  updateInfoCard();
+  closeSettings();
+  showNotif('Ajustes guardados ✓');
+  renderProCal();
+  if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
 }
 
-if(sessionStorage.getItem('auth')==='ok'){
-  document.getElementById('login-screen').classList.remove('show');
-  document.getElementById('panel').style.display='block';
-  document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html';
-  loadAll();startRealtime();requestNotifPermission();
+document.querySelectorAll('.day-toggle-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>btn.classList.toggle('on'));
+});
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(err=>console.log('SW error:',err));
 }
+
+sb.auth.getSession().then(({data:{session}})=>{
+  if(session)showPanel();
+});
 </script>
 </body>
 </html>
