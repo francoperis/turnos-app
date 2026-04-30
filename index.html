@@ -163,9 +163,15 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 .modal-bg.open .link-modal-box{transform:translateY(0);}
 .link-result{background:var(--bg);border-radius:9px;padding:12px 14px;font-size:12px;color:var(--ink-soft);word-break:break-all;border:1.5px solid var(--line);font-family:monospace;line-height:1.5;}
 .link-info{font-size:13px;color:var(--ink-soft);line-height:1.5;background:var(--green-bg);border-radius:8px;padding:10px 12px;}
-/* SETTINGS MODAL */
-.settings-modal-box{background:var(--white);border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md);transform:translateY(16px);transition:transform .25s;}
+/* SETTINGS MODAL — bottom sheet en mobile, centrado en desktop */
+#settings-modal-bg{align-items:flex-end;padding:0;}
+@media(min-width:600px){#settings-modal-bg{align-items:center;padding:20px;}}
+.settings-modal-box{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:var(--shadow-md);transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+@media(min-width:600px){.settings-modal-box{border-radius:16px;transform:translateY(24px);max-height:90vh;}}
 .modal-bg.open .settings-modal-box{transform:translateY(0);}
+/* drag handle en mobile */
+.settings-modal-box::before{content:'';display:block;width:36px;height:4px;background:var(--line);border-radius:2px;margin:10px auto 2px;}
+@media(min-width:600px){.settings-modal-box::before{display:none;}}
 .settings-section{padding:16px 20px;border-bottom:1px solid var(--line);}
 .settings-section:last-of-type{border-bottom:none;}
 .settings-section-title{font-size:11px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;}
@@ -296,32 +302,6 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
             <button class="icon-btn" onclick="loadAll()" title="Actualizar">↻</button>
           </div>
           <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
-        </div>
-        <div class="info-card" id="info-card" style="display:none;">
-          <div class="info-card-title">Mi configuración</div>
-          <div class="info-card-sep"></div>
-          <div class="info-card-row">
-            <span class="info-card-label">Duración</span>
-            <span class="info-card-value" id="ic-duracion">—</span>
-          </div>
-          <div class="info-card-row">
-            <span class="info-card-label">Horario</span>
-            <span class="info-card-value" id="ic-horario">—</span>
-          </div>
-          <div class="info-card-row" id="ic-precio-row" style="display:none;">
-            <span class="info-card-label">Sesión</span>
-            <span class="info-card-value" id="ic-precio">—</span>
-          </div>
-          <div class="info-card-row" id="ic-cbu-row" style="display:none;">
-            <span class="info-card-label">Alias / CBU</span>
-            <span class="info-card-value" id="ic-cbu" style="font-size:12px;word-break:break-all;">—</span>
-          </div>
-          <div id="ic-os-row" style="display:none;">
-            <div class="info-card-sep"></div>
-            <div class="info-card-label" style="margin-bottom:5px;">Obras sociales</div>
-            <div id="ic-os-list" style="font-size:12px;color:var(--ink-soft);line-height:1.7;"></div>
-          </div>
-          <button onclick="openSettings()" style="margin-top:2px;background:none;border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--ink-dim);cursor:pointer;transition:all .15s;width:100%;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--ink-dim)'">Editar ajustes</button>
         </div>
       </div>
     </div>
@@ -469,6 +449,22 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
   </div>
 </div>
 
+<!-- MODAL VER COMPROBANTE -->
+<div class="modal-bg" id="comp-modal-bg" onclick="if(event.target===this)closeCompModal()">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-head">
+      <div>
+        <h3 style="font-size:15px;">Comprobante</h3>
+        <div id="comp-nombre" style="font-size:12px;color:var(--ink-dim);margin-top:1px;"></div>
+      </div>
+      <button class="modal-close" onclick="closeCompModal()">✕</button>
+    </div>
+    <div style="padding:0 0 4px;">
+      <img id="comp-img" src="" alt="Comprobante" style="width:100%;display:block;max-height:500px;object-fit:contain;background:#f0f0f0;">
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
@@ -591,30 +587,10 @@ async function loadAll(){
     (t.data||[]).forEach(r=>{if(!allBookings[r.fecha])allBookings[r.fecha]=[];allBookings[r.fecha].push(r);});
     blockedDays=new Set((b.data||[]).map(r=>r.fecha));
     if(p.data&&p.data.config){proConfig={...proConfig,...p.data.config};}
-    updateInfoCard();
     renderProCal();renderRequests();
     if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
   }catch(e){showNotif('Error al cargar datos','red');console.error(e);}
   showLoader(false);
-}
-
-function updateInfoCard(){
-  const card=document.getElementById('info-card');
-  card.style.display='block';
-  document.getElementById('ic-duracion').textContent=proConfig.duracion+' min por turno';
-  document.getElementById('ic-horario').textContent=proConfig.inicio+' a '+proConfig.fin;
-  if(proConfig.precio){
-    document.getElementById('ic-precio').textContent='$'+Number(proConfig.precio).toLocaleString('es-AR');
-    document.getElementById('ic-precio-row').style.display='flex';
-  }else{document.getElementById('ic-precio-row').style.display='none';}
-  if(proConfig.alias||proConfig.cbu){
-    document.getElementById('ic-cbu').textContent=proConfig.alias||(proConfig.cbu?proConfig.cbu.slice(0,10)+'...':'');
-    document.getElementById('ic-cbu-row').style.display='flex';
-  }else{document.getElementById('ic-cbu-row').style.display='none';}
-  if(proConfig.obras_sociales&&proConfig.obras_sociales.length>0){
-    document.getElementById('ic-os-list').innerHTML=proConfig.obras_sociales.map(os=>`<span style="display:inline-block;background:var(--green-bg);color:var(--green);border-radius:5px;padding:1px 7px;margin:2px 3px 2px 0;font-size:11px;font-weight:600;">${os}</span>`).join('');
-    document.getElementById('ic-os-row').style.display='block';
-  }else{document.getElementById('ic-os-row').style.display='none';}
 }
 
 function startRealtime(){
@@ -734,7 +710,13 @@ function renderRequests(){
   const el=document.getElementById('req-list');const badge=document.getElementById('req-badge');
   if(pending.length===0){badge.style.display='none';el.innerHTML=`<div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>`;return;}
   badge.style.display='inline-block';badge.textContent=`${pending.length} nueva${pending.length>1?'s':''}`;
-  el.innerHTML=pending.map(b=>{const d=parseDate(b.fecha);const modIcon=b.modalidad==='virtual'?'📱 Virtual':'🏢 Presencial';return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>📞 ${b.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button><span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);">${modIcon}</span></div><div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;}).join('');
+  el.innerHTML=pending.map(b=>{
+    const d=parseDate(b.fecha);
+    const modIcon=b.modalidad==='virtual'?'📱 Virtual':'🏢 Presencial';
+    const pagoIcon=b.metodo_pago==='transferencia'?'🏦 Transferencia':b.metodo_pago==='efectivo'?'💵 Efectivo':'';
+    const compBtn=b.comprobante_url?`<button onclick="verComprobante('${b.id}')" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;border:1.5px solid var(--green-light);background:var(--green-bg);color:var(--green);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;">📎 Ver comprobante</button>`:'';
+    return `<div class="req-item"><div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div><div class="req-phone" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span>📞 ${b.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button><span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);">${modIcon}</span>${pagoIcon?`<span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);">${pagoIcon}</span>`:''}</div>${compBtn?`<div style="margin-top:4px;">${compBtn}</div>`:''}<div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div></div>`;
+  }).join('');
 }
 
 function openModal(){
@@ -888,12 +870,25 @@ async function saveSettings(){
   btn.textContent='Guardar cambios';btn.disabled=false;
   if(error){showNotif('Error al guardar','red');console.error(error);return;}
   proConfig={...newConfig};
-  updateInfoCard();
   closeSettings();
   showNotif('Ajustes guardados ✓');
   renderProCal();
   if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
 }
+
+function verComprobante(id){
+  // Buscar el turno en allBookings
+  let turno=null;
+  Object.values(allBookings).forEach(list=>{
+    const found=list.find(b=>b.id===id);
+    if(found)turno=found;
+  });
+  if(!turno||!turno.comprobante_url)return;
+  document.getElementById('comp-img').src=turno.comprobante_url;
+  document.getElementById('comp-nombre').textContent=turno.nombre_paciente;
+  document.getElementById('comp-modal-bg').classList.add('open');
+}
+function closeCompModal(){document.getElementById('comp-modal-bg').classList.remove('open');}
 
 document.querySelectorAll('.day-toggle-btn').forEach(btn=>{
   btn.addEventListener('click',()=>btn.classList.toggle('on'));
