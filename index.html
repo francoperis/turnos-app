@@ -419,13 +419,13 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
           </div>
           <div class="settings-field">
             <label class="settings-label">Horario inicio</label>
-            <input type="time" class="settings-input" id="cfg-inicio">
+            <select class="settings-select" id="cfg-inicio"></select>
           </div>
         </div>
         <div class="settings-row">
           <div class="settings-field">
             <label class="settings-label">Horario fin</label>
-            <input type="time" class="settings-input" id="cfg-fin">
+            <select class="settings-select" id="cfg-fin"></select>
           </div>
           <div class="settings-field">
             <label class="settings-label" style="margin-bottom:4px;">Días sin atención</label>
@@ -845,14 +845,29 @@ function copyLink(btn){navigator.clipboard.writeText(document.getElementById('pu
 // ── AJUSTES ────────────────────────────────────────────────
 let osList=[];
 
+function buildTimeOptions(selectId, selectedValue){
+  const sel=document.getElementById(selectId);
+  sel.innerHTML='';
+  // Opciones cada 30 min de 06:00 a 23:00
+  for(let h=6;h<=23;h++){
+    for(let m=0;m<60;m+=30){
+      const val=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+      const opt=document.createElement('option');
+      opt.value=val;opt.textContent=val;
+      if(val===selectedValue)opt.selected=true;
+      sel.appendChild(opt);
+    }
+  }
+}
+
 function openSettings(){
   document.getElementById('cfg-duracion').value=String(proConfig.duracion);
-  document.getElementById('cfg-inicio').value=proConfig.inicio;
-  document.getElementById('cfg-fin').value=proConfig.fin;
+  buildTimeOptions('cfg-inicio', proConfig.inicio||'08:00');
+  buildTimeOptions('cfg-fin', proConfig.fin||'21:00');
   document.getElementById('cfg-precio').value=proConfig.precio||'';
   document.getElementById('cfg-alias').value=proConfig.alias||'';
   document.getElementById('cfg-cbu').value=proConfig.cbu||'';
-  document.querySelectorAll('.day-toggle-btn').forEach(btn=>{
+  document.querySelectorAll('#cfg-dias .day-toggle-btn').forEach(btn=>{
     btn.classList.toggle('on',proConfig.dias.includes(parseInt(btn.getAttribute('data-day'))));
   });
   osList=[...(proConfig.obras_sociales||[])];
@@ -888,8 +903,9 @@ async function saveSettings(){
   if(dias.length===0){showNotif('Seleccioná al menos un día','red');return;}
   const inicio=document.getElementById('cfg-inicio').value;
   const fin=document.getElementById('cfg-fin').value;
-  if(!inicio||!fin){showNotif('Completá los horarios','red');return;}
-  if(inicio>=fin){showNotif('El horario de inicio debe ser antes del fin','red');return;}
+  console.log('inicio:', JSON.stringify(inicio), 'fin:', JSON.stringify(fin));
+  if(!inicio||!fin){showNotif('Completá los horarios','red');console.warn('horarios vacíos');return;}
+  if(inicio>=fin){showNotif('El horario de inicio debe ser antes del fin','red');console.warn('inicio >= fin');return;}
   const newConfig={
     duracion:parseInt(document.getElementById('cfg-duracion').value),
     inicio,fin,dias,
