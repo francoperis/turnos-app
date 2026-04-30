@@ -871,7 +871,10 @@ function removeOS(i){osList.splice(i,1);renderOSList();}
 async function saveSettings(){
   const dias=[];
   document.querySelectorAll('.day-toggle-btn.on').forEach(btn=>{dias.push(parseInt(btn.getAttribute('data-day')));});
-  if(dias.length===0){showNotif('Seleccioná al menos un día','red');return;}
+  console.log('dias seleccionados:', dias);
+  console.log('botones encontrados:', document.querySelectorAll('.day-toggle-btn').length);
+  console.log('botones ON:', document.querySelectorAll('.day-toggle-btn.on').length);
+  if(dias.length===0){showNotif('Seleccioná al menos un día','red');console.warn('dias vacío — abortando');return;}
   const inicio=document.getElementById('cfg-inicio').value;
   const fin=document.getElementById('cfg-fin').value;
   if(!inicio||!fin){showNotif('Completá los horarios','red');return;}
