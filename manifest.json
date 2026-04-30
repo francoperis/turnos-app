@@ -26,13 +26,4 @@
   ]
 }
 
-{
-  "duracion": 45,
-  "inicio": "09:00",
-  "fin": "20:00",
-  "dias": [1,2,3,4,5],
-  "precio": 5000,
-  "cbu": "0000003100...",
-  "alias": "teresa.turnos",
-  "obras_sociales": ["IOSCOR", "OSDE", "Swiss Medical"]
-}
+
