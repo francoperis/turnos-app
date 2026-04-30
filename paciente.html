@@ -284,7 +284,13 @@ async function loadTaken(){
     takenSlots={};
     (t.data||[]).forEach(r=>{if(!takenSlots[r.fecha])takenSlots[r.fecha]=[];takenSlots[r.fecha].push(r.hora);});
     blockedDays=new Set((b.data||[]).map(r=>r.fecha));
-    if(p.data&&p.data.config){proConfig={...proConfig,...p.data.config};}
+    console.log('Supabase profesionales response:', JSON.stringify(p));
+    if(p.data&&p.data.config){
+      proConfig={...proConfig,...p.data.config};
+      console.log('proConfig cargado:', JSON.stringify(proConfig));
+    } else {
+      console.warn('Config no encontrada o vacía. p.data:', p.data, 'p.error:', p.error);
+    }
     renderConfig();
   }catch(e){console.error(e);}
   showLoader(false);
