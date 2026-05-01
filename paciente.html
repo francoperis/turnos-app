@@ -193,6 +193,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
       <button type="button" class="pago-btn" id="pago-efectivo" onclick="setPago('efectivo')">💵 Efectivo</button>
       <button type="button" class="pago-btn" id="pago-transferencia" onclick="setPago('transferencia')">🏦 Transferencia</button>
     </div>
+    <div id="os-pago-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--ink-dim);background:var(--bg);border-radius:8px;padding:8px 12px;border:1px solid var(--line);">
+      🏥 Con obra social el monto se acuerda en la sesión con el profesional.
+    </div>
 
     <!-- Precio -->
     <div id="precio-display" style="display:none;margin-top:10px;">
@@ -364,34 +367,18 @@ function calcPrecio(){
   return Math.round(proConfig.precio*(1-cobertura/100));
 }
 
-function onOSChange(){
-  actualizarPrecioDisplay();
-  if(selectedPago==='transferencia')renderTransferenciaDatos();
-  checkSubmit();
-}
 
 function actualizarPrecioDisplay(){
   const display=document.getElementById('precio-display');
   if(!selectedPago||!proConfig.precio){display.style.display='none';return;}
-
   const sel=document.getElementById('p-os');
-  const osVisible=document.getElementById('os-select-group').style.display!=='none';
-  const osVal=osVisible&&sel?sel.value:'';
-  const esParticular=!osVal||osVal===''||osVal==='particular';
-
+  const tieneOS=sel.value&&sel.value!=='particular';
+  // Con obra social no mostramos precio — se acuerda en sesión
+  if(tieneOS){display.style.display='none';return;}
   display.style.display='block';
-  const precioEl=document.getElementById('precio-valor');
-  const labelEl=document.getElementById('precio-os-label');
-
-  if(esParticular){
-    precioEl.style.fontSize='22px';
-    precioEl.textContent='$'+Number(proConfig.precio).toLocaleString('es-AR');
-    labelEl.textContent='Precio particular';
-  } else {
-    precioEl.style.fontSize='16px';
-    precioEl.textContent='A confirmar';
-    labelEl.textContent='El profesional te informa el monto con '+osVal;
-  }
+  document.getElementById('precio-valor').style.fontSize='22px';
+  document.getElementById('precio-valor').textContent='$'+Number(proConfig.precio).toLocaleString('es-AR');
+  document.getElementById('precio-os-label').textContent='Precio particular';
 }
 
 function renderTransferenciaDatos(){
@@ -430,12 +417,35 @@ function setMod(m){
 }
 
 function setPago(p){
+  const sel=document.getElementById('p-os');
+  const tieneOS=sel&&sel.value&&sel.value!=='particular';
+  if(p==='transferencia'&&tieneOS)return;
   selectedPago=p;
   document.getElementById('pago-efectivo').classList.toggle('on',p==='efectivo');
   document.getElementById('pago-transferencia').classList.toggle('on',p==='transferencia');
   document.getElementById('transferencia-info-wrap').style.display=p==='transferencia'?'block':'none';
-  // Actualizar datos de transferencia con precio correcto según OS seleccionada
   if(p==='transferencia')renderTransferenciaDatos();
+  actualizarPrecioDisplay();
+  checkSubmit();
+}
+
+function onOSChange(){
+  const sel=document.getElementById('p-os');
+  const tieneOS=sel.value&&sel.value!=='particular';
+  const btnTransferencia=document.getElementById('pago-transferencia');
+  if(tieneOS){
+    btnTransferencia.style.opacity='0.3';
+    btnTransferencia.style.pointerEvents='none';
+    document.getElementById('os-pago-hint').style.display='block';
+    selectedPago='efectivo';
+    document.getElementById('pago-efectivo').classList.add('on');
+    document.getElementById('pago-transferencia').classList.remove('on');
+    document.getElementById('transferencia-info-wrap').style.display='none';
+  } else {
+    btnTransferencia.style.opacity='';
+    btnTransferencia.style.pointerEvents='';
+    document.getElementById('os-pago-hint').style.display='none';
+  }
   actualizarPrecioDisplay();
   checkSubmit();
 }
