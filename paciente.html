@@ -383,21 +383,12 @@ function actualizarPrecioDisplay(){
 
 function renderTransferenciaDatos(){
   const el=document.getElementById('transferencia-datos');
-  const sel=document.getElementById('p-os');
-  const osVal=sel?sel.value:'';
-  const esParticular=!osVal||osVal==='particular';
   let html='';
   if(proConfig.alias){
     html+=`<div class="transferencia-row"><span class="transferencia-label">Alias</span><div style="display:flex;align-items:center;gap:6px;"><span class="transferencia-value">${proConfig.alias}</span><button class="btn-copy-dato" onclick="copyDato('${proConfig.alias}',this)">Copiar</button></div></div>`;
   }
   if(proConfig.cbu){
     html+=`<div class="transferencia-row"><span class="transferencia-label">CBU</span><div style="display:flex;align-items:center;gap:6px;"><span class="transferencia-value" style="font-size:11px;">${proConfig.cbu}</span><button class="btn-copy-dato" onclick="copyDato('${proConfig.cbu}',this)">Copiar</button></div></div>`;
-  }
-  if(proConfig.precio){
-    const montoTexto=esParticular
-      ?'$'+Number(proConfig.precio).toLocaleString('es-AR')
-      :'A confirmar con el profesional';
-    html+=`<div class="transferencia-row"><span class="transferencia-label">Monto</span><span class="transferencia-value" id="transferencia-monto">${montoTexto}</span></div>`;
   }
   if(!proConfig.alias&&!proConfig.cbu){
     html='<div style="font-size:13px;color:var(--ink-dim);">El profesional te va a informar los datos al confirmar el turno.</div>';
