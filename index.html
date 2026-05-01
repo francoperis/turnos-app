@@ -288,7 +288,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
   </header>
   <div class="pro-wrap">
-    <h1 class="page-title">Hola, María Teresa 👋</h1>
+    <h1 class="page-title" id="pro-welcome-name">Hola 👋</h1>
     <p class="page-sub">Tu agenda. Tocá un horario libre para generar un link de turno.</p>
     <div class="link-card">
       <div class="link-card-left">
@@ -502,8 +502,10 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 <script>
 const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
-const PRO_SLUG='arauz';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+// PRO_ID y PRO_SLUG se cargan al iniciar sesión desde la tabla profesionales
+let PRO_ID=null;
+let PRO_SLUG=null;
 const today=new Date();today.setHours(0,0,0,0);
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -592,11 +594,21 @@ async function doRecover(){
 function showRecover(){document.getElementById('login-card-wrap').style.display='none';document.getElementById('recover-card').style.display='block';}
 function showLogin(){document.getElementById('recover-card').style.display='none';document.getElementById('login-card-wrap').style.display='block';}
 
-function showPanel(){
+async function showPanel(){
   document.getElementById('login-screen').classList.remove('show');
   document.getElementById('panel').style.display='block';
-  document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html';
   showLoader(true);
+  // Cargar id y slug del profesional autenticado
+  const{data:{user}}=await sb.auth.getUser();
+  if(!user){logout();return;}
+  PRO_ID=user.id;
+  const{data:pro,error:proErr}=await sb.from('profesionales').select('slug,nombre,config').eq('id',PRO_ID).single();
+  if(proErr||!pro){showNotif('Error al cargar perfil','red');showLoader(false);return;}
+  PRO_SLUG=pro.slug;
+  if(pro.config)proConfig={...proConfig,...pro.config};
+  const nombreMostrar=pro.nombre||'Profesional';
+  document.getElementById('pro-welcome-name').textContent='Hola, '+nombreMostrar+' \uD83D\uDC4B';
+  document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
   loadAll();startRealtime();
 }
 
@@ -614,16 +626,14 @@ let sessionCount={};  // telefono → total sesiones confirmadas
 async function loadAll(){
   showLoader(true);
   try{
-    const[t,b,p,s]=await Promise.all([
-      sb.from('turnos').select('*').eq('profesional_slug',PRO_SLUG).order('fecha').order('hora'),
-      sb.from('dias_bloqueados').select('fecha').eq('profesional_slug',PRO_SLUG),
-      sb.from('profesionales').select('config').eq('slug',PRO_SLUG).single(),
-      sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_slug',PRO_SLUG)
+    const[t,b,s]=await Promise.all([
+      sb.from('turnos').select('*').eq('profesional_id',PRO_ID).order('fecha').order('hora'),
+      sb.from('dias_bloqueados').select('fecha').eq('profesional_id',PRO_ID),
+      sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_id',PRO_ID)
     ]);
     allBookings={};
     (t.data||[]).forEach(r=>{if(!allBookings[r.fecha])allBookings[r.fecha]=[];allBookings[r.fecha].push(r);});
     blockedDays=new Set((b.data||[]).map(r=>r.fecha));
-    if(p.data&&p.data.config){proConfig={...proConfig,...p.data.config};}
     // Mapa telefono → sesiones confirmadas
     sessionCount={};
     (s.data||[]).forEach(r=>{sessionCount[r.telefono]=r.total_sesiones;});
@@ -636,13 +646,13 @@ async function loadAll(){
 function startRealtime(){
   sb.channel('turnos-rt')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'turnos'},payload=>{
-      if(payload.new&&payload.new.profesional_slug===PRO_SLUG){
+      if(payload.new&&payload.new.profesional_id===PRO_ID){
         showNotif('Nueva solicitud: '+payload.new.nombre_paciente);
         loadAll();
       }
     })
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'turnos'},payload=>{
-      if(payload.new&&payload.new.profesional_slug===PRO_SLUG)loadAll();
+      if(payload.new&&payload.new.profesional_id===PRO_ID)loadAll();
     })
     .on('postgres_changes',{event:'DELETE',schema:'public',table:'turnos'},()=>{loadAll();})
     .subscribe(status=>{console.log('Realtime:',status);});
@@ -663,10 +673,10 @@ async function declineBooking(id){
 async function toggleBlock(key){
   showLoader(true);
   if(blockedDays.has(key)){
-    await sb.from('dias_bloqueados').delete().eq('profesional_slug',PRO_SLUG).eq('fecha',key);
+    await sb.from('dias_bloqueados').delete().eq('profesional_id',PRO_ID).eq('fecha',key);
     showNotif('Día desbloqueado');
   }else{
-    await sb.from('dias_bloqueados').insert([{profesional_slug:PRO_SLUG,fecha:key}]);
+    await sb.from('dias_bloqueados').insert([{profesional_id:PRO_ID,fecha:key}]);
     showNotif('Día bloqueado','red');
   }
   await loadAll();
@@ -822,7 +832,7 @@ async function saveManualTurno(){
   const name=document.getElementById('m-name').value.trim(),phone=document.getElementById('m-phone').value.trim(),date=document.getElementById('m-date').value;
   const btn=document.getElementById('modal-save-btn');btn.disabled=true;btn.textContent='Guardando...';
   try{
-    const{error}=await sb.from('turnos').insert([{profesional_slug:PRO_SLUG,nombre_paciente:name,telefono:phone,fecha:date,hora:modalSelectedTime,estado:'confirmed',modalidad:modalidadActual}]);
+    const{error}=await sb.from('turnos').insert([{profesional_id:PRO_ID,nombre_paciente:name,telefono:phone,fecha:date,hora:modalSelectedTime,estado:'confirmed',modalidad:modalidadActual}]);
     if(error)throw error;
     closeModal();showNotif('Turno cargado — '+name);await loadAll();selectProDay(date,parseDate(date));
   }catch(e){showNotif('Error al guardar','red');console.error(e);}
@@ -952,7 +962,7 @@ async function saveSettings(){
   console.log('newConfig a guardar:', newConfig);
   const btn=document.getElementById('btn-save-settings');
   btn.textContent='Guardando...';btn.disabled=true;
-  const{data,error}=await sb.from('profesionales').update({config:newConfig}).eq('slug',PRO_SLUG).select();
+  const{data,error}=await sb.from('profesionales').update({config:newConfig}).eq('id',PRO_ID).select();
   console.log('Supabase update response — data:', data, 'error:', error);
   btn.textContent='Guardar cambios';btn.disabled=false;
   if(error){showNotif('Error al guardar','red');console.error('Error Supabase:', error);return;}
