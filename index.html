@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -243,7 +242,6 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- LOGIN -->
-
 <div class="login-screen show" id="login-screen">
   <div id="login-card-wrap"><div class="login-card">
     <div class="login-header">
@@ -281,7 +279,6 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- PANEL -->
-
 <div id="panel" style="display:none;">
   <header class="app-nav">
     <div class="logo"><div class="logo-dot"></div>TurnosApp</div>
@@ -337,7 +334,6 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL CARGA MANUAL -->
-
 <div class="modal-bg" id="modal-bg" onclick="closeModalBg(event)">
   <div class="modal-box">
     <div class="modal-head"><h3>Cargar turno</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -364,7 +360,6 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL ELIMINAR -->
-
 <div class="modal-bg" id="confirm-modal-bg">
   <div class="modal-box" style="max-width:360px;">
     <div class="modal-head" style="border-bottom:none;padding-bottom:8px;">
@@ -383,7 +378,6 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL LINK -->
-
 <div class="modal-bg" id="link-modal-bg" onclick="closeLinkModalBg(event)">
   <div class="link-modal-box">
     <div class="modal-head"><h3>Link de turno generado</h3><button class="modal-close" onclick="closeLinkModal()">✕</button></div>
@@ -399,101 +393,97 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL AJUSTES -->
-
 <div class="modal-bg" id="settings-modal-bg" onclick="closeSettingsBg(event)">
   <div class="settings-modal-box">
 
-```
-<div class="settings-modal-head">
-  <div class="modal-head" style="border-bottom:1px solid var(--line);">
-    <h3>⚙️ Ajustes</h3>
-    <button class="modal-close" onclick="closeSettings()">✕</button>
-  </div>
-</div>
-
-<div class="settings-modal-scroll">
-
-  <div class="settings-section">
-    <div class="settings-section-title">🗓 Agenda</div>
-    <div class="settings-row">
-      <div class="settings-field">
-        <label class="settings-label">Duración del turno</label>
-        <select class="settings-select" id="cfg-duracion">
-          <option value="30">30 minutos</option>
-          <option value="45">45 minutos</option>
-          <option value="60">60 minutos</option>
-          <option value="90">90 minutos</option>
-        </select>
-      </div>
-      <div class="settings-field">
-        <label class="settings-label">Horario inicio</label>
-        <select class="settings-select" id="cfg-inicio"></select>
+    <div class="settings-modal-head">
+      <div class="modal-head" style="border-bottom:1px solid var(--line);">
+        <h3>⚙️ Ajustes</h3>
+        <button class="modal-close" onclick="closeSettings()">✕</button>
       </div>
     </div>
-    <div class="settings-row">
-      <div class="settings-field">
-        <label class="settings-label">Horario fin</label>
-        <select class="settings-select" id="cfg-fin"></select>
-      </div>
-      <div class="settings-field">
-        <label class="settings-label" style="margin-bottom:4px;">Días sin atención</label>
-        <div style="font-size:12px;color:var(--ink-dim);line-height:1.5;">Domingos siempre bloqueados.</div>
-      </div>
-    </div>
-    <div class="settings-field">
-      <label class="settings-label" style="margin-bottom:8px;">Días que atendés</label>
-      <div class="days-toggle" id="cfg-dias">
-        <button class="day-toggle-btn" data-day="1" type="button">L</button>
-        <button class="day-toggle-btn" data-day="2" type="button">M</button>
-        <button class="day-toggle-btn" data-day="3" type="button">X</button>
-        <button class="day-toggle-btn" data-day="4" type="button">J</button>
-        <button class="day-toggle-btn" data-day="5" type="button">V</button>
-        <button class="day-toggle-btn" data-day="6" type="button">S</button>
-      </div>
-    </div>
-  </div>
 
-  <div class="settings-section">
-    <div class="settings-section-title">💰 Datos de cobro</div>
-    <div class="settings-row">
-      <div class="settings-field">
-        <label class="settings-label">Precio sesión ($)</label>
-        <input type="number" class="settings-input" id="cfg-precio" placeholder="Ej: 8000" min="0">
+    <div class="settings-modal-scroll">
+
+      <div class="settings-section">
+        <div class="settings-section-title">🗓 Agenda</div>
+        <div class="settings-row">
+          <div class="settings-field">
+            <label class="settings-label">Duración del turno</label>
+            <select class="settings-select" id="cfg-duracion">
+              <option value="30">30 minutos</option>
+              <option value="45">45 minutos</option>
+              <option value="60">60 minutos</option>
+              <option value="90">90 minutos</option>
+            </select>
+          </div>
+          <div class="settings-field">
+            <label class="settings-label">Horario inicio</label>
+            <select class="settings-select" id="cfg-inicio"></select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-field">
+            <label class="settings-label">Horario fin</label>
+            <select class="settings-select" id="cfg-fin"></select>
+          </div>
+          <div class="settings-field">
+            <label class="settings-label" style="margin-bottom:4px;">Días sin atención</label>
+            <div style="font-size:12px;color:var(--ink-dim);line-height:1.5;">Domingos siempre bloqueados.</div>
+          </div>
+        </div>
+        <div class="settings-field">
+          <label class="settings-label" style="margin-bottom:8px;">Días que atendés</label>
+          <div class="days-toggle" id="cfg-dias">
+            <button class="day-toggle-btn" data-day="1" type="button">L</button>
+            <button class="day-toggle-btn" data-day="2" type="button">M</button>
+            <button class="day-toggle-btn" data-day="3" type="button">X</button>
+            <button class="day-toggle-btn" data-day="4" type="button">J</button>
+            <button class="day-toggle-btn" data-day="5" type="button">V</button>
+            <button class="day-toggle-btn" data-day="6" type="button">S</button>
+          </div>
+        </div>
       </div>
-      <div class="settings-field">
-        <label class="settings-label">Alias de transferencia</label>
-        <input type="text" class="settings-input" id="cfg-alias" placeholder="teresa.turnos">
+
+      <div class="settings-section">
+        <div class="settings-section-title">💰 Datos de cobro</div>
+        <div class="settings-row">
+          <div class="settings-field">
+            <label class="settings-label">Precio sesión ($)</label>
+            <input type="number" class="settings-input" id="cfg-precio" placeholder="Ej: 8000" min="0">
+          </div>
+          <div class="settings-field">
+            <label class="settings-label">Alias de transferencia</label>
+            <input type="text" class="settings-input" id="cfg-alias" placeholder="teresa.turnos">
+          </div>
+        </div>
+        <div class="settings-field">
+          <label class="settings-label">CBU (opcional)</label>
+          <input type="text" class="settings-input" id="cfg-cbu" placeholder="22 dígitos" maxlength="22">
+        </div>
       </div>
-    </div>
-    <div class="settings-field">
-      <label class="settings-label">CBU (opcional)</label>
-      <input type="text" class="settings-input" id="cfg-cbu" placeholder="22 dígitos" maxlength="22">
-    </div>
-  </div>
 
-  <div class="settings-section">
-    <div class="settings-section-title">🏥 Obras sociales</div>
-    <div style="font-size:12px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">Agregá las obras sociales que aceptás. Los porcentajes de cobertura los configuramos cuando los tengas.</div>
-    <div class="os-list" id="os-list"></div>
-    <div class="os-add-row">
-      <input type="text" class="os-add-input" id="os-input" placeholder="Nombre (ej: IOSCOR)" onkeydown="if(event.key==='Enter')addOS()">
-      <button class="os-add-btn" type="button" onclick="addOS()">+ Agregar</button>
+      <div class="settings-section">
+        <div class="settings-section-title">🏥 Obras sociales</div>
+        <div style="font-size:12px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">Agregá las obras sociales que aceptás. Los porcentajes de cobertura los configuramos cuando los tengas.</div>
+        <div class="os-list" id="os-list"></div>
+        <div class="os-add-row">
+          <input type="text" class="os-add-input" id="os-input" placeholder="Nombre (ej: IOSCOR)" onkeydown="if(event.key==='Enter')addOS()">
+          <button class="os-add-btn" type="button" onclick="addOS()">+ Agregar</button>
+        </div>
+      </div>
+
+    </div><!-- /scroll -->
+
+    <div class="settings-modal-footer">
+      <button class="btn-modal-cancel" style="flex:1;" onclick="closeSettings()">Cancelar</button>
+      <button class="btn-modal-save" style="flex:2;" id="btn-save-settings" onclick="saveSettings()">Guardar cambios</button>
     </div>
-  </div>
-
-</div><!-- /scroll -->
-
-<div class="settings-modal-footer">
-  <button class="btn-modal-cancel" style="flex:1;" onclick="closeSettings()">Cancelar</button>
-  <button class="btn-modal-save" style="flex:2;" id="btn-save-settings" onclick="saveSettings()">Guardar cambios</button>
-</div>
-```
 
   </div>
 </div>
 
 <!-- MODAL VER COMPROBANTE -->
-
 <div class="modal-bg" id="comp-modal-bg" onclick="if(event.target===this)closeCompModal()">
   <div class="modal-box" style="max-width:380px;">
     <div class="modal-head">
@@ -619,18 +609,24 @@ async function logout(){
   document.getElementById('login-error').classList.remove('show');
 }
 
+let sessionCount={};  // telefono → total sesiones confirmadas
+
 async function loadAll(){
   showLoader(true);
   try{
-    const[t,b,p]=await Promise.all([
+    const[t,b,p,s]=await Promise.all([
       sb.from('turnos').select('*').eq('profesional_slug',PRO_SLUG).order('fecha').order('hora'),
       sb.from('dias_bloqueados').select('fecha').eq('profesional_slug',PRO_SLUG),
-      sb.from('profesionales').select('config').eq('slug',PRO_SLUG).single()
+      sb.from('profesionales').select('config').eq('slug',PRO_SLUG).single(),
+      sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_slug',PRO_SLUG)
     ]);
     allBookings={};
     (t.data||[]).forEach(r=>{if(!allBookings[r.fecha])allBookings[r.fecha]=[];allBookings[r.fecha].push(r);});
     blockedDays=new Set((b.data||[]).map(r=>r.fecha));
     if(p.data&&p.data.config){proConfig={...proConfig,...p.data.config};}
+    // Mapa telefono → sesiones confirmadas
+    sessionCount={};
+    (s.data||[]).forEach(r=>{sessionCount[r.telefono]=r.total_sesiones;});
     renderProCal();renderRequests();
     if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
   }catch(e){showNotif('Error al cargar datos','red');console.error(e);}
@@ -758,12 +754,23 @@ function renderRequests(){
     const d=parseDate(b.fecha);
     const modIcon=b.modalidad==='virtual'?'📱 Virtual':'🏢 Presencial';
     const pagoIcon=b.metodo_pago==='transferencia'?'🏦 Transferencia':b.metodo_pago==='efectivo'?'💵 Efectivo':'';
-    const osTag=b.obra_social&&b.obra_social!=='particular'?`<span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:#f0f4f0;border:1px solid var(--line);color:var(--ink-soft);">🏥 ${b.obra_social}</span>`:'';
+    const osTag=b.obra_social?`<span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:#f0f4f0;border:1px solid var(--line);color:var(--ink-soft);">🏥 ${b.obra_social}</span>`:'';
     const precioTag=b.precio_final?`<span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--green-bg);color:var(--green);">$${Number(b.precio_final).toLocaleString('es-AR')}</span>`:'';
     const compBtn=b.comprobante_url?`<button onclick="verComprobante('${b.id}')" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;border:1.5px solid var(--green-light);background:var(--green-bg);color:var(--green);cursor:pointer;font-family:'Outfit',sans-serif;">📎 Ver comprobante</button>`:'';
+    // Badge NUEVO — menos de 2 sesiones confirmadas previas
+    const sesiones=sessionCount[b.telefono]||0;
+    const nuevoTag=sesiones<2
+      ?`<span style="font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);text-transform:uppercase;letter-spacing:.3px;">✨ Nuevo</span>`
+      :'';
     return `<div class="req-item">
-      <div class="req-header"><span class="req-name">${b.nombre_paciente}</span><span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span></div>
-      <div class="req-phone" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <div class="req-header">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="req-name">${b.nombre_paciente}</span>
+          ${nuevoTag}
+        </div>
+        <span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
+      </div>
+      <div class="req-phone" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px;">
         <span>📞 ${b.telefono}</span>
         <button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button>
         <span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);">${modIcon}</span>
@@ -982,6 +989,5 @@ sb.auth.getSession().then(({data:{session}})=>{
   if(session)showPanel();
 });
 </script>
-
 </body>
 </html>
