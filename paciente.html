@@ -116,8 +116,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
   <div class="card">
     <div class="card-header">
       <div class="header-label">Reservá tu turno con</div>
-      <div class="header-profession">Lic. en Psicología</div>
-      <div class="header-name">María Teresa Arauz</div>
+      <div class="header-profession" id="header-profession">Profesional</div>
+      <div class="header-name" id="header-name">Cargando...</div>
       <div class="header-sub">Salud Mental · Corrientes</div>
       <div class="header-os" id="header-os" style="display:none;"></div>
     </div>
@@ -237,7 +237,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
     <div class="success" id="success-screen">
       <div class="success-circle">✓</div>
       <h3>¡Turno solicitado!</h3>
-      <p>Tu solicitud fue enviada a la Lic. Arauz.<br>Te vamos a contactar para confirmar.</p>
+      <p>Tu solicitud fue enviada al profesional.<br>Te vamos a contactar para confirmar.</p>
       <div class="success-detail" id="success-detail"></div>
     </div>
   </div>
@@ -246,8 +246,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 <script>
 const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
-const PRO_SLUG='arauz';
+// PRO_SLUG y PRO_ID se resuelven leyendo ?p= de la URL y buscando en la tabla profesionales
+const PRO_SLUG_PARAM=new URLSearchParams(window.location.search).get('p')||'arauz';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let PRO_ID=null;
+let PRO_SLUG=null;
 const today=new Date();today.setHours(0,0,0,0);
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -298,22 +301,37 @@ function getMaxMonth(){return new Date(today.getFullYear(),today.getMonth()+2,1)
 async function loadTaken(){
   showLoader(true);
   try{
-    const[t,b,p]=await Promise.all([
-      sb.from('turnos').select('fecha,hora').eq('profesional_slug',PRO_SLUG),
-      sb.from('dias_bloqueados').select('fecha').eq('profesional_slug',PRO_SLUG),
-      sb.from('profesionales').select('config').eq('slug',PRO_SLUG).single()
+    // 1 — Resolver profesional por slug
+    const{data:pro,error:proErr}=await sb.from('profesionales')
+      .select('id,slug,nombre,profesion,config')
+      .eq('slug',PRO_SLUG_PARAM)
+      .single();
+    if(proErr||!pro){
+      document.body.innerHTML='<div style="text-align:center;padding:60px 20px;font-family:Outfit,sans-serif;color:#555;">Profesional no encontrado.</div>';
+      return;
+    }
+    PRO_ID=pro.id;
+    PRO_SLUG=pro.slug;
+    // Actualizar header con datos reales del profesional
+    if(pro.nombre)document.getElementById('header-name').textContent=pro.nombre;
+    if(pro.profesion)document.getElementById('header-profession').textContent=pro.profesion;
+    console.log('Supabase profesionales response:', JSON.stringify(pro));
+    if(pro.config){
+      proConfig={...proConfig,...pro.config};
+      console.log('proConfig cargado:', JSON.stringify(proConfig));
+    } else {
+      console.warn('Config no encontrada o vacía.');
+    }
+    renderConfig();
+
+    // 2 — Cargar turnos y días bloqueados usando profesional_id
+    const[t,b]=await Promise.all([
+      sb.from('turnos').select('fecha,hora').eq('profesional_id',PRO_ID),
+      sb.from('dias_bloqueados').select('fecha').eq('profesional_id',PRO_ID)
     ]);
     takenSlots={};
     (t.data||[]).forEach(r=>{if(!takenSlots[r.fecha])takenSlots[r.fecha]=[];takenSlots[r.fecha].push(r.hora);});
     blockedDays=new Set((b.data||[]).map(r=>r.fecha));
-    console.log('Supabase profesionales response:', JSON.stringify(p));
-    if(p.data&&p.data.config){
-      proConfig={...proConfig,...p.data.config};
-      console.log('proConfig cargado:', JSON.stringify(proConfig));
-    } else {
-      console.warn('Config no encontrada o vacía. p.data:', p.data, 'p.error:', p.error);
-    }
-    renderConfig();
   }catch(e){console.error(e);}
   showLoader(false);
 
@@ -563,15 +581,15 @@ async function submitForm(){
 
     // 1 — Upsert paciente (crea si no existe, no pisa si ya existe)
     await sb.from('pacientes').upsert({
-      profesional_slug:PRO_SLUG,
+      profesional_id:PRO_ID,
       nombre:name,
       telefono:phone,
       obra_social:obraSeleccionada
-    },{onConflict:'profesional_slug,telefono',ignoreDuplicates:false});
+    },{onConflict:'profesional_id,telefono',ignoreDuplicates:false});
 
     // 2 — Insertar turno
     const row={
-      profesional_slug:PRO_SLUG,
+      profesional_id:PRO_ID,
       nombre_paciente:name,
       telefono:phone,
       fecha,hora,
