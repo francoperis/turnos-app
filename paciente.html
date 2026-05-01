@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -123,127 +122,124 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
       <div class="header-os" id="header-os" style="display:none;"></div>
     </div>
 
-```
-<div id="form-body" class="card-body">
-  <!-- Nombre -->
-  <div class="form-group">
-    <label class="form-label">Nombre completo</label>
-    <input type="text" class="form-input" id="p-name" oninput="validateName(this);checkSubmit()" maxlength="60">
-    <div class="field-hint" id="hint-name">Solo se permiten letras y espacios</div>
-  </div>
-  <!-- Teléfono -->
-  <div class="form-group">
-    <label class="form-label">Teléfono</label>
-    <input type="tel" class="form-input" id="p-phone" oninput="validatePhone(this);checkSubmit()" maxlength="20">
-    <div class="field-hint" id="hint-phone">Solo se permiten números, espacios y +</div>
-  </div>
-  <!-- Modalidad -->
-  <div class="form-group">
-    <label class="form-label">Modalidad</label>
-    <div class="mod-btns">
-      <button type="button" class="mod-btn on" id="mod-presencial" onclick="setMod('presencial')">Presencial</button>
-      <button type="button" class="mod-btn" id="mod-virtual" onclick="setMod('virtual')">Virtual</button>
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <!-- Modo link fijo -->
-  <div id="fixed-mode" style="display:none;">
-    <div class="fixed-slot">
-      <div class="fixed-slot-label">Tu turno</div>
-      <div class="fixed-slot-value" id="fixed-slot-value"></div>
-      <div class="fixed-slot-sub">Turno reservado para vos</div>
-    </div>
-  </div>
-
-  <!-- Modo libre -->
-  <div id="free-mode">
-    <div class="cal-nav">
-      <button class="cal-nav-btn" id="prev-btn" onclick="changeMonth(-1)">‹</button>
-      <span class="cal-month" id="cal-month"></span>
-      <button class="cal-nav-btn" id="next-btn" onclick="changeMonth(1)">›</button>
-    </div>
-    <div class="days-header">
-      <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div>
-      <div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div>
-      <div class="day-name">S</div>
-    </div>
-    <div class="days-grid" id="days-grid"></div>
-    <div class="slots-section" id="slots-section" style="display:none;">
-      <div class="slots-title" id="slots-title"></div>
-      <div class="time-grid" id="time-grid"></div>
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <!-- Método de pago -->
-  <div class="pago-section" id="pago-section">
-
-    <div class="form-group">
-      <label class="form-label">Obra social</label>
-      <select class="form-input" id="p-os" onchange="onOSChange()">
-        <option value="particular">No tengo / Particular</option>
-      </select>
-    </div>
-
-    <label class="form-label">Método de pago</label>
-    <div class="pago-btns">
-      <button type="button" class="pago-btn" id="pago-efectivo" onclick="setPago('efectivo')">💵 Efectivo</button>
-      <button type="button" class="pago-btn" id="pago-transferencia" onclick="setPago('transferencia')">🏦 Transferencia</button>
-    </div>
-    <div id="os-pago-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--ink-dim);background:var(--bg);border-radius:8px;padding:8px 12px;border:1px solid var(--line);">
-      🏥 Con obra social el monto se acuerda en la sesión con el profesional.
-    </div>
-
-    <!-- Precio -->
-    <div id="precio-display" style="display:none;margin-top:10px;">
-      <div style="background:var(--green-bg);border:1.5px solid var(--green-light);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Total a pagar</div>
-          <div style="font-size:22px;font-weight:700;color:var(--ink);" id="precio-valor">—</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:var(--ink-dim);" id="precio-os-label"></div>
+    <div id="form-body" class="card-body">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input type="text" class="form-input" id="p-name" oninput="validateName(this);checkSubmit()" maxlength="60">
+        <div class="field-hint" id="hint-name">Solo se permiten letras y espacios</div>
+      </div>
+      <!-- Teléfono -->
+      <div class="form-group">
+        <label class="form-label">Teléfono</label>
+        <input type="tel" class="form-input" id="p-phone" oninput="validatePhone(this);checkSubmit()" maxlength="20">
+        <div class="field-hint" id="hint-phone">Solo se permiten números, espacios y +</div>
+      </div>
+      <!-- Modalidad -->
+      <div class="form-group">
+        <label class="form-label">Modalidad</label>
+        <div class="mod-btns">
+          <button type="button" class="mod-btn on" id="mod-presencial" onclick="setMod('presencial')">Presencial</button>
+          <button type="button" class="mod-btn" id="mod-virtual" onclick="setMod('virtual')">Virtual</button>
         </div>
       </div>
+
+      <hr class="divider">
+
+      <!-- Modo link fijo -->
+      <div id="fixed-mode" style="display:none;">
+        <div class="fixed-slot">
+          <div class="fixed-slot-label">Tu turno</div>
+          <div class="fixed-slot-value" id="fixed-slot-value"></div>
+          <div class="fixed-slot-sub">Turno reservado para vos</div>
+        </div>
+      </div>
+
+      <!-- Modo libre -->
+      <div id="free-mode">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="prev-btn" onclick="changeMonth(-1)">‹</button>
+          <span class="cal-month" id="cal-month"></span>
+          <button class="cal-nav-btn" id="next-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="days-header">
+          <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div>
+          <div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div>
+          <div class="day-name">S</div>
+        </div>
+        <div class="days-grid" id="days-grid"></div>
+        <div class="slots-section" id="slots-section" style="display:none;">
+          <div class="slots-title" id="slots-title"></div>
+          <div class="time-grid" id="time-grid"></div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Método de pago -->
+      <div class="pago-section" id="pago-section">
+
+        <div class="form-group">
+          <label class="form-label">Obra social</label>
+          <select class="form-input" id="p-os" onchange="onOSChange()">
+            <option value="particular">No tengo / Particular</option>
+          </select>
+        </div>
+
+        <label class="form-label">Método de pago</label>
+        <div class="pago-btns">
+          <button type="button" class="pago-btn" id="pago-efectivo" onclick="setPago('efectivo')">💵 Efectivo</button>
+          <button type="button" class="pago-btn" id="pago-transferencia" onclick="setPago('transferencia')">🏦 Transferencia</button>
+        </div>
+        <div id="os-pago-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--ink-dim);background:var(--bg);border-radius:8px;padding:8px 12px;border:1px solid var(--line);">
+          🏥 Con obra social el monto se acuerda en la sesión con el profesional.
+        </div>
+
+        <!-- Precio -->
+        <div id="precio-display" style="display:none;margin-top:10px;">
+          <div style="background:var(--green-bg);border:1.5px solid var(--green-light);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Total a pagar</div>
+              <div style="font-size:22px;font-weight:700;color:var(--ink);" id="precio-valor">—</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:var(--ink-dim);" id="precio-os-label"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info transferencia -->
+        <div id="transferencia-info-wrap" style="display:none;">
+          <div class="transferencia-info" id="transferencia-info" style="margin-top:10px;">
+            <div class="transferencia-info-title">📋 Datos para transferir</div>
+            <div id="transferencia-datos"></div>
+          </div>
+          <div class="comprobante-section">
+            <label class="comprobante-label-title">Comprobante de pago</label>
+            <div class="comprobante-hint">Opcional pero recomendado — ayuda a confirmar tu turno más rápido.</div>
+            <input type="file" id="comprobante-input" accept="image/*" style="display:none;" onchange="handleComprobante(this)">
+            <div class="comprobante-drop" id="comprobante-drop" onclick="document.getElementById('comprobante-input').click()">
+              <div class="comprobante-drop-icon">📎</div>
+              <div class="comprobante-drop-text">Tocá para adjuntar imagen<br><strong>o pegá desde tu galería</strong></div>
+            </div>
+            <div class="comprobante-preview" id="comprobante-preview" style="display:none;">
+              <img id="comprobante-img" src="" alt="Comprobante">
+            </div>
+            <div class="comprobante-change" id="comprobante-change" style="display:none;" onclick="clearComprobante()">× Cambiar imagen</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="error-msg">Hubo un error. Por favor intentá de nuevo.</div>
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Solicitar turno</button>
     </div>
 
-    <!-- Info transferencia -->
-    <div id="transferencia-info-wrap" style="display:none;">
-      <div class="transferencia-info" id="transferencia-info" style="margin-top:10px;">
-        <div class="transferencia-info-title">📋 Datos para transferir</div>
-        <div id="transferencia-datos"></div>
-      </div>
-      <div class="comprobante-section">
-        <label class="comprobante-label-title">Comprobante de pago</label>
-        <div class="comprobante-hint">Opcional pero recomendado — ayuda a confirmar tu turno más rápido.</div>
-        <input type="file" id="comprobante-input" accept="image/*" style="display:none;" onchange="handleComprobante(this)">
-        <div class="comprobante-drop" id="comprobante-drop" onclick="document.getElementById('comprobante-input').click()">
-          <div class="comprobante-drop-icon">📎</div>
-          <div class="comprobante-drop-text">Tocá para adjuntar imagen<br><strong>o pegá desde tu galería</strong></div>
-        </div>
-        <div class="comprobante-preview" id="comprobante-preview" style="display:none;">
-          <img id="comprobante-img" src="" alt="Comprobante">
-        </div>
-        <div class="comprobante-change" id="comprobante-change" style="display:none;" onclick="clearComprobante()">× Cambiar imagen</div>
-      </div>
+    <div class="success" id="success-screen">
+      <div class="success-circle">✓</div>
+      <h3>¡Turno solicitado!</h3>
+      <p>Tu solicitud fue enviada a la Lic. Arauz.<br>Te vamos a contactar para confirmar.</p>
+      <div class="success-detail" id="success-detail"></div>
     </div>
-  </div>
-
-  <div class="error-msg" id="error-msg">Hubo un error. Por favor intentá de nuevo.</div>
-  <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Solicitar turno</button>
-</div>
-
-<div class="success" id="success-screen">
-  <div class="success-circle">✓</div>
-  <h3>¡Turno solicitado!</h3>
-  <p>Tu solicitud fue enviada a la Lic. Arauz.<br>Te vamos a contactar para confirmar.</p>
-  <div class="success-detail" id="success-detail"></div>
-</div>
-```
-
   </div>
 </div>
 
@@ -562,8 +558,18 @@ async function submitForm(){
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='Enviando...';
   try{
     const osSelect=document.getElementById('p-os');
-    const obraSeleccionada=osSelect.value||null;
+    const obraSeleccionada=osSelect.value&&osSelect.value!=='particular'?osSelect.value:null;
     const precioFinal=calcPrecio();
+
+    // 1 — Upsert paciente (crea si no existe, no pisa si ya existe)
+    await sb.from('pacientes').upsert({
+      profesional_slug:PRO_SLUG,
+      nombre:name,
+      telefono:phone,
+      obra_social:obraSeleccionada
+    },{onConflict:'profesional_slug,telefono',ignoreDuplicates:false});
+
+    // 2 — Insertar turno
     const row={
       profesional_slug:PRO_SLUG,
       nombre_paciente:name,
@@ -578,19 +584,20 @@ async function submitForm(){
     };
     const{error}=await sb.from('turnos').insert([row]);
     if(error)throw error;
+
     document.getElementById('form-body').style.display='none';
     document.getElementById('success-screen').classList.add('show');
     const d=parseDate(fecha);
     const pagoText=selectedPago==='transferencia'
       ?'Transferencia'+(comprobanteBase64?' · Comprobante adjunto':' · Sin comprobante')
       :'Efectivo';
-    const osText=obraSeleccionada&&obraSeleccionada!=='particular'?obraSeleccionada:'Particular';
+    const osText=obraSeleccionada?obraSeleccionada:'Particular';
     document.getElementById('success-detail').innerHTML=
       '<div><strong>Paciente:</strong> '+name+'</div>'+
       '<div><strong>Fecha:</strong> '+DAYS[d.getDay()]+' '+d.getDate()+' de '+MONTHS[d.getMonth()]+'</div>'+
       '<div><strong>Hora:</strong> '+hora+'</div>'+
       '<div><strong>Modalidad:</strong> '+(selectedMod==='virtual'?'Virtual':'Presencial')+'</div>'+
-      (osText?'<div><strong>Obra social:</strong> '+osText+'</div>':'')+
+      '<div><strong>Obra social:</strong> '+osText+'</div>'+
       (precioFinal?'<div><strong>Total a pagar:</strong> $'+precioFinal.toLocaleString('es-AR')+'</div>':'')+
       '<div><strong>Pago:</strong> '+pagoText+'</div>'+
       '<div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:600;">Pendiente de confirmación</div>';
@@ -599,6 +606,5 @@ async function submitForm(){
 
 loadTaken();
 </script>
-
 </body>
 </html>
