@@ -68,16 +68,22 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-copy:hover{opacity:.88;}
 /* MÉTRICAS */
 .metrics-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
-.metric-card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;}
-.metric-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1;}
-.metric-num.green{color:var(--green);}
-.metric-num.amber{color:var(--amber);}
+.metric-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.metric-card.total::before{background:var(--line);}
+.metric-card.conf::before{background:var(--green);}
+.metric-card.pend::before{background:var(--amber);}
+.metric-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;line-height:1;}
+.metric-card.total .metric-num{color:var(--ink);}
+.metric-card.conf .metric-num{color:var(--green);}
+.metric-card.pend .metric-num{color:var(--amber);}
 .metric-label{font-size:11px;color:var(--ink-dim);font-weight:500;}
 @media(max-width:500px){
   .page-title{font-size:22px;}
   .link-url{max-width:160px;}
-  .metric-num{font-size:18px;}
+  .metric-num{font-size:22px;}
   .metric-label{font-size:10px;}
+  .metric-card{padding:12px 12px;}
 }
 .pro-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;}
 @media(max-width:720px){.pro-grid{grid-template-columns:1fr;}}
@@ -364,16 +370,16 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
       <button class="btn-copy" onclick="copyLink(this)">📋 Copiar link</button>
     </div>
     <div class="metrics-bar">
-      <div class="metric-card">
+      <div class="metric-card total">
         <div class="metric-num" id="metric-total">—</div>
         <div class="metric-label">Turnos este mes</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-num green" id="metric-confirmed">—</div>
+      <div class="metric-card conf">
+        <div class="metric-num" id="metric-confirmed">—</div>
         <div class="metric-label">Confirmados</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-num amber" id="metric-pending">—</div>
+      <div class="metric-card pend">
+        <div class="metric-num" id="metric-pending">—</div>
         <div class="metric-label">Sin confirmar</div>
       </div>
     </div>
@@ -906,10 +912,6 @@ function renderRequests(){
           ${nuevoTag}
         </div>
         <span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
-      </div>
-      <div class="req-meta">
-        <span>📞 ${b.telefono}</span>
-        <button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button>
       </div>
       ${warningTel}
       <div class="req-actions">
