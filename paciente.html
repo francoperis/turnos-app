@@ -585,7 +585,7 @@ async function submitForm(){
       nombre:name,
       telefono:phone,
       obra_social:obraSeleccionada
-    },{onConflict:'profesional_id,telefono',ignoreDuplicates:false});
+    },{onConflict:'profesional_id,telefono',ignoreDuplicates:true});
 
     // 2 — Insertar turno
     const row={
