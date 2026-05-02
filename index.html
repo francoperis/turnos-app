@@ -1224,19 +1224,23 @@ function toggleDurPac(){
   if(durPacOn)loadDurPacList();
 }
 
-async function loadDurPacList(){
+function loadDurPacList(){
   const list=document.getElementById('dur-pac-list');
-  list.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:var(--ink-dim);">Cargando...</div>';
-  const{data,error}=await sb.from('pacientes').select('telefono,nombre').eq('profesional_id',PRO_ID).order('nombre');
-  if(error||!data||data.length===0){
-    list.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:var(--ink-dim);">Sin pacientes registrados aún.</div>';
+  // Armar lista desde allBookings (cache en memoria) — solo pacientes con turnos reales
+  const seen=new Set();
+  const uniquePacientes=[];
+  Object.values(allBookings).flat().forEach(b=>{
+    const tel=(b.telefono||'').replace(/\D/g,'');
+    if(!tel||seen.has(tel))return;
+    seen.add(tel);
+    uniquePacientes.push({telefono:b.telefono,nombre:b.nombre_paciente});
+  });
+  uniquePacientes.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(uniquePacientes.length===0){
+    list.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:var(--ink-dim);">Sin pacientes con turnos aún.</div>';
     return;
   }
-  // Deduplicar por telefono normalizado
-  const seen=new Set();
-  const uniquePacientes=data.filter(p=>{const tel=(p.telefono||'').replace(/\D/g,'');if(!tel||seen.has(tel))return false;seen.add(tel);return true;});
   const baseDur=proConfig.duracion||60;
-  const opciones=[30,45,60,75,90].map(m=>`<option value="${m}">${m} min</option>`).join('');
   list.innerHTML=uniquePacientes.map(p=>{
     const iniciales=p.nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const val=durPacData[p.telefono]||'base';
