@@ -54,15 +54,31 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
   .btn-logout{font-size:11px;padding:5px 9px;}
 }
 /* MAIN */
-.pro-wrap{max-width:960px;margin:0 auto;padding:12px 20px 16px;}
-.page-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:500;margin-bottom:2px;}
-.page-sub{font-size:12px;color:var(--ink-dim);margin-bottom:12px;}
-.link-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.pro-wrap{max-width:960px;margin:0 auto;padding:16px 20px 16px;}
+.pro-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.pro-header-left{}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;margin-bottom:2px;line-height:1.2;}
+.page-profession{font-size:12px;color:var(--green);font-weight:600;margin-bottom:2px;letter-spacing:.2px;}
+.page-sub{font-size:12px;color:var(--ink-dim);}
+.link-card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
 .link-card-left{display:flex;flex-direction:column;gap:2px;min-width:0;}
 .link-card-left span{font-size:10px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.6px;}
-.link-url{font-size:12px;font-weight:500;color:var(--green);word-break:break-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.link-url{font-size:12px;font-weight:500;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:580px;}
 .btn-copy{background:var(--green);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer;transition:opacity .15s;white-space:nowrap;flex-shrink:0;}
 .btn-copy:hover{opacity:.88;}
+/* MÉTRICAS */
+.metrics-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.metric-card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;}
+.metric-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1;}
+.metric-num.green{color:var(--green);}
+.metric-num.amber{color:var(--amber);}
+.metric-label{font-size:11px;color:var(--ink-dim);font-weight:500;}
+@media(max-width:500px){
+  .page-title{font-size:22px;}
+  .link-url{max-width:160px;}
+  .metric-num{font-size:18px;}
+  .metric-label{font-size:10px;}
+}
 .pro-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;}
 @media(max-width:720px){.pro-grid{grid-template-columns:1fr;}}
 .card{background:var(--white);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;}
@@ -313,14 +329,33 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
   </header>
   <div class="pro-wrap">
-    <h1 class="page-title" id="pro-welcome-name">Hola 👋</h1>
-    <p class="page-sub">Tu agenda. Tocá un horario libre para generar un link de turno.</p>
+    <div class="pro-header">
+      <div class="pro-header-left">
+        <div class="page-profession" id="pro-profession"></div>
+        <h1 class="page-title" id="pro-welcome-name">Hola 👋</h1>
+        <p class="page-sub">Tu agenda. Tocá un horario libre para generar un link de turno.</p>
+      </div>
+    </div>
     <div class="link-card">
       <div class="link-card-left">
-        <span>Link público para pacientes</span>
+        <span>Link para pacientes</span>
         <div class="link-url" id="public-link-text"></div>
       </div>
       <button class="btn-copy" onclick="copyLink(this)">📋 Copiar link</button>
+    </div>
+    <div class="metrics-bar">
+      <div class="metric-card">
+        <div class="metric-num" id="metric-total">—</div>
+        <div class="metric-label">Turnos este mes</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num green" id="metric-confirmed">—</div>
+        <div class="metric-label">Confirmados</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num amber" id="metric-pending">—</div>
+        <div class="metric-label">Sin confirmar</div>
+      </div>
     </div>
     <div class="pro-grid">
       <div class="card">
@@ -644,7 +679,10 @@ async function showPanel(){
   PRO_SLUG=pro.slug;
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
+  const profMostrar=pro.profesion||'';
   document.getElementById('pro-welcome-name').textContent='Hola, '+nombreMostrar+' \uD83D\uDC4B';
+  document.getElementById('pro-profession').textContent=profMostrar;
+  document.getElementById('pro-profession').style.display=profMostrar?'block':'none';
   document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
   loadAll();startRealtime();
 }
@@ -726,6 +764,21 @@ async function toggleBlock(key){
 
 function renderProCal(){
   document.getElementById('pro-month-label').textContent=MONTHS[proMonth.getMonth()]+' '+proMonth.getFullYear();
+  // Calcular métricas del mes actual
+  const mesKey=proMonth.getFullYear()+'-'+String(proMonth.getMonth()+1).padStart(2,'0');
+  let total=0,confirmed=0,pending=0;
+  Object.entries(allBookings).forEach(([key,list])=>{
+    if(key.startsWith(mesKey)){
+      list.forEach(b=>{
+        total++;
+        if(b.estado==='confirmed')confirmed++;
+        else if(b.estado==='pending')pending++;
+      });
+    }
+  });
+  document.getElementById('metric-total').textContent=total;
+  document.getElementById('metric-confirmed').textContent=confirmed;
+  document.getElementById('metric-pending').textContent=pending;
   const grid=document.getElementById('pro-cal-days');grid.innerHTML='';
   const first=new Date(proMonth.getFullYear(),proMonth.getMonth(),1);
   const last=new Date(proMonth.getFullYear(),proMonth.getMonth()+1,0);
