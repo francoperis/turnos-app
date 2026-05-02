@@ -150,10 +150,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-copy-phone{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
 .btn-copy-phone:hover{border-color:var(--green);color:var(--green);}
 .req-actions{display:flex;gap:6px;margin-top:8px;}
-.btn-confirm{flex:1;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:7px 0;border-radius:7px;transition:opacity .15s;}
+.btn-confirm{flex:2;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 0;border-radius:7px;transition:opacity .15s;}
 .btn-confirm:hover{opacity:.85;}
-.btn-decline{background:transparent;color:var(--ink-dim);border:1px solid var(--line);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all .15s;}
+.btn-decline{flex:1;background:transparent;color:var(--ink-dim);border:1px solid var(--line);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
 .btn-decline:hover{border-color:var(--red);color:var(--red);}
+.btn-details{flex:1;background:transparent;color:var(--green);border:1px solid var(--green-light);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
+.btn-details:hover{background:var(--green-bg);}
 .empty-req{padding:24px 16px;text-align:center;font-size:13px;color:var(--ink-dim);}
 .empty-req .big{font-size:28px;margin-bottom:8px;}
 .new-badge{display:inline-block;background:var(--amber-bg);color:var(--amber);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;animation:pulse 2s infinite;}
@@ -193,7 +195,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .dur-pac-select:focus{border-color:var(--green);}
 .dur-pac-select.custom{border-color:var(--green);background:var(--green-bg);color:var(--green);font-weight:600;}
 
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:400;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-bg.open{opacity:1;pointer-events:all;}
 .modal-box{background:var(--white);border-radius:16px;width:100%;max-width:400px;box-shadow:var(--shadow-md);transform:translateY(16px);transition:transform .25s;overflow:hidden;}
 .modal-bg.open .modal-box{transform:translateY(0);}
@@ -686,7 +688,7 @@ async function doRecover(){
   if(!email)return;
   const btn=document.getElementById('recover-btn');
   btn.textContent='Enviando...';btn.disabled=true;
-  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/reset'});
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/reset.html'});
   btn.textContent='Enviar link';btn.disabled=false;
   if(error){errEl.textContent='Ocurrió un error. Intentá de nuevo.';errEl.classList.add('show');}
   else{sucEl.classList.add('show');}
@@ -913,7 +915,7 @@ function renderRequests(){
       <div class="req-actions">
         <button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button>
         <button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button>
-        <button class="btn-decline" onclick="openDetailModal('${b.id}')" style="border-color:var(--green);color:var(--green);">+ Detalles</button>
+        <button class="btn-details" onclick="openDetailModal('${b.id}')">Detalles</button>
       </div>
     </div>`;
   }).join('');
@@ -1173,8 +1175,8 @@ function openDetailModal(id){
     ${comprobanteHtml}
   `;
   document.getElementById('detail-modal-actions').innerHTML=`
-    <button class="btn-confirm" onclick="confirmBooking('${b.id}');closeDetailModal()">✓ Confirmar</button>
-    <button class="btn-decline" onclick="declineBooking('${b.id}');closeDetailModal()">Rechazar</button>
+    <button class="btn-confirm" style="flex:2;padding:11px 0;font-size:13px;border-radius:8px;" onclick="confirmBooking('${b.id}');closeDetailModal()">✓ Confirmar</button>
+    <button class="btn-decline" style="flex:1;padding:11px 0;font-size:13px;border-radius:8px;text-align:center;" onclick="declineBooking('${b.id}');closeDetailModal()">Rechazar</button>
   `;
   document.getElementById('detail-modal-bg').classList.add('open');
 }
