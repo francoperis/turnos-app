@@ -792,16 +792,20 @@ function startRealtime(){
 }
 
 async function confirmBooking(id){
-  showLoader(true);
   const{error}=await sb.from('turnos').update({estado:'confirmed'}).eq('id',id);
-  if(error){showNotif('Error al confirmar','red');showLoader(false);return;}
-  showLoader(false);showNotif('Turno confirmado ✓');await loadAll();
+  if(error){showNotif('Error al confirmar','red');return;}
+  // Actualizar cache local sin recargar todo
+  Object.values(allBookings).forEach(arr=>arr.forEach(b=>{if(b.id===id)b.estado='confirmed';}));
+  renderRequests();if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
+  showNotif('Turno confirmado ✓');
 }
 async function declineBooking(id){
-  showLoader(true);
   const{error}=await sb.from('turnos').delete().eq('id',id);
-  if(error){showNotif('Error al rechazar: '+error.message,'red');showLoader(false);return;}
-  showLoader(false);showNotif('Turno rechazado','red');await loadAll();
+  if(error){showNotif('Error al rechazar: '+error.message,'red');return;}
+  // Eliminar del cache local sin recargar todo
+  Object.keys(allBookings).forEach(k=>{allBookings[k]=allBookings[k].filter(b=>b.id!==id);});
+  renderRequests();if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
+  showNotif('Turno rechazado','red');
 }
 async function toggleBlock(key){
   showLoader(true);
@@ -1008,10 +1012,11 @@ async function confirmDelete(){
   const idToDelete=pendingDeleteId;
   if(!idToDelete)return;
   document.getElementById('confirm-modal-bg').classList.remove('open');pendingDeleteId=null;
-  showLoader(true);
   const{error}=await sb.from('turnos').delete().eq('id',idToDelete);
-  if(error){showNotif('Error al eliminar','red');showLoader(false);return;}
-  showNotif('Turno eliminado','red');await loadAll();
+  if(error){showNotif('Error al eliminar','red');return;}
+  Object.keys(allBookings).forEach(k=>{allBookings[k]=allBookings[k].filter(b=>b.id!==idToDelete);});
+  renderProCal();if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
+  showNotif('Turno eliminado','red');
 }
 
 async function togglePagado(btn){
@@ -1021,7 +1026,10 @@ async function togglePagado(btn){
   btn.textContent='...';btn.disabled=true;
   const{error}=await sb.from('turnos').update({pagado:nuevoEstado}).eq('id',id);
   if(error){btn.textContent=esPagado?'Pagado':'Sin pagar';btn.disabled=false;return;}
-  showNotif(nuevoEstado?'Marcado como pagado':'Marcado como sin pagar');await loadAll();
+  // Actualizar cache local sin recargar
+  Object.values(allBookings).forEach(arr=>arr.forEach(b=>{if(b.id===id)b.pagado=nuevoEstado;}));
+  if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
+  showNotif(nuevoEstado?'Marcado como pagado ✓':'Marcado como sin pagar');
 }
 
 function copyPhone(phone,btn){
@@ -1224,9 +1232,12 @@ async function loadDurPacList(){
     list.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:var(--ink-dim);">Sin pacientes registrados aún.</div>';
     return;
   }
+  // Deduplicar por telefono normalizado
+  const seen=new Set();
+  const uniquePacientes=data.filter(p=>{const tel=(p.telefono||'').replace(/\D/g,'');if(!tel||seen.has(tel))return false;seen.add(tel);return true;});
   const baseDur=proConfig.duracion||60;
   const opciones=[30,45,60,75,90].map(m=>`<option value="${m}">${m} min</option>`).join('');
-  list.innerHTML=data.map(p=>{
+  list.innerHTML=uniquePacientes.map(p=>{
     const iniciales=p.nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const val=durPacData[p.telefono]||'base';
     const isCustom=val!=='base';
