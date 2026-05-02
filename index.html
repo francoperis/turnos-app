@@ -775,7 +775,7 @@ function startRealtime(){
       if(payload.new&&payload.new.profesional_id===PRO_ID)loadAll();
     })
     .on('postgres_changes',{event:'DELETE',schema:'public',table:'turnos'},()=>{loadAll();})
-    .subscribe(status=>{console.log('Realtime:',status);});
+    .subscribe();
 }
 
 async function confirmBooking(id){
@@ -1084,13 +1084,11 @@ function removeOS(i){osList.splice(i,1);renderOSList();}
 async function saveSettings(){
   const dias=[];
   document.querySelectorAll('#cfg-dias .day-toggle-btn.on').forEach(btn=>{dias.push(parseInt(btn.getAttribute('data-day')));});
-  console.log('saveSettings ejecutado — dias:', dias);
   if(dias.length===0){showNotif('Seleccioná al menos un día','red');return;}
   const inicio=document.getElementById('cfg-inicio').value;
   const fin=document.getElementById('cfg-fin').value;
-  console.log('inicio:', JSON.stringify(inicio), 'fin:', JSON.stringify(fin));
-  if(!inicio||!fin){showNotif('Completá los horarios','red');console.warn('horarios vacíos');return;}
-  if(inicio>=fin){showNotif('El horario de inicio debe ser antes del fin','red');console.warn('inicio >= fin');return;}
+  if(!inicio||!fin){showNotif('Completá los horarios','red');return;}
+  if(inicio>=fin){showNotif('El horario de inicio debe ser antes del fin','red');return;}
   const newConfig={
     duracion:parseInt(document.getElementById('cfg-duracion').value),
     inicio,fin,dias,
@@ -1101,13 +1099,11 @@ async function saveSettings(){
     dur_pac_activo:durPacOn,
     dur_pac:{...durPacData}
   };
-  console.log('newConfig a guardar:', newConfig);
   const btn=document.getElementById('btn-save-settings');
   btn.textContent='Guardando...';btn.disabled=true;
   const{data,error}=await sb.from('profesionales').update({config:newConfig}).eq('id',PRO_ID).select();
-  console.log('Supabase update response — data:', data, 'error:', error);
   btn.textContent='Guardar cambios';btn.disabled=false;
-  if(error){showNotif('Error al guardar','red');console.error('Error Supabase:', error);return;}
+  if(error){showNotif('Error al guardar','red');return;}
   proConfig={...newConfig};
   closeSettings();
   showNotif('Ajustes guardados ✓');
