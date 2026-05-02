@@ -156,7 +156,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .req-list{padding:0;}
 .req-item{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:3px;}
 .req-item:last-child{border-bottom:none;}
-.req-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.req-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap;overflow:hidden;}
 .req-name{font-size:13px;font-weight:600;}
 .req-time{font-size:11px;font-weight:600;color:var(--green);white-space:nowrap;}
 .req-meta{font-size:11px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:3px;}
@@ -927,11 +927,11 @@ function renderRequests(){
       :'';
     return `<div class="req-item">
       <div class="req-header">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span class="req-name">${b.nombre_paciente}</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;">
+          <span class="req-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${b.nombre_paciente}</span>
           ${nuevoTag}
         </div>
-        <span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
+        <span class="req-time" style="flex-shrink:0;white-space:nowrap;">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
       </div>
       ${warningTel}
       <div class="req-actions">
