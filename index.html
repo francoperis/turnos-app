@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--green-light:#c8e6da;--amber:#d97706;--amber-bg:#fef3cd;--red:#dc2626;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,.07);--shadow-md:0 4px 24px rgba(0,0,0,.10);}
+:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--green-light:#c8e6da;--amber:#d97706;--amber-bg:#fef3cd;--red:#dc2626;--radius:12px;--shadow:0 2px 16px rgba(0,0,0,.09);--shadow-md:0 4px 24px rgba(0,0,0,.12);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
 .loader-overlay{position:fixed;inset:0;background:rgba(247,245,242,.9);display:flex;align-items:center;justify-content:center;z-index:200;transition:opacity .2s;}
@@ -68,16 +68,18 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-copy:hover{opacity:.88;}
 /* MÉTRICAS */
 .metrics-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
-.metric-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;}
-.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.metric-card.total::before{background:var(--line);}
-.metric-card.conf::before{background:var(--green);}
-.metric-card.pend::before{background:var(--amber);}
+.metric-card{border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;border:1px solid transparent;}
+.metric-card.total{background:#f0ede8;border-color:#e3dfd9;}
+.metric-card.conf{background:#e6f2ec;border-color:#c8e6da;}
+.metric-card.pend{background:#fef6e4;border-color:#f8e4b0;}
 .metric-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;line-height:1;}
 .metric-card.total .metric-num{color:var(--ink);}
 .metric-card.conf .metric-num{color:var(--green);}
-.metric-card.pend .metric-num{color:var(--amber);}
-.metric-label{font-size:11px;color:var(--ink-dim);font-weight:500;}
+.metric-card.pend .metric-num{color:#b45309;}
+.metric-label{font-size:11px;font-weight:600;}
+.metric-card.total .metric-label{color:#888;}
+.metric-card.conf .metric-label{color:#2d7d5f;}
+.metric-card.pend .metric-label{color:#b45309;}
 @media(max-width:500px){
   .page-title{font-size:22px;}
   .link-url{max-width:160px;}
@@ -158,10 +160,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .req-actions{display:flex;gap:6px;margin-top:8px;}
 .btn-confirm{flex:2;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 0;border-radius:7px;transition:opacity .15s;}
 .btn-confirm:hover{opacity:.85;}
-.btn-decline{flex:1;background:transparent;color:var(--ink-dim);border:1px solid var(--line);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
+.btn-decline{flex:1;background:transparent;color:var(--ink-soft);border:1.5px solid #d0ccc7;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
 .btn-decline:hover{border-color:var(--red);color:var(--red);}
-.btn-details{flex:1;background:transparent;color:var(--green);border:1px solid var(--green-light);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
+.btn-details{flex:1;background:transparent;color:var(--green);border:1.5px solid var(--green-light);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
 .btn-details:hover{background:var(--green-bg);}
+.req-warning{font-size:11px;font-weight:600;color:#b45309;background:#fef9ec;border:1px solid #f8e4b0;border-radius:6px;padding:4px 8px;margin-top:4px;display:flex;align-items:center;gap:5px;}
 .empty-req{padding:24px 16px;text-align:center;font-size:13px;color:var(--ink-dim);}
 .empty-req .big{font-size:28px;margin-bottom:8px;}
 .new-badge{display:inline-block;background:var(--amber-bg);color:var(--amber);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;animation:pulse 2s infinite;}
@@ -903,7 +906,7 @@ function renderRequests(){
     // Warning si el teléfono ya está registrado con otro nombre
     const nombreRegistrado=pacienteNombre[b.telefono];
     const warningTel=(nombreRegistrado&&nombreRegistrado.toLowerCase()!==b.nombre_paciente.toLowerCase())
-      ?`<div style="margin-top:6px;font-size:11px;font-weight:600;color:#b45309;background:#fef3cd;border:1px solid #fcd34d;border-radius:7px;padding:5px 10px;">⚠️ Este teléfono está registrado como <strong>${nombreRegistrado}</strong></div>`
+      ?`<div class="req-warning">⚠️ Teléfono registrado como <strong>${nombreRegistrado}</strong></div>`
       :'';
     return `<div class="req-item">
       <div class="req-header">
