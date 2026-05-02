@@ -158,7 +158,25 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .empty-req .big{font-size:28px;margin-bottom:8px;}
 .new-badge{display:inline-block;background:var(--amber-bg);color:var(--amber);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-/* DURACIÓN POR PACIENTE */
+/* MODAL DETALLE SOLICITUD */
+.detail-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.detail-modal-bg.open{opacity:1;pointer-events:all;}
+@media(min-width:600px){.detail-modal-bg{align-items:center;}}
+.detail-modal{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:0;overflow:hidden;transform:translateY(30px);transition:transform .25s cubic-bezier(.34,1.2,.64,1);}
+@media(min-width:600px){.detail-modal{border-radius:16px;transform:translateY(10px);}}
+.detail-modal-bg.open .detail-modal{transform:translateY(0);}
+.detail-modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;}
+.detail-modal-head h3{font-size:16px;font-weight:600;}
+.detail-modal-body{padding:16px 20px;display:flex;flex-direction:column;gap:14px;}
+.detail-row{display:flex;flex-direction:column;gap:2px;}
+.detail-label{font-size:10px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;}
+.detail-value{font-size:14px;font-weight:500;color:var(--ink);}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.detail-warning{background:#fef3cd;border:1px solid #fcd34d;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#b45309;}
+.detail-actions{padding:12px 20px 20px;display:flex;gap:8px;}
+.detail-actions .btn-confirm{flex:1;padding:11px 0;font-size:13px;border-radius:8px;}
+.detail-actions .btn-decline{padding:11px 16px;font-size:13px;border-radius:8px;}
+
 .dur-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .dur-toggle-label{font-size:13px;font-weight:500;color:var(--ink);}
 .dur-toggle-sub{font-size:11px;color:var(--ink-dim);margin-top:1px;}
@@ -556,6 +574,17 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL VER COMPROBANTE -->
+<div class="detail-modal-bg" id="detail-modal-bg" onclick="if(event.target===this)closeDetailModal()">
+  <div class="detail-modal">
+    <div class="detail-modal-head">
+      <h3 id="detail-title">Solicitud de turno</h3>
+      <button class="modal-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="detail-modal-body" id="detail-modal-body"></div>
+    <div class="detail-actions" id="detail-modal-actions"></div>
+  </div>
+</div>
+
 <div class="modal-bg" id="comp-modal-bg" onclick="if(event.target===this)closeCompModal()">
   <div class="modal-box" style="max-width:380px;">
     <div class="modal-head">
@@ -879,14 +908,13 @@ function renderRequests(){
       <div class="req-meta">
         <span>📞 ${b.telefono}</span>
         <button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button>
-        ${b.modalidad==='virtual'?'<span class="req-tag">📱 Virtual</span>':'<span class="req-tag">🏢 Presencial</span>'}
-        ${b.metodo_pago==='transferencia'?'<span class="req-tag">🏦 Transferencia</span>':b.metodo_pago==='efectivo'?'<span class="req-tag">💵 Efectivo</span>':''}
-        ${b.obra_social?`<span class="req-tag">🏥 ${b.obra_social}</span>`:''}
-        ${b.precio_final?`<span class="req-tag green">$${Number(b.precio_final).toLocaleString('es-AR')}</span>`:''}
-        ${compBtn}
       </div>
       ${warningTel}
-      <div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div>
+      <div class="req-actions">
+        <button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button>
+        <button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button>
+        <button class="btn-decline" onclick="openDetailModal('${b.id}')" style="border-color:var(--green);color:var(--green);">+ Detalles</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1102,7 +1130,57 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').catch(err=>console.log('SW error:',err));
 }
 
-// ── DURACIÓN POR PACIENTE ───────────────────────────────────
+// ── MODAL DETALLE SOLICITUD ─────────────────────────────────
+function openDetailModal(id){
+  const b=Object.values(allBookings).flat().find(x=>x.id===id);
+  if(!b)return;
+  const d=parseDate(b.fecha);
+  const fechaStr=DAYS[d.getDay()]+' '+d.getDate()+' de '+MONTHS[d.getMonth()]+' · '+b.hora;
+  const sesiones=sessionCount[b.telefono]||0;
+  const nombreRegistrado=pacienteNombre[b.telefono];
+  const warningHtml=(nombreRegistrado&&nombreRegistrado.toLowerCase()!==b.nombre_paciente.toLowerCase())
+    ?`<div class="detail-warning">⚠️ Este teléfono está registrado como <strong>${nombreRegistrado}</strong></div>`:'';
+  const comprobanteHtml=b.comprobante_url
+    ?`<div class="detail-row"><div class="detail-label">Comprobante</div><button onclick="verComprobante('${b.id}')" style="margin-top:4px;font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;border:1.5px solid var(--green-light);background:var(--green-bg);color:var(--green);cursor:pointer;font-family:'Outfit',sans-serif;width:fit-content;">📎 Ver comprobante</button></div>`:'';
+
+  document.getElementById('detail-title').textContent=b.nombre_paciente;
+  document.getElementById('detail-modal-body').innerHTML=`
+    ${warningHtml}
+    <div class="detail-grid">
+      <div class="detail-row">
+        <div class="detail-label">Fecha y hora</div>
+        <div class="detail-value">${fechaStr}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Teléfono</div>
+        <div class="detail-value" style="display:flex;align-items:center;gap:6px;">${b.telefono}<button class="btn-copy-phone" onclick="copyPhone('${b.telefono}',this)">Copiar</button></div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Modalidad</div>
+        <div class="detail-value">${b.modalidad==='virtual'?'📱 Virtual':'🏢 Presencial'}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Pago</div>
+        <div class="detail-value">${b.metodo_pago==='transferencia'?'🏦 Transferencia':b.metodo_pago==='efectivo'?'💵 Efectivo':'—'}</div>
+      </div>
+      ${b.obra_social?`<div class="detail-row"><div class="detail-label">Obra social</div><div class="detail-value">🏥 ${b.obra_social}</div></div>`:''}
+      ${b.precio_final?`<div class="detail-row"><div class="detail-label">Precio</div><div class="detail-value" style="color:var(--green);font-weight:700;">$${Number(b.precio_final).toLocaleString('es-AR')}</div></div>`:''}
+      <div class="detail-row">
+        <div class="detail-label">Sesiones previas</div>
+        <div class="detail-value">${sesiones>0?sesiones+' confirmadas':'Primera vez'}</div>
+      </div>
+    </div>
+    ${comprobanteHtml}
+  `;
+  document.getElementById('detail-modal-actions').innerHTML=`
+    <button class="btn-confirm" onclick="confirmBooking('${b.id}');closeDetailModal()">✓ Confirmar</button>
+    <button class="btn-decline" onclick="declineBooking('${b.id}');closeDetailModal()">Rechazar</button>
+  `;
+  document.getElementById('detail-modal-bg').classList.add('open');
+}
+function closeDetailModal(){document.getElementById('detail-modal-bg').classList.remove('open');}
+
+
 let durPacOn=false;
 let durPacData={};  // telefono → duracion (número) o 'base'
 
