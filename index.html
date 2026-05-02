@@ -622,14 +622,16 @@ async function logout(){
 }
 
 let sessionCount={};  // telefono → total sesiones confirmadas
+let pacienteNombre={};  // telefono → nombre registrado en pacientes
 
 async function loadAll(){
   showLoader(true);
   try{
-    const[t,b,s]=await Promise.all([
+    const[t,b,s,pac]=await Promise.all([
       sb.from('turnos').select('*').eq('profesional_id',PRO_ID).order('fecha').order('hora'),
       sb.from('dias_bloqueados').select('fecha').eq('profesional_id',PRO_ID),
-      sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_id',PRO_ID)
+      sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_id',PRO_ID),
+      sb.from('pacientes').select('telefono,nombre').eq('profesional_id',PRO_ID)
     ]);
     allBookings={};
     (t.data||[]).forEach(r=>{if(!allBookings[r.fecha])allBookings[r.fecha]=[];allBookings[r.fecha].push(r);});
@@ -637,6 +639,9 @@ async function loadAll(){
     // Mapa telefono → sesiones confirmadas
     sessionCount={};
     (s.data||[]).forEach(r=>{sessionCount[r.telefono]=r.total_sesiones;});
+    // Mapa telefono → nombre registrado
+    pacienteNombre={};
+    (pac.data||[]).forEach(r=>{pacienteNombre[r.telefono]=r.nombre;});
     renderProCal();renderRequests();
     if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
   }catch(e){showNotif('Error al cargar datos','red');console.error(e);}
@@ -772,6 +777,11 @@ function renderRequests(){
     const nuevoTag=sesiones<2
       ?`<span style="font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber);text-transform:uppercase;letter-spacing:.3px;">✨ Nuevo</span>`
       :'';
+    // Warning si el teléfono ya está registrado con otro nombre
+    const nombreRegistrado=pacienteNombre[b.telefono];
+    const warningTel=(nombreRegistrado&&nombreRegistrado.toLowerCase()!==b.nombre_paciente.toLowerCase())
+      ?`<div style="margin-top:6px;font-size:11px;font-weight:600;color:#b45309;background:#fef3cd;border:1px solid #fcd34d;border-radius:7px;padding:5px 10px;">⚠️ Este teléfono está registrado como <strong>${nombreRegistrado}</strong></div>`
+      :'';
     return `<div class="req-item">
       <div class="req-header">
         <div style="display:flex;align-items:center;gap:6px;">
@@ -788,6 +798,7 @@ function renderRequests(){
         ${osTag}${precioTag}
       </div>
       ${compBtn?`<div style="margin-top:4px;">${compBtn}</div>`:''}
+      ${warningTel}
       <div class="req-actions"><button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button><button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button></div>
     </div>`;
   }).join('');
