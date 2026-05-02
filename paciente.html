@@ -568,7 +568,8 @@ function checkSubmit(){
 }
 
 async function submitForm(){
-  const name=document.getElementById('p-name').value.trim();
+  const rawName=document.getElementById('p-name').value.trim();
+  const name=rawName.replace(/\b\w/g,(c)=>c.toUpperCase());
   const phone=document.getElementById('p-phone').value.trim();
   const fecha=fixedMode?fixedFecha:selectedDay;
   const hora=fixedMode?fixedHora:selectedTime;
