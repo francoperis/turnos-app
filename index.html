@@ -124,9 +124,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .req-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .req-name{font-size:13px;font-weight:600;}
 .req-time{font-size:11px;font-weight:600;color:var(--green);white-space:nowrap;}
-.req-meta{font-size:11px;color:var(--ink-dim);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px;}
-.req-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);}
-.req-tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-light);}
+.req-meta{font-size:11px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:3px;}
+.req-tag{font-size:10px;font-weight:500;padding:1px 6px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;}
+.req-tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-light);font-weight:700;}
 .btn-copy-phone{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
 .btn-copy-phone:hover{border-color:var(--green);color:var(--green);}
 .req-actions{display:flex;gap:6px;margin-top:8px;}
@@ -138,7 +138,23 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .empty-req .big{font-size:28px;margin-bottom:8px;}
 .new-badge{display:inline-block;background:var(--amber-bg);color:var(--amber);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-/* MODAL */
+/* DURACIÓN POR PACIENTE */
+.dur-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.dur-toggle-label{font-size:13px;font-weight:500;color:var(--ink);}
+.dur-toggle-sub{font-size:11px;color:var(--ink-dim);margin-top:1px;}
+.sw-toggle{width:40px;height:22px;background:var(--line);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.sw-toggle.on{background:var(--green);}
+.sw-toggle::after{content:'';position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:3px;left:3px;transition:transform .2s cubic-bezier(.34,1.4,.64,1);box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.sw-toggle.on::after{transform:translateX(18px);}
+.dur-pac-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:10px;}
+.dur-pac-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--white);}
+.dur-pac-row:last-child{border-bottom:none;}
+.dur-pac-avatar{width:30px;height:30px;border-radius:50%;background:var(--green-bg);border:1.5px solid var(--green-light);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--green);flex-shrink:0;}
+.dur-pac-name{flex:1;font-size:13px;font-weight:500;color:var(--ink);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dur-pac-select{padding:4px 8px;border:1.5px solid var(--line);border-radius:6px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink);background:var(--bg);outline:none;cursor:pointer;transition:border-color .15s;}
+.dur-pac-select:focus{border-color:var(--green);}
+.dur-pac-select.custom{border-color:var(--green);background:var(--green-bg);color:var(--green);font-weight:600;}
+
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-bg.open{opacity:1;pointer-events:all;}
 .modal-box{background:var(--white);border-radius:16px;width:100%;max-width:400px;box-shadow:var(--shadow-md);transform:translateY(16px);transition:transform .25s;overflow:hidden;}
@@ -475,6 +491,22 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
         <div class="os-add-row">
           <input type="text" class="os-add-input" id="os-input" placeholder="Nombre (ej: IOSCOR)" onkeydown="if(event.key==='Enter')addOS()">
           <button class="os-add-btn" type="button" onclick="addOS()">+ Agregar</button>
+        </div>
+      </div>
+
+      <div class="settings-section" id="dur-pac-section">
+        <div class="settings-section-title">⏱ Duración por paciente</div>
+        <div class="dur-toggle-row">
+          <div>
+            <div class="dur-toggle-label">Duración personalizada</div>
+            <div class="dur-toggle-sub">Asigná tiempos distintos a cada paciente</div>
+          </div>
+          <div class="sw-toggle" id="dur-pac-toggle" onclick="toggleDurPac()"></div>
+        </div>
+        <div id="dur-pac-off" style="font-size:12px;color:var(--ink-dim);">Todos los turnos usarán la duración base configurada arriba.</div>
+        <div id="dur-pac-on" style="display:none;">
+          <div style="font-size:11px;color:var(--ink-dim);margin-bottom:8px;">Pacientes en "Base" usan la duración general. Los cambios se guardan con "Guardar cambios".</div>
+          <div class="dur-pac-list" id="dur-pac-list"><div style="padding:14px;text-align:center;font-size:12px;color:var(--ink-dim);">Cargando pacientes...</div></div>
         </div>
       </div>
 
@@ -926,6 +958,12 @@ function openSettings(){
   });
   osList=[...(proConfig.obras_sociales||[])];
   renderOSList();
+  // Widget duración por paciente
+  const durPacActivo=!!(proConfig.dur_pac_activo);
+  durPacOn=durPacActivo;
+  durPacData={...(proConfig.dur_pac||{})};
+  renderDurPacToggle();
+  if(durPacActivo)loadDurPacList();
   document.getElementById('settings-modal-bg').classList.add('open');
 }
 
@@ -970,7 +1008,9 @@ async function saveSettings(){
     precio:document.getElementById('cfg-precio').value?parseInt(document.getElementById('cfg-precio').value):null,
     alias:document.getElementById('cfg-alias').value.trim()||null,
     cbu:document.getElementById('cfg-cbu').value.trim()||null,
-    obras_sociales:[...osList]
+    obras_sociales:[...osList],
+    dur_pac_activo:durPacOn,
+    dur_pac:{...durPacData}
   };
   console.log('newConfig a guardar:', newConfig);
   const btn=document.getElementById('btn-save-settings');
@@ -1006,6 +1046,59 @@ document.querySelectorAll('.day-toggle-btn').forEach(btn=>{
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').catch(err=>console.log('SW error:',err));
+}
+
+// ── DURACIÓN POR PACIENTE ───────────────────────────────────
+let durPacOn=false;
+let durPacData={};  // telefono → duracion (número) o 'base'
+
+function renderDurPacToggle(){
+  const tog=document.getElementById('dur-pac-toggle');
+  const off=document.getElementById('dur-pac-off');
+  const on=document.getElementById('dur-pac-on');
+  tog.classList.toggle('on',durPacOn);
+  off.style.display=durPacOn?'none':'block';
+  on.style.display=durPacOn?'block':'none';
+}
+
+function toggleDurPac(){
+  durPacOn=!durPacOn;
+  renderDurPacToggle();
+  if(durPacOn)loadDurPacList();
+}
+
+async function loadDurPacList(){
+  const list=document.getElementById('dur-pac-list');
+  list.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:var(--ink-dim);">Cargando...</div>';
+  const{data,error}=await sb.from('pacientes').select('telefono,nombre').eq('profesional_id',PRO_ID).order('nombre');
+  if(error||!data||data.length===0){
+    list.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:var(--ink-dim);">Sin pacientes registrados aún.</div>';
+    return;
+  }
+  const baseDur=proConfig.duracion||60;
+  const opciones=[30,45,60,75,90].map(m=>`<option value="${m}">${m} min</option>`).join('');
+  list.innerHTML=data.map(p=>{
+    const iniciales=p.nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const val=durPacData[p.telefono]||'base';
+    const isCustom=val!=='base';
+    return `<div class="dur-pac-row">
+      <div class="dur-pac-avatar">${iniciales}</div>
+      <div class="dur-pac-name">${p.nombre}</div>
+      <select class="dur-pac-select${isCustom?' custom':''}" data-tel="${p.telefono}" onchange="onDurPacChange(this)">
+        <option value="base"${val==='base'?' selected':''}>Base (${baseDur} min)</option>
+        ${[30,45,60,75,90].map(m=>`<option value="${m}"${val==m?' selected':''}>${m} min</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+}
+
+function onDurPacChange(sel){
+  const tel=sel.getAttribute('data-tel');
+  const val=sel.value;
+  sel.classList.toggle('custom',val!=='base');
+  sel.classList.toggle('',val==='base');
+  if(val==='base'){delete durPacData[tel];}
+  else{durPacData[tel]=parseInt(val);}
 }
 
 sb.auth.getSession().then(({data:{session}})=>{
