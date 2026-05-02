@@ -73,7 +73,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .metric-card.conf{background:#edf5f1;border-color:#b8ddd0;}
 .metric-card.pend{background:#fef8ec;border-color:#f0d99a;}
 .metric-icon{font-size:14px;margin-bottom:8px;line-height:1;}
-.metric-num{font-size:40px;font-weight:700;line-height:1;letter-spacing:-1px;}
+.metric-num{font-size:30px;font-weight:700;line-height:1;letter-spacing:-1px;}
 .metric-card.total .metric-num{color:#2a2520;}
 .metric-card.conf .metric-num{color:#1d6b4e;}
 .metric-card.pend .metric-num{color:#92400e;}
@@ -88,7 +88,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 @media(max-width:500px){
   .page-title{font-size:22px;}
   .link-url{max-width:160px;}
-  .metric-num{font-size:32px;}
+  .metric-num{font-size:24px;}
   .metric-label{font-size:10px;}
   .metric-card{padding:14px 12px 14px;}
 }
@@ -795,13 +795,13 @@ async function confirmBooking(id){
   showLoader(true);
   const{error}=await sb.from('turnos').update({estado:'confirmed'}).eq('id',id);
   if(error){showNotif('Error al confirmar','red');showLoader(false);return;}
-  showNotif('Turno confirmado ✓');await loadAll();
+  showLoader(false);showNotif('Turno confirmado ✓');await loadAll();
 }
 async function declineBooking(id){
   showLoader(true);
   const{error}=await sb.from('turnos').delete().eq('id',id);
   if(error){showNotif('Error al rechazar: '+error.message,'red');showLoader(false);return;}
-  showNotif('Turno rechazado','red');await loadAll();
+  showLoader(false);showNotif('Turno rechazado','red');await loadAll();
 }
 async function toggleBlock(key){
   showLoader(true);
@@ -940,8 +940,9 @@ function renderRequests(){
 }
 
 function openModal(){
-  const d=proSelectedDay||fmt(today);
+  const d=proSelectedDay&&proSelectedDay>=fmt(today)?proSelectedDay:fmt(today);
   document.getElementById('m-date').value=d;document.getElementById('m-name').value='';document.getElementById('m-phone').value='';
+  document.getElementById('m-date').min=fmt(today);
   modalSelectedTime=null;document.getElementById('modal-slots-wrap').style.display='none';document.getElementById('modal-save-btn').disabled=true;
   onModalDateChange();document.getElementById('modal-bg').classList.add('open');
   setTimeout(()=>document.getElementById('m-name').focus(),200);
