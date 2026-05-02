@@ -41,19 +41,17 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;display:none;font-weight:500;}
 .login-error.show{display:block;}
 /* NAV */
-.app-nav{background:var(--white);border-bottom:1px solid var(--line);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.app-nav{background:var(--white);border-bottom:1px solid var(--line);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
 .logo{font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);display:flex;align-items:center;gap:8px;}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
 .nav-right{display:flex;align-items:center;gap:6px;}
 .btn-settings{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
 .btn-settings:hover{border-color:var(--green);color:var(--green);}
-.btn-logout{border:none;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 8px;border-radius:6px;transition:color .15s;}
-.btn-logout:hover{color:var(--red);}
+.btn-logout{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
 @media(max-width:500px){
-  .btn-settings .nav-text{display:none;}
-  .btn-logout .nav-text{display:none;}
-  .btn-settings{padding:6px 8px;font-size:16px;}
-  .btn-logout{padding:6px 8px;font-size:16px;}
+  .btn-settings{font-size:11px;padding:5px 9px;}
+  .btn-logout{font-size:11px;padding:5px 9px;}
 }
 /* MAIN */
 .pro-wrap{max-width:960px;margin:0 auto;padding:12px 20px 16px;}
@@ -259,7 +257,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </style>
 </head>
 <body>
-<div class="loader-overlay hide" id="loader"><div class="spinner"></div></div>
+<div class="loader-overlay" id="loader"><div class="spinner"></div></div>
 
 <div class="notif-bar">
   <div class="notif-pill" id="notif-pill">
@@ -269,7 +267,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- LOGIN -->
-<div class="login-screen show" id="login-screen">
+<div class="login-screen" id="login-screen">
   <div id="login-card-wrap"><div class="login-card">
     <div class="login-header">
       <div class="login-logo">TurnosApp</div>
@@ -310,8 +308,8 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
   <header class="app-nav">
     <div class="logo"><div class="logo-dot"></div>TurnosApp</div>
     <div class="nav-right">
-      <button class="btn-settings" onclick="openSettings()">⚙️<span class="nav-text"> Ajustes</span></button>
-      <button class="btn-logout" onclick="logout()">↪<span class="nav-text"> Cerrar sesión</span></button>
+      <button class="btn-settings" onclick="openSettings()">⚙️ Ajustes</button>
+      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
     </div>
   </header>
   <div class="pro-wrap">
@@ -1105,7 +1103,19 @@ function onDurPacChange(sel){
 }
 
 sb.auth.getSession().then(({data:{session}})=>{
-  if(session)showPanel();
+  if(session){
+    showPanel();
+  } else {
+    // No hay sesión — mostrar login
+    document.getElementById('login-screen').classList.add('show');
+    document.getElementById('loader').classList.add('hide');
+  }
+});
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==='SIGNED_OUT'){
+    document.getElementById('panel').style.display='none';
+    document.getElementById('login-screen').classList.add('show');
+  }
 });
 </script>
 </body>
