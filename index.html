@@ -47,14 +47,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .nav-right{display:flex;align-items:center;gap:6px;}
 .btn-settings{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
 .btn-settings:hover{border-color:var(--green);color:var(--green);}
-.btn-logout{border:none;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 8px;border-radius:6px;transition:all .15s;}
+.btn-logout{border:none;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 8px;border-radius:6px;transition:color .15s;}
 .btn-logout:hover{color:var(--red);}
-.btn-logout-text{display:inline;}
 @media(max-width:500px){
-  .btn-logout-text{display:none;}
-  .btn-logout::after{content:'↪';}
-  .btn-settings .btn-settings-text{display:none;}
-  .btn-settings::before{content:'⚙️';}
+  .btn-settings .nav-text{display:none;}
+  .btn-logout .nav-text{display:none;}
+  .btn-settings{padding:6px 8px;font-size:16px;}
+  .btn-logout{padding:6px 8px;font-size:16px;}
 }
 /* MAIN */
 .pro-wrap{max-width:960px;margin:0 auto;padding:12px 20px 16px;}
@@ -311,8 +310,8 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
   <header class="app-nav">
     <div class="logo"><div class="logo-dot"></div>TurnosApp</div>
     <div class="nav-right">
-      <button class="btn-settings" onclick="openSettings()"><span class="btn-settings-text">⚙️ Ajustes</span></button>
-      <button class="btn-logout" onclick="logout()"><span class="btn-logout-text">Cerrar sesión</span></button>
+      <button class="btn-settings" onclick="openSettings()">⚙️<span class="nav-text"> Ajustes</span></button>
+      <button class="btn-logout" onclick="logout()">↪<span class="nav-text"> Cerrar sesión</span></button>
     </div>
   </header>
   <div class="pro-wrap">
