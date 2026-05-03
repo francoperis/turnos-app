@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2d7d5f">
+<meta name="description" content="TurnosApp — Gestión de turnos para profesionales de salud. Tus pacientes reservan solos, vos confirmás con un toque.">
+<title>TurnosApp — Agenda inteligente para profesionales</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--green-light:#c8e6da;--green-dark:#1f5c45;--radius:12px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(247,245,242,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:0 24px;}
+.nav-inner{max-width:1000px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:var(--ink);text-decoration:none;}
+.nav-logo span{color:var(--green);}
+.nav-cta{background:var(--green);color:#fff;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:opacity .15s;}
+.nav-cta:hover{opacity:.88;}
+
+/* HERO */
+.hero{padding:80px 24px 72px;text-align:center;background:var(--bg);}
+.hero-inner{max-width:680px;margin:0 auto;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green-bg);color:var(--green);font-size:12px;font-weight:600;padding:7px 16px;border-radius:20px;letter-spacing:.4px;margin-bottom:28px;border:1px solid var(--green-light);}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,56px);font-weight:500;color:var(--ink);line-height:1.15;letter-spacing:-.5px;margin-bottom:20px;}
+.hero-title em{color:var(--green);font-style:normal;}
+.hero-sub{font-size:17px;color:var(--ink-soft);line-height:1.7;margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto;}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:52px;}
+.btn-primary{background:var(--green);color:#fff;border:none;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;padding:15px 32px;border-radius:11px;cursor:pointer;letter-spacing:.2px;transition:opacity .15s;text-decoration:none;display:inline-block;}
+.btn-primary:hover{opacity:.88;}
+.btn-secondary{background:transparent;color:var(--green);border:1.5px solid var(--green-light);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;padding:14px 28px;border-radius:11px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block;}
+.btn-secondary:hover{background:var(--green-bg);}
+.hero-proof{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;}
+.proof-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);font-weight:500;}
+.proof-check{width:18px;height:18px;border-radius:50%;background:var(--green-bg);border:1.5px solid var(--green-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.proof-check::after{content:'';width:5px;height:8px;border-right:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(45deg) translate(-1px,-1px);}
+
+/* SECTION SHARED */
+.section{padding:72px 24px;}
+.section-inner{max-width:900px;margin:0 auto;}
+.section-label{text-align:center;font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.section-title{text-align:center;font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,36px);font-weight:500;color:var(--ink);margin-bottom:12px;letter-spacing:-.3px;}
+.section-sub{text-align:center;font-size:15px;color:var(--ink-soft);margin-bottom:48px;line-height:1.65;}
+
+/* STEPS */
+.steps-bg{background:var(--white);}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;position:relative;}
+.step{padding:32px 24px;text-align:center;position:relative;}
+.step:not(:last-child)::after{content:'';position:absolute;top:44px;right:-1px;width:1px;height:36px;background:var(--line);}
+.step-num{width:52px;height:52px;border-radius:50%;background:var(--green-bg);border:2px solid var(--green-light);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:20px;font-weight:700;color:var(--green);font-family:'Outfit',sans-serif;}
+.step-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+.step-desc{font-size:14px;color:var(--ink-soft);line-height:1.65;}
+@media(max-width:600px){.step:not(:last-child)::after{display:none;}.step{border-bottom:1px solid var(--line);}.step:last-child{border-bottom:none;}}
+
+/* FEATURES */
+.features-bg{background:var(--bg);}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+.feat-card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:26px 22px;}
+.feat-icon{width:42px;height:42px;border-radius:10px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.feat-icon svg{width:20px;height:20px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.feat-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.feat-desc{font-size:13px;color:var(--ink-soft);line-height:1.65;}
+
+/* PARA QUIEN */
+.quien-bg{background:var(--white);}
+.tags{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:44px;}
+.tag{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:9px 18px;font-size:14px;color:#444;font-weight:500;}
+.tag.hl{background:var(--green-bg);border-color:var(--green-light);color:var(--green);font-weight:600;}
+.callout{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;max-width:520px;margin:0 auto;text-align:center;}
+.callout p{font-size:16px;color:var(--ink-soft);line-height:1.7;}
+.callout strong{color:var(--ink);}
+
+/* CTA FINAL */
+.cta-final{background:var(--green);padding:80px 24px;text-align:center;}
+.cta-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,40px);font-weight:500;color:#fff;margin-bottom:14px;letter-spacing:-.3px;}
+.cta-sub{font-size:16px;color:rgba(255,255,255,.75);margin-bottom:36px;line-height:1.65;max-width:400px;margin-left:auto;margin-right:auto;}
+.btn-white{background:#fff;color:var(--green);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;padding:15px 36px;border-radius:11px;border:none;cursor:pointer;letter-spacing:.2px;transition:opacity .15s;display:inline-block;text-decoration:none;}
+.btn-white:hover{opacity:.92;}
+.cta-note{margin-top:18px;font-size:13px;color:rgba(255,255,255,.5);}
+
+/* FOOTER */
+footer{background:var(--green-dark);padding:28px 24px;text-align:center;}
+footer p{font-size:13px;color:rgba(255,255,255,.4);}
+footer a{color:rgba(255,255,255,.55);text-decoration:none;}
+footer a:hover{color:rgba(255,255,255,.8);}
+.footer-links{display:flex;gap:20px;justify-content:center;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/landing" class="nav-logo">Turnos<span>App</span></a>
+    <a href="https://wa.me/543794622895?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20TurnosApp" class="nav-cta">Contactanos</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><div class="hero-badge-dot"></div>Gestión de turnos para profesionales</div>
+    <h1 class="hero-title">Tu agenda, <em>ordenada</em>.<br>Tus pacientes, a tiempo.</h1>
+    <p class="hero-sub">Olvidá los mensajes de WhatsApp para coordinar horarios. Tus pacientes reservan solos, vos confirmás con un toque.</p>
+    <div class="hero-ctas">
+      <a href="https://wa.me/543794622895?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20TurnosApp" class="btn-primary">Quiero probarlo</a>
+      <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
+    </div>
+    <div class="hero-proof">
+      <div class="proof-item"><div class="proof-check"></div>Sin instalación</div>
+      <div class="proof-item"><div class="proof-check"></div>Listo en minutos</div>
+      <div class="proof-item"><div class="proof-check"></div>Funciona desde el celular</div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="section steps-bg" id="como-funciona">
+  <div class="section-inner">
+    <div class="section-label">Cómo funciona</div>
+    <h2 class="section-title">Tres pasos, sin complicaciones</h2>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Configurás tu agenda</div>
+        <div class="step-desc">Cargás tus horarios disponibles, la duración de cada sesión y los días que atendés.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">El paciente elige su turno</div>
+        <div class="step-desc">Le compartís un link. Elige día y hora directamente, sin ir y venir por WhatsApp.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Vos confirmás con un toque</div>
+        <div class="step-desc">Recibís la solicitud en tu panel. Confirmás o rechazás al instante desde el celular.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-bg" id="funcionalidades">
+  <div class="section-inner">
+    <div class="section-label">Funcionalidades</div>
+    <h2 class="section-title">Todo lo que necesitás, nada que no uses</h2>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="feat-title">Calendario visual</div>
+        <div class="feat-desc">Ves todos tus turnos del mes de un vistazo. Bloqueá días con un toque.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+        <div class="feat-title">Link de turno fijo</div>
+        <div class="feat-desc">Generás un link para un horario específico y se lo mandás al paciente. Expira automáticamente.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="feat-title">Slots configurables</div>
+        <div class="feat-desc">Sesiones de 30, 45 o 60 minutos. Horarios que no empiezan en punto.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="feat-title">Sin doble turno</div>
+        <div class="feat-desc">El sistema detecta conflictos automáticamente. No hay forma de reservar un horario ocupado.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="feat-title">Control de pagos</div>
+        <div class="feat-desc">Marcá cada turno como pagado o pendiente. Tus datos bancarios siempre a mano para el paciente.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div class="feat-title">100% desde el celular</div>
+        <div class="feat-desc">Funciona como app en iOS y Android sin instalación. Tu panel siempre en el bolsillo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUIÉN -->
+<section class="section quien-bg" id="para-quien">
+  <div class="section-inner">
+    <div class="section-label">Para quién es</div>
+    <h2 class="section-title">Para el profesional que trabaja solo</h2>
+    <p class="section-sub">Sin equipo administrativo. Sin secretaria. Solo vos y tus pacientes.</p>
+    <div class="tags">
+      <span class="tag hl">Psicólogos</span>
+      <span class="tag hl">Psiquiatras</span>
+      <span class="tag">Odontólogos</span>
+      <span class="tag">Kinesiólogos</span>
+      <span class="tag">Nutricionistas</span>
+      <span class="tag">Fonoaudiólogos</span>
+      <span class="tag">Médicos clínicos</span>
+      <span class="tag">Dermatólogos</span>
+      <span class="tag">Terapistas ocupacionales</span>
+      <span class="tag">Podólogos</span>
+      <span class="tag">Osteopáticos</span>
+      <span class="tag">Veterinarios</span>
+      <span class="tag">y más...</span>
+    </div>
+    <div class="callout">
+      <p>Si tu día empieza respondiendo mensajes para coordinar horarios, <strong>esto es para vos</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <h2 class="cta-title">¿Listo para ordenar tu agenda?</h2>
+  <p class="cta-sub">Escribinos y te dejamos funcionando en el día.</p>
+  <a href="https://wa.me/543794622895?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20TurnosApp" class="btn-white">Quiero empezar</a>
+  <p class="cta-note">Sin contrato. Sin permanencia.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#funcionalidades">Funcionalidades</a>
+    <a href="#para-quien">Para quién</a>
+    <a href="https://wa.me/543794622895?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20TurnosApp">Contacto</a>
+  </div>
+  <p>© 2026 TurnosApp · Todos los derechos reservados</p>
+</footer>
+
+<script>
+  // Smooth scroll para links internos
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      const el=document.querySelector(a.getAttribute('href'));
+      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  });
+</script>
+</body>
+</html>
