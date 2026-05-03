@@ -929,11 +929,11 @@ function renderRequests(){
       :'';
     return `<div class="req-item">
       <div class="req-header">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;">
-          <span class="req-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${b.nombre_paciente}</span>
+        <span class="req-name">${b.nombre_paciente}</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           ${nuevoTag}
+          <span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
         </div>
-        <span class="req-time" style="flex-shrink:0;white-space:nowrap;">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
       </div>
       ${warningTel}
       <div class="req-actions">
@@ -1235,7 +1235,8 @@ function loadDurPacList(){
     const tel=(b.telefono||'').replace(/\D/g,'');
     if(!tel||seen.has(tel))return;
     seen.add(tel);
-    uniquePacientes.push({telefono:b.telefono,nombre:b.nombre_paciente});
+    // Guardar el telefono normalizado como clave consistente
+    uniquePacientes.push({telefono:tel,nombre:b.nombre_paciente,telefonoOriginal:b.telefono});
   });
   uniquePacientes.sort((a,b)=>a.nombre.localeCompare(b.nombre));
   if(uniquePacientes.length===0){
