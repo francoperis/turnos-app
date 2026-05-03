@@ -336,9 +336,16 @@ async function loadTaken(){
   const params=new URLSearchParams(window.location.search);
   const fecha=params.get('fecha'),hora=params.get('hora');
   if(fecha&&hora){
+    const d=parseDate(fecha);
+    const slotHour=parseInt(hora.split(':')[0]);
+    const slotMin=parseInt(hora.split(':')[1]);
+    const slotDateTime=new Date(d.getFullYear(),d.getMonth(),d.getDate(),slotHour,slotMin);
+    if(slotDateTime<=new Date()){
+      document.body.innerHTML='<div style="text-align:center;padding:60px 20px;font-family:Outfit,sans-serif;color:#555;"><p style="font-size:22px;margin-bottom:8px;">⏰</p><p style="font-weight:600;font-size:16px;margin-bottom:6px;">Este turno ya no está disponible.</p><p style="font-size:14px;">Solicitá un nuevo link a tu profesional.</p></div>';
+      return;
+    }
     fixedMode=true;fixedFecha=fecha;fixedHora=hora;
     selectedDay=fecha;selectedTime=hora;
-    const d=parseDate(fecha);
     document.getElementById('fixed-mode').style.display='block';
     document.getElementById('free-mode').style.display='none';
     document.getElementById('fixed-slot-value').textContent=DAYS[d.getDay()]+' '+d.getDate()+' de '+MONTHS[d.getMonth()]+' · '+hora;
