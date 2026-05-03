@@ -1,8 +1,19 @@
 {
   "redirects": [
-    { "source": "/reset", "destination": "/reset.html", "permanent": false }
+    {
+      "source": "/reset",
+      "destination": "/reset.html",
+      "permanent": false
+    }
   ],
   "rewrites": [
-    { "source": "/paciente", "destination": "/paciente.html" }
+    {
+      "source": "/paciente",
+      "destination": "/paciente.html"
+    },
+    {
+      "source": "/landing",
+      "destination": "/landing.html"
+    }
   ]
 }
