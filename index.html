@@ -27,17 +27,18 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 /* LOGIN */
 .login-screen{display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px;}
 .login-screen.show{display:flex;}
-.login-card{background:linear-gradient(170deg,#ffffff 0%,#faf9f7 100%);border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow-md);width:100%;max-width:340px;overflow:hidden;}
-.login-header{background:var(--green);padding:32px 28px 24px;text-align:center;}
-.login-logo{font-family:'Playfair Display',serif;font-size:28px;font-weight:500;color:#fff;letter-spacing:-.3px;text-align:center;}
-.login-header p{font-size:13px;color:rgba(255,255,255,.7);margin-top:6px;font-family:'Outfit',sans-serif;font-weight:400;}
-.login-body{padding:28px;}
-.login-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;text-align:left;}
-.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:9px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:400;letter-spacing:normal;text-align:left;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
-.login-input:focus{border-color:var(--green);background:var(--white);}
-.login-input::placeholder{font-size:14px;letter-spacing:normal;color:var(--ink-dim);}
-.login-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;border-radius:10px;margin-top:16px;transition:opacity .15s;letter-spacing:.2px;}
+.login-card{background:linear-gradient(170deg,#ffffff 0%,#faf9f7 100%);border-radius:20px;border:1px solid var(--line);box-shadow:0 8px 40px rgba(0,0,0,.10);width:100%;max-width:400px;overflow:hidden;}
+.login-header{background:var(--green);padding:40px 32px 30px;text-align:center;}
+.login-logo{font-family:'Playfair Display',serif;font-size:34px;font-weight:500;color:#fff;letter-spacing:-.3px;text-align:center;}
+.login-header p{font-size:14px;color:rgba(255,255,255,.75);margin-top:8px;font-family:'Outfit',sans-serif;font-weight:400;}
+.login-body{padding:32px;}
+.login-label{font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block;text-align:left;}
+.login-input{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:10px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:400;letter-spacing:normal;text-align:left;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s,box-shadow .15s;}
+.login-input:focus{border-color:var(--green);background:var(--white);box-shadow:0 0 0 3px rgba(45,125,95,.10);}
+.login-input::placeholder{font-size:15px;letter-spacing:normal;color:#bbb;}
+.login-btn{width:100%;padding:15px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;border-radius:11px;margin-top:20px;transition:opacity .15s,transform .1s;letter-spacing:.2px;}
 .login-btn:hover{opacity:.88;}
+.login-btn:active{transform:scale(.98);}
 .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;display:none;font-weight:500;}
 .login-error.show{display:block;}
 /* NAV */
@@ -327,15 +328,15 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
     <div class="login-body">
       <label class="login-label">Email</label>
-      <input type="email" class="login-input" id="login-email" placeholder="tu@email.com" required autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
-      <label class="login-label" style="margin-top:12px;">Contraseña</label>
+      <input type="email" class="login-input" id="login-email" placeholder="hola@ejemplo.com" required autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <label class="login-label" style="margin-top:18px;">Contraseña</label>
       <div style="position:relative;">
-        <input type="password" class="login-input" id="login-pass" placeholder="Tu contraseña" required autocomplete="current-password" style="padding-right:44px;" onkeydown="if(event.key==='Enter')doLogin()">
-        <button type="button" onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-dim);font-family:'Outfit',sans-serif;" id="pass-eye">VER</button>
+        <input type="password" class="login-input" id="login-pass" placeholder="Tu contraseña" required autocomplete="current-password" style="padding-right:56px;" onkeydown="if(event.key==='Enter')doLogin()">
+        <button type="button" onclick="togglePass()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:11px;font-weight:700;color:var(--ink-soft);font-family:'Outfit',sans-serif;letter-spacing:.4px;padding:4px;" id="pass-eye">VER</button>
       </div>
       <button class="login-btn" onclick="doLogin()" id="login-btn">Entrar</button>
       <div class="login-error" id="login-error">Email o contraseña incorrectos.</div>
-      <div style="text-align:center;margin-top:12px;"><span style="font-size:12px;color:#2d7d5f;cursor:pointer;" onclick="showRecover()">¿Olvidaste tu contraseña?</span></div>
+      <div style="text-align:center;margin-top:16px;"><span style="font-size:13px;color:var(--green);cursor:pointer;font-weight:500;" onclick="showRecover()">¿Olvidaste tu contraseña?</span></div>
     </div>
   </div></div>
 
@@ -346,11 +347,11 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
     <div class="login-body">
       <label class="login-label">Email</label>
-      <input type="email" class="login-input" id="recover-email" placeholder="tu@email.com" required autocomplete="email">
+      <input type="email" class="login-input" id="recover-email" placeholder="hola@ejemplo.com" required autocomplete="email">
       <button class="login-btn" onclick="doRecover()" id="recover-btn">Enviar link</button>
       <div class="login-error" id="recover-error"></div>
       <div class="login-error" id="recover-success" style="color:#2d7d5f;">Te enviamos el link al email. Revisá tu bandeja.</div>
-      <div style="text-align:center;margin-top:12px;"><span style="font-size:12px;color:#2d7d5f;cursor:pointer;" onclick="showLogin()">← Volver al login</span></div>
+      <div style="text-align:center;margin-top:16px;"><span style="font-size:13px;color:var(--green);cursor:pointer;font-weight:500;" onclick="showLogin()">← Volver al login</span></div>
     </div>
   </div>
 </div>
