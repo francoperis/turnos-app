@@ -755,11 +755,10 @@ let pacienteNombre={};  // telefono → nombre registrado en pacientes
 async function loadAll(){
   showLoader(true);
   try{
-    const[t,b,s,pac]=await Promise.all([
+    const[t,b,s]=await Promise.all([
       sb.from('turnos').select('*').eq('profesional_id',PRO_ID).order('fecha').order('hora'),
       sb.from('dias_bloqueados').select('fecha').eq('profesional_id',PRO_ID),
-      sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_id',PRO_ID),
-      sb.from('pacientes').select('telefono,nombre').eq('profesional_id',PRO_ID)
+      sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_id',PRO_ID)
     ]);
     allBookings={};
     (t.data||[]).forEach(r=>{if(!allBookings[r.fecha])allBookings[r.fecha]=[];allBookings[r.fecha].push(r);});
@@ -767,9 +766,12 @@ async function loadAll(){
     // Mapa telefono → sesiones confirmadas
     sessionCount={};
     (s.data||[]).forEach(r=>{sessionCount[r.telefono]=r.total_sesiones;});
-    // Mapa telefono → nombre registrado
+    // Mapa telefono → nombre (desde turnos confirmados, no desde tabla pacientes)
     pacienteNombre={};
-    (pac.data||[]).forEach(r=>{pacienteNombre[r.telefono]=r.nombre;});
+    Object.values(allBookings).flat().filter(r=>r.estado==='confirmed').forEach(r=>{
+      const tel=(r.telefono||'').replace(/\D/g,'');
+      if(tel&&!pacienteNombre[r.telefono])pacienteNombre[r.telefono]=r.nombre_paciente;
+    });
     renderProCal();renderRequests();
     if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
   }catch(e){showNotif('Error al cargar datos','red');console.error(e);}
