@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -109,7 +110,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .cal-day-name{text-align:center;font-size:12px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
 .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink);transition:all .12s;}
-.cal-day:hover:not(.empty):not(.past){background:var(--bg);}
+.cal-day:hover:not(.empty):not(.selected){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
 .cal-day.past{color:#b0b0b0;background:#f0eeeb;border-radius:8px;cursor:pointer;}
 .cal-day.today{font-weight:700;color:var(--green);}
@@ -224,7 +225,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 @media(max-width:420px){.modal-row{grid-template-columns:1fr;}}
 input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width:100%;}
 .modal-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block;}
-.modal-input{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.modal-input{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;box-sizing:border-box;min-width:0;}
+input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width:100%;}
+@media(max-width:420px){.modal-row{grid-template-columns:1fr;}}
 .modal-input:focus{border-color:var(--green);background:var(--white);}
 .modal-footer{padding:0 20px 18px;display:flex;gap:8px;}
 .btn-modal-cancel{flex:1;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--ink-soft);transition:all .15s;}
@@ -437,6 +440,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- MODAL CARGA MANUAL -->
+
 <div class="modal-bg" id="modal-bg" onclick="closeModalBg(event)">
   <div class="modal-box">
     <div class="modal-head"><h3>Cargar turno</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -1283,5 +1287,6 @@ sb.auth.onAuthStateChange((event,session)=>{
   }
 });
 </script>
+
 </body>
 </html>
