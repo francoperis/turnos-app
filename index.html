@@ -131,14 +131,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .btn-block.unblock:hover{background:var(--green-bg);}
 .blocked-msg{background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);text-align:center;margin-bottom:8px;}
 .slots-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;}
-.slot-wrap{position:relative;border-radius:12px;overflow:hidden;}
-.slot-action-left{position:absolute;left:0;top:0;bottom:0;width:90px;background:#2563eb;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;border-radius:12px 0 0 12px;opacity:0;transition:opacity .1s;}
-.slot-action-left .sa-icon{font-size:20px;}
-.slot-action-left span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
-.slot-action-right{position:absolute;right:0;top:0;bottom:0;width:90px;background:var(--red);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;border-radius:0 12px 12px 0;opacity:0;transition:opacity .1s;}
-.slot-action-right .sa-icon{font-size:20px;}
-.slot-action-right span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
-.slot-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:var(--bg);border:1.5px solid transparent;flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;will-change:transform;}
+.slot-wrap{position:relative;border-radius:12px;}
+.slot-action-left,.slot-action-right{position:absolute;top:0;bottom:0;width:90px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;opacity:0;transition:opacity .1s;pointer-events:none;}
+.slot-action-left{left:0;background:#2563eb;border-radius:12px 0 0 12px;}
+.slot-action-right{right:0;background:var(--red);border-radius:0 12px 12px 0;}
+.slot-action-left .sa-icon,.slot-action-right .sa-icon{font-size:20px;line-height:1;}
+.slot-action-left span,.slot-action-right span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
+.slot-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:var(--bg);border:1.5px solid transparent;flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
 .slot-row.booked{background:var(--green-bg);border-color:var(--green-light);}
 .slot-row.booked.unpaid{background:#fff8ed;border-color:#f0d89a;}
 .slot-time{font-size:15px;font-weight:700;width:52px;flex-shrink:0;color:var(--ink-soft);text-align:center;line-height:1.1;}
@@ -157,10 +156,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .badge-booked{background:var(--green-light);color:var(--green);}
 .badge-new{background:var(--amber-bg);color:var(--amber);}
 .badge-unpaid{background:#fde8b8;color:#92400e;}
-.btn-delete-slot{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;flex-shrink:0;opacity:0;}
-@media(hover:hover){.slot-row:hover .btn-delete-slot{opacity:1;}.slot-row:hover .slot-link-btn{opacity:1;}}
+.btn-delete-slot{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin-left:4px;flex-shrink:0;opacity:0;}
+@media(hover:hover){.slot-row:hover .btn-delete-slot{opacity:1;}}
 .btn-delete-slot:hover{border-color:var(--red);color:var(--red);background:#fef2f2;}
 .slot-link-btn{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;white-space:nowrap;opacity:0;}
+@media(hover:hover){.slot-row:hover .slot-link-btn{opacity:1;}}
 .slot-link-btn:hover{border-color:var(--green);color:var(--green);}
 .no-day-selected{text-align:center;padding:24px 20px;font-size:14px;color:var(--ink-dim);}
 .no-day-selected .big{font-size:32px;margin-bottom:8px;}
@@ -907,12 +907,17 @@ function renderProDayDetail(key,date){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
       const modalidadText=bk.modalidad==='virtual'?'Virtual':'Presencial';
+      const pagadoStyle=bk.pagado
+        ?'font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:#edf5f1;color:#0f6e56;flex-shrink:0;cursor:pointer;border:none;font-family:Outfit,sans-serif;'
+        :'font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0;';
+      const pagadoText=bk.pagado?'Pagado':'Sin pagar';
+      const pagadoBadge='<button style="'+pagadoStyle+'" onclick="togglePagado(this)" data-id="'+bk.id+'" data-pagado="'+bk.pagado+'">'+pagadoText+'</button>';
+      const deleteBtn=isPastDay?'':'<button class="btn-delete-slot" onclick="deleteBooking(\''+bk.id+'\',\''+bk.nombre_paciente+'\')">✕</button>';
       const unpaidClass=bk.pagado?'':'unpaid';
       const pagadoBadgeClass=bk.pagado?'slot-badge badge-booked':'slot-badge badge-unpaid';
-      const pagadoText=bk.pagado?'Pagado':'Sin pagar';
-      const pagadoBadge=`<div class="${pagadoBadgeClass}" style="cursor:pointer;" onclick="togglePagado(this)" data-id="${bk.id}" data-pagado="${bk.pagado}">${pagadoText}</div>`;
-      const deleteBtn=isPastDay?'':'<button class="btn-delete-slot" onclick="deleteBooking(\''+bk.id+'\',\''+bk.nombre_paciente+'\')">✕</button>';
-      html+=`<div class="slot-wrap" data-id="${bk.id}" data-nombre="${bk.nombre_paciente}" data-fecha="${key}" data-hora="${time}"><div class="slot-action-left"><div class="sa-icon">🕐</div><span>Agendar</span></div><div class="slot-action-right"><div class="sa-icon">🗑</div><span>Eliminar</span></div><div class="slot-row booked ${unpaidClass}" data-id="${bk.id}"><div class="slot-time">${time}<small>hs</small></div><div class="slot-divider"></div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span>${modalidadText}</span></div>${deleteBtn}<div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadge}</div></div></div>`;
+      const pagadoLabel=bk.pagado?'Pagado':'Sin pagar';
+      const pagadoBadgeEl=`<div class="${pagadoBadgeClass}" style="cursor:pointer;" onclick="togglePagado(this)" data-id="${bk.id}" data-pagado="${bk.pagado}">${pagadoLabel}</div>`;
+      html+=`<div class="slot-wrap" data-id="${bk.id}" data-nombre="${bk.nombre_paciente}" data-fecha="${key}" data-hora="${time}"><div class="slot-action-left"><div class="sa-icon">🕐</div><span>Agendar</span></div><div class="slot-action-right"><div class="sa-icon">🗑️</div><span>Eliminar</span></div><div class="slot-row booked ${unpaidClass}" data-id="${bk.id}"><div class="slot-time">${time}<small>hs</small></div><div class="slot-divider"></div><div class="slot-patient"><strong>${bk.nombre_paciente}</strong><div class="phone-row"><span>${bk.telefono}</span><button class="btn-copy-phone" onclick="copyPhone('${bk.telefono}',this)">Copiar</button></div><span>${modalidadText}</span></div>${deleteBtn}<div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadgeEl}</div></div></div>`;
     }else if(isPastDay||isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--line)">${time}</div><div class="slot-patient"><span style="color:var(--line)">—</span></div></div>`;
     }else if(!isBlocked){
@@ -1040,21 +1045,15 @@ async function togglePagado(el){
   const id=el.getAttribute('data-id');
   const esPagado=el.getAttribute('data-pagado')==='true';
   const nuevoEstado=!esPagado;
-  const prevText=el.textContent;
-  el.textContent='...';
+  const prev=el.textContent;el.textContent='...';
   const{error}=await sb.from('turnos').update({pagado:nuevoEstado}).eq('id',id);
-  if(error){el.textContent=prevText;return;}
-  // Actualizar cache local
+  if(error){el.textContent=prev;return;}
   Object.values(allBookings).forEach(arr=>arr.forEach(b=>{if(b.id===id)b.pagado=nuevoEstado;}));
-  // Actualizar UI sin re-render completo
   el.setAttribute('data-pagado',nuevoEstado);
   el.textContent=nuevoEstado?'Pagado':'Sin pagar';
   el.className=nuevoEstado?'slot-badge badge-booked':'slot-badge badge-unpaid';
-  // Opción C: cambiar fondo del slot
   const slotRow=el.closest('.slot-row');
-  if(slotRow){
-    slotRow.classList.toggle('unpaid',!nuevoEstado);
-  }
+  if(slotRow)slotRow.classList.toggle('unpaid',!nuevoEstado);
   showNotif(nuevoEstado?'Marcado como pagado ✓':'Marcado como sin pagar');
 }
 
@@ -1308,90 +1307,65 @@ sb.auth.onAuthStateChange((event,session)=>{
   }
 });
 
-// --- SWIPE en slots (mobile) ---
+// --- SWIPE mobile (solo touch) ---
 function initSwipe(wrap){
   const row=wrap.querySelector('.slot-row');
-  const actionLeft=wrap.querySelector('.slot-action-left');
-  const actionRight=wrap.querySelector('.slot-action-right');
+  const aL=wrap.querySelector('.slot-action-left');
+  const aR=wrap.querySelector('.slot-action-right');
   if(!row)return;
-  let startX=0,currentX=0,swiping=false;
-  const THRESHOLD=65;
-
-  row.addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;
-    currentX=0;swiping=true;
-    row.style.transition='none';
-  },{passive:true});
-
+  let x0=0,dx=0,active=false;
+  const LIMIT=90,THRESHOLD=65;
+  row.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;dx=0;active=true;row.style.transition='none';},{passive:true});
   row.addEventListener('touchmove',e=>{
-    if(!swiping)return;
-    currentX=e.touches[0].clientX-startX;
-    const clamped=Math.max(-95,Math.min(95,currentX));
-    row.style.transform=`translateX(${clamped}px)`;
-    // Mostrar fondo según dirección
-    if(clamped<-10){
-      if(actionRight)actionRight.style.opacity=Math.min(1,Math.abs(clamped)/60);
-      if(actionLeft)actionLeft.style.opacity='0';
-    } else if(clamped>10){
-      if(actionLeft)actionLeft.style.opacity=Math.min(1,clamped/60);
-      if(actionRight)actionRight.style.opacity='0';
-    } else {
-      if(actionLeft)actionLeft.style.opacity='0';
-      if(actionRight)actionRight.style.opacity='0';
-    }
+    if(!active)return;
+    dx=e.touches[0].clientX-x0;
+    const c=Math.max(-LIMIT,Math.min(LIMIT,dx));
+    row.style.transform=`translateX(${c}px)`;
+    if(c<-10){if(aR)aR.style.opacity=Math.min(1,Math.abs(c)/50);if(aL)aL.style.opacity='0';}
+    else if(c>10){if(aL)aL.style.opacity=Math.min(1,c/50);if(aR)aR.style.opacity='0';}
+    else{if(aL)aL.style.opacity='0';if(aR)aR.style.opacity='0';}
   },{passive:true});
-
   row.addEventListener('touchend',()=>{
-    if(!swiping)return;
-    swiping=false;
+    if(!active)return;active=false;
     row.style.transition='transform .2s ease';
-    if(actionLeft)actionLeft.style.opacity='0';
-    if(actionRight)actionRight.style.opacity='0';
-    if(currentX<-THRESHOLD){
-      // Swipe izquierda → eliminar
-      const id=wrap.dataset.id;
-      const nombre=wrap.dataset.nombre;
+    if(aL)aL.style.opacity='0';if(aR)aR.style.opacity='0';
+    if(dx<-THRESHOLD){
       row.style.transform='translateX(-110%)';
-      setTimeout(()=>deleteBooking(id,nombre),180);
-    } else if(currentX>THRESHOLD){
-      // Swipe derecha → agendar calendario
-      const fecha=wrap.dataset.fecha;
-      const hora=wrap.dataset.hora;
-      const nombre=wrap.dataset.nombre||'Turno';
+      setTimeout(()=>deleteBooking(wrap.dataset.id,wrap.dataset.nombre),180);
+    } else if(dx>THRESHOLD){
       row.style.transform='';
-      addToCalendar(fecha,hora,nombre);
+      addToCalendar(wrap.dataset.fecha,wrap.dataset.hora,wrap.dataset.nombre||'Turno');
     } else {
       row.style.transform='';
     }
   });
 }
-
 function addToCalendar(fecha,hora,nombre){
   try{
     const[y,m,d]=fecha.split('-').map(Number);
     const[h,min]=hora.split(':').map(Number);
-    const start=new Date(y,m-1,d,h,min);
-    const end=new Date(y,m-1,d,h,min+30);
-    function pad(n){return String(n).padStart(2,'0');}
-    function icsDate(dt){return dt.getFullYear()+pad(dt.getMonth()+1)+pad(dt.getDate())+'T'+pad(dt.getHours())+pad(dt.getMinutes())+'00';}
-    const ics=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Turno - ${nombre}\nDTSTART:${icsDate(start)}\nDTEND:${icsDate(end)}\nDESCRIPTION:Turno agendado via TurnosApp\nEND:VEVENT\nEND:VCALENDAR`;
-    const blob=new Blob([ics],{type:'text/calendar'});
-    const url=URL.createObjectURL(blob);
+    const s=new Date(y,m-1,d,h,min),e=new Date(y,m-1,d,h,min+30);
+    const p=n=>String(n).padStart(2,'0');
+    const dt=t=>t.getFullYear()+p(t.getMonth()+1)+p(t.getDate())+'T'+p(t.getHours())+p(t.getMinutes())+'00';
+    const ics=`BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:Turno - ${nombre}
+DTSTART:${dt(s)}
+DTEND:${dt(e)}
+DESCRIPTION:TurnosApp
+END:VEVENT
+END:VCALENDAR`;
     const a=document.createElement('a');
-    a.href=url;a.download='turno.ics';a.click();
-    URL.revokeObjectURL(url);
+    a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
+    a.download='turno.ics';a.click();
     showNotif('Turno enviado al calendario ✓');
-  }catch(e){showNotif('No se pudo agendar','red');}
+  }catch{showNotif('Error al agendar','red');}
 }
-
-// Observar DOM para inicializar swipe en slots nuevos
-const slotObserver=new MutationObserver(()=>{
-  document.querySelectorAll('.slot-wrap:not([data-swipe])').forEach(w=>{
-    w.setAttribute('data-swipe','1');
-    initSwipe(w);
-  });
+const _swipeObs=new MutationObserver(()=>{
+  document.querySelectorAll('.slot-wrap:not([data-sw])').forEach(w=>{w.setAttribute('data-sw','1');initSwipe(w);});
 });
-slotObserver.observe(document.body,{childList:true,subtree:true});
+_swipeObs.observe(document.body,{childList:true,subtree:true});
 </script>
 
 </body>
