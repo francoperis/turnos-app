@@ -240,8 +240,10 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 @media(max-width:420px){.modal-row{grid-template-columns:1fr;}}
 .modal-input:focus{border-color:var(--green);background:var(--white);}
 .modal-footer{padding:0 20px 18px;display:flex;gap:8px;}
-.btn-modal-cancel{flex:1;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--ink-soft);transition:all .15s;}
-.btn-modal-cancel:hover{border-color:var(--ink);color:var(--ink);}
+.btn-modal-cancel{flex:1;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--ink-soft);transition:all .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media(hover:hover){.btn-modal-cancel:hover{border-color:var(--ink);color:var(--ink);}}
+.btn-confirm{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media(hover:none){.btn-modal-cancel:focus,.btn-confirm:focus{outline:none;}}
 .btn-modal-save{flex:2;padding:10px;border:none;border-radius:8px;background:var(--green);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;transition:opacity .15s;}
 .btn-modal-save:hover{opacity:.88;}
 .btn-modal-save:disabled{opacity:.45;pointer-events:none;}
@@ -489,7 +491,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
     </div>
     <div class="modal-footer" style="padding-top:0;">
       <button class="btn-modal-cancel" onclick="closeConfirmModal()">Cancelar</button>
-      <button style="flex:2;padding:10px;border:none;border-radius:8px;background:var(--red);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;" onclick="confirmDelete()">Sí, eliminar</button>
+      <button style="flex:2;padding:10px;border:none;border-radius:8px;background:var(--red);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;touch-action:manipulation;-webkit-tap-highlight-color:transparent;" onclick="confirmDelete()">Sí, eliminar</button>
     </div>
   </div>
 </div>
