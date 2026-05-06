@@ -1023,13 +1023,17 @@ function closeLinkModal(){document.getElementById('link-modal-bg').classList.rem
 function closeLinkModalBg(e){if(e.target===document.getElementById('link-modal-bg'))closeLinkModal();}
 function copyGeneratedLink(){navigator.clipboard.writeText(generatedLink).catch(()=>{});showNotif('Link copiado ✓');closeLinkModal();}
 
-let pendingDeleteId=null;
+let pendingDeleteId=null,_pendingSwipeRow=null;
 function deleteBooking(id,nombre){
   pendingDeleteId=id;
   document.getElementById('confirm-nombre').textContent=nombre;
   document.getElementById('confirm-modal-bg').classList.add('open');
 }
-function closeConfirmModal(){document.getElementById('confirm-modal-bg').classList.remove('open');pendingDeleteId=null;}
+function closeConfirmModal(){
+  document.getElementById('confirm-modal-bg').classList.remove('open');
+  pendingDeleteId=null;
+  if(_pendingSwipeRow){_pendingSwipeRow.style.transition='transform .2s ease';_pendingSwipeRow.style.transform='';_pendingSwipeRow=null;}
+}
 async function confirmDelete(){
   const idToDelete=pendingDeleteId;
   if(!idToDelete)return;
@@ -1331,6 +1335,7 @@ function initSwipe(wrap){
     if(aL)aL.style.opacity='0';if(aR)aR.style.opacity='0';
     if(dx<-THRESHOLD){
       row.style.transform='translateX(-110%)';
+      _pendingSwipeRow=row;
       setTimeout(()=>deleteBooking(wrap.dataset.id,wrap.dataset.nombre),180);
     } else if(dx>THRESHOLD){
       row.style.transform='';
