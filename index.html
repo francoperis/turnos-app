@@ -773,7 +773,7 @@ async function loadAll(){
   showLoader(true);
   try{
     const[t,b,s]=await Promise.all([
-      sb.from('turnos').select('*').eq('profesional_id',PRO_ID).order('fecha').order('hora'),
+      sb.from('turnos').select('*').eq('profesional_id',PRO_ID).not('estado','in','("rejected","cancelled")').order('fecha').order('hora'),
       sb.from('dias_bloqueados').select('fecha').eq('profesional_id',PRO_ID),
       sb.from('sesiones_por_paciente').select('telefono,total_sesiones').eq('profesional_id',PRO_ID)
     ]);
@@ -819,12 +819,12 @@ async function confirmBooking(id){
   showNotif('Turno confirmado ✓');
 }
 async function declineBooking(id){
-  const{error}=await sb.from('turnos').delete().eq('id',id);
+  const{error}=await sb.from('turnos').update({estado:'rejected'}).eq('id',id);
   if(error){showNotif('Error al rechazar: '+error.message,'red');return;}
-  // Eliminar del cache local sin recargar todo
+  // Marcar como rejected en cache local y ocultar de la vista
   Object.keys(allBookings).forEach(k=>{allBookings[k]=allBookings[k].filter(b=>b.id!==id);});
   renderRequests();if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
-  showNotif('Turno rechazado','red');
+  showNotif('Solicitud rechazada');
 }
 async function toggleBlock(key){
   showLoader(true);
@@ -1040,11 +1040,12 @@ async function confirmDelete(){
   const idToDelete=pendingDeleteId;
   if(!idToDelete)return;
   document.getElementById('confirm-modal-bg').classList.remove('open');pendingDeleteId=null;
-  const{error}=await sb.from('turnos').delete().eq('id',idToDelete);
-  if(error){showNotif('Error al eliminar','red');return;}
+  if(_pendingSwipeRow){_pendingSwipeRow=null;}
+  const{error}=await sb.from('turnos').update({estado:'cancelled'}).eq('id',idToDelete);
+  if(error){showNotif('Error al cancelar','red');return;}
   Object.keys(allBookings).forEach(k=>{allBookings[k]=allBookings[k].filter(b=>b.id!==idToDelete);});
   renderProCal();if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
-  showNotif('Turno eliminado','red');
+  showNotif('Turno cancelado');
 }
 
 async function togglePagado(el){
