@@ -2,6 +2,8 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/panel", "destination": "/index.html" },
-    { "source": "/paciente", "destination": "/paciente.html" }
+    { "source": "/paciente", "destination": "/paciente.html" },
+    { "source": "/admin", "destination": "/admin.html" }
+  
   ]
 }
