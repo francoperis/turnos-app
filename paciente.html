@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedí tu turno</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--green-light:#c8e6da;--red:#dc2626;--shadow-md:0 4px 24px rgba(0,0,0,.10);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+.loader-overlay{position:fixed;inset:0;background:rgba(247,245,242,.9);display:flex;align-items:center;justify-content:center;z-index:200;transition:opacity .2s;}
+.loader-overlay.hide{opacity:0;pointer-events:none;}
+.spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--green);animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 20px 60px;}
+.card{background:var(--white);border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow-md);width:100%;max-width:440px;overflow:hidden;}
+.card-header{background:var(--green);padding:22px 28px 20px;}
+.header-label{font-size:11px;font-weight:500;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;}
+.header-profession{font-size:14px;font-weight:500;color:rgba(255,255,255,.85);margin-bottom:6px;}
+.header-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#fff;line-height:1.2;margin-bottom:8px;letter-spacing:-.2px;}
+.header-sub{font-size:12px;color:rgba(255,255,255,.65);border-top:1px solid rgba(255,255,255,.2);padding-top:8px;margin-top:2px;}
+/* Obras sociales en header */
+.header-os{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.header-os-chip{font-size:10px;font-weight:600;color:rgba(255,255,255,.8);background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:2px 8px;}
+.card-body{padding:24px 28px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:9px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--green);background:var(--white);}
+.divider{border:none;border-top:1px solid var(--line);margin:20px 0;}
+/* Modalidad */
+.mod-btns{display:flex;gap:8px;margin-top:4px;}
+.mod-btn{flex:1;padding:10px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink-soft);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+.mod-btn.on{background:var(--green);color:#fff;border-color:var(--green);}
+/* FIXED SLOT */
+.fixed-slot{background:var(--green-bg);border:1.5px solid var(--green-light);border-radius:10px;padding:14px 16px;margin-bottom:4px;}
+.fixed-slot-label{font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.fixed-slot-value{font-size:18px;font-weight:600;color:var(--ink);}
+.fixed-slot-sub{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-month{font-size:14px;font-weight:600;}
+.cal-nav-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:13px;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cal-nav-btn:hover{background:var(--bg);}
+.cal-nav-btn[disabled]{opacity:.25;pointer-events:none;}
+.days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+.day-name{text-align:center;font-size:12px;font-weight:600;color:var(--ink-dim);padding:3px 0;}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink);transition:all .12s;}
+.day:hover:not(.empty):not(.past):not(.no-slot):not(.selected){background:var(--bg);}
+.day.empty{pointer-events:none;opacity:0;}
+.day.past{color:var(--line);pointer-events:none;}
+.day.no-slot{color:var(--line);pointer-events:none;}
+.day.today{font-weight:700;color:var(--green);}
+.day.selected{background:var(--green);color:#fff!important;}
+/* TIME SLOTS */
+.slots-section{margin-top:16px;}
+.slots-title{font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.time-btn{padding:10px 4px;border:1.5px solid var(--line);border-radius:8px;background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--ink-soft);cursor:pointer;transition:all .12s;text-align:center;}
+.time-btn:hover{border-color:var(--green);color:var(--green);}
+.time-btn.selected{background:var(--green);border-color:var(--green);color:#fff;}
+.time-btn.taken{opacity:.35;pointer-events:none;text-decoration:line-through;}
+/* PAGO */
+.pago-section{margin-top:4px;}
+.pago-btns{display:flex;gap:8px;margin-top:4px;}
+.pago-btn{flex:1;padding:11px 8px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink-soft);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;}
+.pago-btn.on{background:var(--green);color:#fff;border-color:var(--green);}
+.transferencia-info{background:var(--green-bg);border:1.5px solid var(--green-light);border-radius:10px;padding:14px 16px;margin-top:12px;}
+.transferencia-info-title{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.transferencia-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.transferencia-row:last-child{margin-bottom:0;}
+.transferencia-label{font-size:12px;color:var(--ink-soft);font-weight:500;}
+.transferencia-value{font-size:13px;font-weight:700;color:var(--ink);font-family:monospace;}
+.btn-copy-dato{background:none;border:1px solid var(--green-light);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;white-space:nowrap;}
+.btn-copy-dato:hover{background:var(--green);color:#fff;}
+/* COMPROBANTE */
+.comprobante-section{margin-top:12px;}
+.comprobante-label-title{font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block;}
+.comprobante-hint{font-size:12px;color:var(--ink-dim);margin-bottom:8px;line-height:1.5;}
+.comprobante-drop{border:2px dashed var(--line);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);}
+.comprobante-drop:hover{border-color:var(--green);background:var(--green-bg);}
+.comprobante-drop.has-file{border-color:var(--green);border-style:solid;background:var(--green-bg);}
+.comprobante-drop-icon{font-size:24px;margin-bottom:6px;}
+.comprobante-drop-text{font-size:13px;color:var(--ink-dim);}
+.comprobante-drop-text strong{color:var(--green);}
+.comprobante-preview{margin-top:8px;border-radius:8px;overflow:hidden;border:1px solid var(--green-light);}
+.comprobante-preview img{width:100%;display:block;max-height:200px;object-fit:cover;}
+.comprobante-change{font-size:11px;color:var(--green);cursor:pointer;text-align:center;margin-top:6px;font-weight:600;}
+/* SUBMIT */
+.submit-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;border-radius:10px;margin-top:20px;transition:all .15s;}
+.submit-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(45,125,95,.3);}
+.submit-btn:disabled{opacity:.45;pointer-events:none;transform:none;}
+.error-msg{font-size:12px;color:var(--red);margin-top:8px;text-align:center;display:none;}
+.error-msg.show{display:block;}
+.field-error{border-color:var(--red)!important;background:#fef2f2!important;}
+.field-hint{font-size:11px;color:var(--red);margin-top:4px;display:none;}
+.field-hint.show{display:block;}
+/* SUCCESS */
+.success{display:none;flex-direction:column;align-items:center;text-align:center;padding:48px 28px;}
+.success.show{display:flex;}
+.success-circle{width:64px;height:64px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:20px;box-shadow:0 8px 28px rgba(45,125,95,.3);animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success h3{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;}
+.success p{font-size:14px;color:var(--ink-dim);line-height:1.6;}
+.success-detail{background:var(--green-bg);border-radius:10px;padding:14px 18px;margin-top:20px;text-align:left;width:100%;}
+.success-detail div{font-size:13px;color:var(--ink-soft);padding:3px 0;}
+.success-detail strong{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="loader-overlay" id="loader"><div class="spinner"></div></div>
+<div class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="header-label">Reservá tu turno con</div>
+      <div class="header-profession" id="header-profession">Profesional</div>
+      <div class="header-name" id="header-name">Cargando...</div>
+      <div class="header-sub">Salud Mental · Corrientes</div>
+      <div class="header-os" id="header-os" style="display:none;"></div>
+    </div>
+
+    <div id="form-body" class="card-body">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input type="text" class="form-input" id="p-name" oninput="validateName(this);checkSubmit()" maxlength="60">
+        <div class="field-hint" id="hint-name">Solo se permiten letras y espacios</div>
+      </div>
+      <!-- Teléfono -->
+      <div class="form-group">
+        <label class="form-label">Teléfono</label>
+        <input type="tel" class="form-input" id="p-phone" oninput="validatePhone(this);checkSubmit()" maxlength="20">
+        <div class="field-hint" id="hint-phone">Solo se permiten números, espacios y +</div>
+      </div>
+      <!-- Modalidad -->
+      <div class="form-group">
+        <label class="form-label">Modalidad</label>
+        <div class="mod-btns">
+          <button type="button" class="mod-btn on" id="mod-presencial" onclick="setMod('presencial')">Presencial</button>
+          <button type="button" class="mod-btn" id="mod-virtual" onclick="setMod('virtual')">Virtual</button>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Modo link fijo -->
+      <div id="fixed-mode" style="display:none;">
+        <div class="fixed-slot">
+          <div class="fixed-slot-label">Tu turno</div>
+          <div class="fixed-slot-value" id="fixed-slot-value"></div>
+          <div class="fixed-slot-sub">Turno reservado para vos</div>
+        </div>
+      </div>
+
+      <!-- Modo libre -->
+      <div id="free-mode">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="prev-btn" onclick="changeMonth(-1)">‹</button>
+          <span class="cal-month" id="cal-month"></span>
+          <button class="cal-nav-btn" id="next-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="days-header">
+          <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div>
+          <div class="day-name">X</div><div class="day-name">J</div><div class="day-name">V</div>
+          <div class="day-name">S</div>
+        </div>
+        <div class="days-grid" id="days-grid"></div>
+        <div class="slots-section" id="slots-section" style="display:none;">
+          <div class="slots-title" id="slots-title"></div>
+          <div class="time-grid" id="time-grid"></div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Método de pago -->
+      <div class="pago-section" id="pago-section">
+
+        <div class="form-group">
+          <label class="form-label">Obra social</label>
+          <select class="form-input" id="p-os" onchange="onOSChange()">
+            <option value="particular">No tengo / Particular</option>
+          </select>
+        </div>
+
+        <label class="form-label">Método de pago</label>
+        <div class="pago-btns">
+          <button type="button" class="pago-btn" id="pago-efectivo" onclick="setPago('efectivo')">💵 Efectivo</button>
+          <button type="button" class="pago-btn" id="pago-transferencia" onclick="setPago('transferencia')">🏦 Transferencia</button>
+        </div>
+        <div id="os-pago-hint" style="display:none;margin-top:8px;font-size:12px;color:var(--ink-dim);background:var(--bg);border-radius:8px;padding:8px 12px;border:1px solid var(--line);">
+          🏥 Con obra social el monto se acuerda en la sesión con el profesional.
+        </div>
+
+        <!-- Precio -->
+        <div id="precio-display" style="display:none;margin-top:10px;">
+          <div style="background:var(--green-bg);border:1.5px solid var(--green-light);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Total a pagar</div>
+              <div style="font-size:22px;font-weight:700;color:var(--ink);" id="precio-valor">—</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:var(--ink-dim);" id="precio-os-label"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info transferencia -->
+        <div id="transferencia-info-wrap" style="display:none;">
+          <div class="transferencia-info" id="transferencia-info" style="margin-top:10px;">
+            <div class="transferencia-info-title">📋 Datos para transferir</div>
+            <div id="transferencia-datos"></div>
+          </div>
+          <div class="comprobante-section">
+            <label class="comprobante-label-title">Comprobante de pago</label>
+            <div class="comprobante-hint">Opcional pero recomendado — ayuda a confirmar tu turno más rápido.</div>
+            <input type="file" id="comprobante-input" accept="image/*" style="display:none;" onchange="handleComprobante(this)">
+            <div class="comprobante-drop" id="comprobante-drop" onclick="document.getElementById('comprobante-input').click()">
+              <div class="comprobante-drop-icon">📎</div>
+              <div class="comprobante-drop-text">Tocá para adjuntar imagen<br><strong>o pegá desde tu galería</strong></div>
+            </div>
+            <div class="comprobante-preview" id="comprobante-preview" style="display:none;">
+              <img id="comprobante-img" src="" alt="Comprobante">
+            </div>
+            <div class="comprobante-change" id="comprobante-change" style="display:none;" onclick="clearComprobante()">× Cambiar imagen</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="error-msg">Hubo un error. Por favor intentá de nuevo.</div>
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Solicitar turno</button>
+    </div>
+
+    <div class="success" id="success-screen">
+      <div class="success-circle">✓</div>
+      <h3>¡Turno solicitado!</h3>
+      <p>Tu solicitud fue enviada al profesional.<br>Te vamos a contactar para confirmar.</p>
+      <div class="success-detail" id="success-detail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://sqqetiycodpfhoeqwguv.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxcWV0aXljb2RwZmhvZXF3Z3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTE5MDUsImV4cCI6MjA5MjM4NzkwNX0.wwjZsLU3sDVhqM4138xTdg8gmf_lDDKJXKRtb0N1k40';
+// PRO_SLUG y PRO_ID se resuelven leyendo ?p= de la URL y buscando en la tabla profesionales
+const PRO_SLUG_PARAM=new URLSearchParams(window.location.search).get('p');
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let PRO_ID=null;
+let PRO_SLUG=null;
+const today=new Date();today.setHours(0,0,0,0);
+const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+let currentMonth=new Date(today.getFullYear(),today.getMonth(),1);
+let selectedDay=null,selectedTime=null,takenSlots={},blockedDays=new Set();
+let fixedMode=false,fixedFecha=null,fixedHora=null;
+let selectedMod='presencial';
+let selectedPago=null;
+let comprobanteFile=null;
+let comprobanteBase64=null;
+
+// Config del profesional — se carga de Supabase
+let proConfig={
+  duracion:60,
+  inicio:'08:00',
+  fin:'21:00',
+  dias:[1,2,3,4,5,6],
+  precio:null,
+  alias:null,
+  cbu:null,
+  obras_sociales:[]
+};
+
+function generateSlots(){
+  const slots=[];
+  const[ih,im]=proConfig.inicio.split(':').map(Number);
+  const[fh,fm]=proConfig.fin.split(':').map(Number);
+  let cur=ih*60+im;
+  const end=fh*60+fm;
+  while(cur<end){
+    const h=String(Math.floor(cur/60)).padStart(2,'0');
+    const m=String(cur%60).padStart(2,'0');
+    slots.push(h+':'+m);
+    cur+=Number(proConfig.duracion);
+  }
+  return slots;
+}
+
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function isPast(d){return d<today;}
+function isSunday(d){return d.getDay()===0;}
+function isWorkDay(d){return proConfig.dias.includes(d.getDay());}
+function showLoader(v){document.getElementById('loader').classList.toggle('hide',!v);}
+function getMaxMonth(){return new Date(today.getFullYear(),today.getMonth()+2,1);}
+
+async function loadTaken(){
+  showLoader(true);
+  try{
+    if(!PRO_SLUG_PARAM){
+      document.body.innerHTML='<div style="text-align:center;padding:60px 20px;font-family:Outfit,sans-serif;color:#555;">Link inválido. Solicitá el link correcto a tu profesional.</div>';
+      return;
+    }
+    const{data:pro,error:proErr}=await sb.from('profesionales')
+      .select('id,slug,nombre,profesion,config')
+      .eq('slug',PRO_SLUG_PARAM)
+      .single();
+    if(proErr||!pro){
+      document.body.innerHTML='<div style="text-align:center;padding:60px 20px;font-family:Outfit,sans-serif;color:#555;">Profesional no encontrado.</div>';
+      return;
+    }
+    PRO_ID=pro.id;
+    PRO_SLUG=pro.slug;
+    if(pro.nombre)document.getElementById('header-name').textContent=pro.nombre;
+    if(pro.profesion)document.getElementById('header-profession').textContent=pro.profesion;
+    if(pro.config){
+      proConfig={...proConfig,...pro.config};
+    }
+    renderConfig();
+
+    // 2 — Cargar turnos y días bloqueados usando profesional_id
+    const[t,b]=await Promise.all([
+      sb.from('turnos').select('fecha,hora').eq('profesional_id',PRO_ID).not('estado','in','("rejected","cancelled")'),
+      sb.from('dias_bloqueados').select('fecha').eq('profesional_id',PRO_ID)
+    ]);
+    takenSlots={};
+    (t.data||[]).forEach(r=>{if(!takenSlots[r.fecha])takenSlots[r.fecha]=[];takenSlots[r.fecha].push(r.hora);});
+    blockedDays=new Set((b.data||[]).map(r=>r.fecha));
+  }catch(e){console.error(e);}
+  showLoader(false);
+
+  const params=new URLSearchParams(window.location.search);
+  const fecha=params.get('fecha'),hora=params.get('hora');
+  if(fecha&&hora){
+    const d=parseDate(fecha);
+    const slotHour=parseInt(hora.split(':')[0]);
+    const slotMin=parseInt(hora.split(':')[1]);
+    const slotDateTime=new Date(d.getFullYear(),d.getMonth(),d.getDate(),slotHour,slotMin);
+    if(slotDateTime<=new Date()){
+      document.body.innerHTML='<div style="text-align:center;padding:60px 20px;font-family:Outfit,sans-serif;color:#555;"><p style="font-size:22px;margin-bottom:8px;">⏰</p><p style="font-weight:600;font-size:16px;margin-bottom:6px;">Este turno ya no está disponible.</p><p style="font-size:14px;">Solicitá un nuevo link a tu profesional.</p></div>';
+      return;
+    }
+    fixedMode=true;fixedFecha=fecha;fixedHora=hora;
+    selectedDay=fecha;selectedTime=hora;
+    document.getElementById('fixed-mode').style.display='block';
+    document.getElementById('free-mode').style.display='none';
+    document.getElementById('fixed-slot-value').textContent=DAYS[d.getDay()]+' '+d.getDate()+' de '+MONTHS[d.getMonth()]+' · '+hora;
+  }else{
+    renderCal();
+  }
+  checkSubmit();
+}
+
+function renderConfig(){
+  // Header chips
+  if(proConfig.obras_sociales&&proConfig.obras_sociales.length>0){
+    const osEl=document.getElementById('header-os');
+    osEl.style.display='flex';
+    osEl.innerHTML=proConfig.obras_sociales.map(os=>{
+      const nombre=typeof os==='object'?os.nombre:os;
+      return `<span class="header-os-chip">${nombre}</span>`;
+    }).join('');
+  }
+  // Selector OS — siempre visible, particular por default
+  const sel=document.getElementById('p-os');
+  sel.innerHTML='<option value="particular">No tengo / Particular</option>';
+  (proConfig.obras_sociales||[]).forEach(os=>{
+    const nombre=typeof os==='object'?os.nombre:os;
+    const opt=document.createElement('option');
+    opt.value=nombre;
+    opt.textContent=nombre;
+    sel.appendChild(opt);
+  });
+  renderTransferenciaDatos();
+}
+
+function calcPrecio(){
+  if(!proConfig.precio)return null;
+  const sel=document.getElementById('p-os');
+  const opt=sel.options[sel.selectedIndex];
+  const cobertura=parseFloat((opt&&opt.dataset.cobertura)||0);
+  return Math.round(proConfig.precio*(1-cobertura/100));
+}
+
+
+function actualizarPrecioDisplay(){
+  const display=document.getElementById('precio-display');
+  if(!selectedPago||!proConfig.precio){display.style.display='none';return;}
+  const sel=document.getElementById('p-os');
+  const tieneOS=sel.value&&sel.value!=='particular';
+  // Con obra social no mostramos precio — se acuerda en sesión
+  if(tieneOS){display.style.display='none';return;}
+  display.style.display='block';
+  document.getElementById('precio-valor').style.fontSize='22px';
+  document.getElementById('precio-valor').textContent='$'+Number(proConfig.precio).toLocaleString('es-AR');
+  document.getElementById('precio-os-label').textContent='Precio particular';
+}
+
+function renderTransferenciaDatos(){
+  const el=document.getElementById('transferencia-datos');
+  let html='';
+  if(proConfig.alias){
+    html+=`<div class="transferencia-row"><span class="transferencia-label">Alias</span><div style="display:flex;align-items:center;gap:6px;"><span class="transferencia-value">${proConfig.alias}</span><button class="btn-copy-dato" onclick="copyDato('${proConfig.alias}',this)">Copiar</button></div></div>`;
+  }
+  if(proConfig.cbu){
+    html+=`<div class="transferencia-row"><span class="transferencia-label">CBU</span><div style="display:flex;align-items:center;gap:6px;"><span class="transferencia-value" style="font-size:11px;">${proConfig.cbu}</span><button class="btn-copy-dato" onclick="copyDato('${proConfig.cbu}',this)">Copiar</button></div></div>`;
+  }
+  if(!proConfig.alias&&!proConfig.cbu){
+    html='<div style="font-size:13px;color:var(--ink-dim);">El profesional te va a informar los datos al confirmar el turno.</div>';
+  }
+  el.innerHTML=html;
+}
+
+function copyDato(val,btn){
+  navigator.clipboard.writeText(val).catch(()=>{});
+  btn.textContent='✓';setTimeout(()=>btn.textContent='Copiar',2000);
+}
+
+function setMod(m){
+  selectedMod=m;
+  document.getElementById('mod-presencial').classList.toggle('on',m==='presencial');
+  document.getElementById('mod-virtual').classList.toggle('on',m==='virtual');
+}
+
+function setPago(p){
+  const sel=document.getElementById('p-os');
+  const tieneOS=sel&&sel.value&&sel.value!=='particular';
+  if(p==='transferencia'&&tieneOS)return;
+  selectedPago=p;
+  document.getElementById('pago-efectivo').classList.toggle('on',p==='efectivo');
+  document.getElementById('pago-transferencia').classList.toggle('on',p==='transferencia');
+  document.getElementById('transferencia-info-wrap').style.display=p==='transferencia'?'block':'none';
+  if(p==='transferencia')renderTransferenciaDatos();
+  actualizarPrecioDisplay();
+  checkSubmit();
+}
+
+function onOSChange(){
+  const sel=document.getElementById('p-os');
+  const tieneOS=sel.value&&sel.value!=='particular';
+  const btnTransferencia=document.getElementById('pago-transferencia');
+  if(tieneOS){
+    btnTransferencia.style.opacity='0.3';
+    btnTransferencia.style.pointerEvents='none';
+    document.getElementById('os-pago-hint').style.display='block';
+    selectedPago='efectivo';
+    document.getElementById('pago-efectivo').classList.add('on');
+    document.getElementById('pago-transferencia').classList.remove('on');
+    document.getElementById('transferencia-info-wrap').style.display='none';
+  } else {
+    btnTransferencia.style.opacity='';
+    btnTransferencia.style.pointerEvents='';
+    document.getElementById('os-pago-hint').style.display='none';
+  }
+  actualizarPrecioDisplay();
+  checkSubmit();
+}
+
+function handleComprobante(input){
+  const file=input.files[0];
+  if(!file)return;
+  comprobanteFile=file;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    comprobanteBase64=e.target.result;
+    document.getElementById('comprobante-drop').style.display='none';
+    document.getElementById('comprobante-preview').style.display='block';
+    document.getElementById('comprobante-img').src=comprobanteBase64;
+    document.getElementById('comprobante-change').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearComprobante(){
+  comprobanteFile=null;comprobanteBase64=null;
+  document.getElementById('comprobante-input').value='';
+  document.getElementById('comprobante-drop').style.display='block';
+  document.getElementById('comprobante-preview').style.display='none';
+  document.getElementById('comprobante-change').style.display='none';
+}
+
+function renderCal(){
+  const maxMonth=getMaxMonth();
+  const minMonth=new Date(today.getFullYear(),today.getMonth(),1);
+  document.getElementById('cal-month').textContent=MONTHS[currentMonth.getMonth()]+' '+currentMonth.getFullYear();
+  document.getElementById('prev-btn').disabled=(currentMonth<=minMonth);
+  document.getElementById('next-btn').disabled=(new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1)>=maxMonth);
+  const slots=generateSlots();
+  const grid=document.getElementById('days-grid');grid.innerHTML='';
+  const first=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),1);
+  const last=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,0);
+  for(let i=0;i<first.getDay();i++){const e=document.createElement('div');e.className='day empty';grid.appendChild(e);}
+  for(let d=1;d<=last.getDate();d++){
+    const date=new Date(currentMonth.getFullYear(),currentMonth.getMonth(),d);
+    const key=fmt(date);const div=document.createElement('div');div.className='day';div.textContent=d;
+    if(date.getTime()===today.getTime())div.classList.add('today');
+    if(isPast(date)||isSunday(date)||!isWorkDay(date)||blockedDays.has(key)){div.classList.add('past');grid.appendChild(div);continue;}
+    const taken=takenSlots[key]||[];
+    if(slots.filter(s=>!taken.includes(s)).length===0){div.classList.add('no-slot');grid.appendChild(div);continue;}
+    if(selectedDay===key)div.classList.add('selected');
+    (function(k,dt){div.onclick=function(){selectDay(k,dt);};})(key,date);
+    grid.appendChild(div);
+  }
+}
+
+function selectDay(key,date){
+  selectedDay=key;selectedTime=null;renderCal();
+  const taken=takenSlots[key]||[];
+  const slots=generateSlots();
+  const isToday=date.getTime()===today.getTime();
+  const nowHour=new Date().getHours();
+  const nowMin=new Date().getMinutes();
+  document.getElementById('slots-title').textContent=DAYS[date.getDay()]+' '+date.getDate()+' de '+MONTHS[date.getMonth()];
+  document.getElementById('time-grid').innerHTML=slots.map(t=>{
+    const slotHour=parseInt(t.split(':')[0]);
+    const slotMin=parseInt(t.split(':')[1]);
+    const isPastSlot=isToday&&(slotHour<nowHour||(slotHour===nowHour&&slotMin<=nowMin));
+    const isTaken=taken.includes(t);
+    return '<button class="time-btn'+((isTaken||isPastSlot)?' taken':'')+'" onclick="selectTime(\''+t+'\',this)">'+t+'</button>';
+  }).join('');
+  document.getElementById('slots-section').style.display='block';
+  checkSubmit();
+}
+
+function selectTime(time,btn){
+  document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');selectedTime=time;checkSubmit();
+}
+
+function changeMonth(dir){
+  const next=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+dir,1);
+  const min=new Date(today.getFullYear(),today.getMonth(),1);
+  const max=getMaxMonth();
+  if(next<min||next>=max)return;
+  currentMonth=next;selectedDay=null;selectedTime=null;
+  document.getElementById('slots-section').style.display='none';
+  renderCal();checkSubmit();
+}
+
+function setMod(m){
+  selectedMod=m;
+  const bp=document.getElementById('mod-presencial');
+  const bv=document.getElementById('mod-virtual');
+  if(m==='presencial'){
+    bp.style.background='#2d7d5f';bp.style.color='#fff';bp.style.borderColor='#2d7d5f';
+    bv.style.background='#f7f5f2';bv.style.color='#888';bv.style.borderColor='#e8e4df';
+  } else {
+    bv.style.background='#2d7d5f';bv.style.color='#fff';bv.style.borderColor='#2d7d5f';
+    bp.style.background='#f7f5f2';bp.style.color='#888';bp.style.borderColor='#e8e4df';
+  }
+}
+function validateName(input){
+  const val=input.value;
+  const clean=val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ ]/g,'');
+  if(val!==clean)input.value=clean;
+  const hint=document.getElementById('hint-name');
+  if(clean.trim().length>0&&clean.trim().length<2){input.classList.add('field-error');hint.classList.add('show');}
+  else{input.classList.remove('field-error');hint.classList.remove('show');}
+}
+
+function validatePhone(input){
+  const val=input.value;
+  const clean=val.replace(/[^0-9+\s\-]/g,'');
+  if(val!==clean)input.value=clean;
+  const hint=document.getElementById('hint-phone');
+  const digits=clean.replace(/\D/g,'');
+  if(clean.length>0&&digits.length<6){input.classList.add('field-error');hint.classList.add('show');}
+  else{input.classList.remove('field-error');hint.classList.remove('show');}
+}
+
+function checkSubmit(){
+  const n=document.getElementById('p-name').value.trim();
+  const p=document.getElementById('p-phone').value.trim();
+  const digits=p.replace(/\D/g,'');
+  const nameOk=n.length>=2&&/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ ]+$/.test(n);
+  const phoneOk=digits.length>=6;
+  const dayOk=!!(fixedMode?fixedFecha:selectedDay);
+  const timeOk=!!(fixedMode?fixedHora:selectedTime);
+  const pagoOk=!!selectedPago;
+  document.getElementById('submit-btn').disabled=!(nameOk&&phoneOk&&dayOk&&timeOk&&pagoOk);
+}
+
+async function submitForm(){
+  const rawName=document.getElementById('p-name').value.trim();
+  const name=rawName.replace(/\b\w/g,(c)=>c.toUpperCase());
+  const phone=document.getElementById('p-phone').value.trim();
+  const fecha=fixedMode?fixedFecha:selectedDay;
+  const hora=fixedMode?fixedHora:selectedTime;
+  const errEl=document.getElementById('error-msg');errEl.classList.remove('show');
+  const btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='Enviando...';
+  try{
+    const osSelect=document.getElementById('p-os');
+    const obraSeleccionada=osSelect.value&&osSelect.value!=='particular'?osSelect.value:null;
+    const precioFinal=calcPrecio();
+
+    // 1 — Upsert paciente (crea si no existe, no pisa si ya existe)
+    await sb.from('pacientes').upsert({
+      profesional_id:PRO_ID,
+      nombre:name,
+      telefono:phone,
+      obra_social:obraSeleccionada
+    },{onConflict:'profesional_id,telefono',ignoreDuplicates:true});
+
+    // 2 — Insertar turno
+    const row={
+      profesional_id:PRO_ID,
+      nombre_paciente:name,
+      telefono:phone,
+      fecha,hora,
+      estado:'pending',
+      modalidad:selectedMod,
+      metodo_pago:selectedPago,
+      obra_social:obraSeleccionada,
+      precio_final:precioFinal,
+      comprobante_url:comprobanteBase64||null
+    };
+    const{error}=await sb.from('turnos').insert([row]);
+    if(error)throw error;
+
+    document.getElementById('form-body').style.display='none';
+    document.getElementById('success-screen').classList.add('show');
+    const d=parseDate(fecha);
+    const pagoText=selectedPago==='transferencia'
+      ?'Transferencia'+(comprobanteBase64?' · Comprobante adjunto':' · Sin comprobante')
+      :'Efectivo';
+    const osText=obraSeleccionada?obraSeleccionada:'Particular';
+    document.getElementById('success-detail').innerHTML=
+      '<div><strong>Paciente:</strong> '+name+'</div>'+
+      '<div><strong>Fecha:</strong> '+DAYS[d.getDay()]+' '+d.getDate()+' de '+MONTHS[d.getMonth()]+'</div>'+
+      '<div><strong>Hora:</strong> '+hora+'</div>'+
+      '<div><strong>Modalidad:</strong> '+(selectedMod==='virtual'?'Virtual':'Presencial')+'</div>'+
+      '<div><strong>Obra social:</strong> '+osText+'</div>'+
+      (precioFinal?'<div><strong>Total a pagar:</strong> $'+precioFinal.toLocaleString('es-AR')+'</div>':'')+
+      '<div><strong>Pago:</strong> '+pagoText+'</div>'+
+      '<div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:600;">Pendiente de confirmación</div>';
+  }catch(e){errEl.classList.add('show');btn.disabled=false;btn.textContent='Solicitar turno';console.error(e);}
+}
+
+loadTaken();
+</script>
+</body>
+</html>
