@@ -490,8 +490,8 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
       <p style="font-size:14px;color:var(--ink-soft);text-align:center;line-height:1.6;">¿Eliminás el turno de <strong id="confirm-nombre" style="color:var(--ink);"></strong>? Esta acción no se puede deshacer.</p>
     </div>
     <div class="modal-footer" style="padding-top:0;">
-      <button class="btn-modal-cancel" onclick="closeConfirmModal()">Cancelar</button>
-      <button style="flex:2;padding:10px;border:none;border-radius:8px;background:var(--red);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;touch-action:manipulation;-webkit-tap-highlight-color:transparent;" onclick="confirmDelete()">Sí, eliminar</button>
+      <button class="btn-modal-cancel" ontouchend="tapBtn(event,closeConfirmModal)" onclick="closeConfirmModal()">Cancelar</button>
+      <button style="flex:2;padding:10px;border:none;border-radius:8px;background:var(--red);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;touch-action:manipulation;-webkit-tap-highlight-color:transparent;" ontouchend="tapBtn(event,confirmDelete)" onclick="confirmDelete()">Sí, eliminar</button>
     </div>
   </div>
 </div>
@@ -1313,6 +1313,9 @@ sb.auth.onAuthStateChange((event,session)=>{
     document.getElementById('login-screen').classList.add('show');
   }
 });
+
+// Evitar doble tap en mobile — touchend ejecuta la acción y cancela el click posterior
+function tapBtn(e,fn){e.preventDefault();fn();}
 
 // --- SWIPE mobile (solo touch) ---
 function initSwipe(wrap){
