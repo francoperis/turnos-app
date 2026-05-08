@@ -581,10 +581,17 @@ const planBadge=p=>{if(p==='trial')return'<span class="badge ba">Trial</span>';i
 
 // Helper para UPDATE robusto — intenta con id, luego con user_id
 async function updatePro(id, data){
-  let{error}=await sb.from('profesionales').update(data).eq('id',id);
-  if(error){
-    const r=await sb.from('profesionales').update(data).eq('user_id',id);
-    return r.error;
+  // Intentar con id — verificar que realmente afectó filas
+  const r1=await sb.from('profesionales').update(data).eq('id',id).select('id');
+  if(r1.error) {
+    // Error real de DB
+    const r2=await sb.from('profesionales').update(data).eq('user_id',id).select('id');
+    return r2.error;
+  }
+  if(!r1.data||r1.data.length===0){
+    // No afectó ninguna fila — intentar con user_id
+    const r2=await sb.from('profesionales').update(data).eq('user_id',id).select('id');
+    return r2.error;
   }
   return null;
 }
