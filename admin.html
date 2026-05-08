@@ -161,6 +161,86 @@ tr:hover td{background:#faf9f8;}
 /* INFO BOX */
 .info-box{background:var(--green-bg);border:1px solid var(--green-light);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--ink-soft);line-height:1.5;}
 .info-box strong{color:var(--ink);}
+
+/* NOTAS */
+.nota-badge{font-size:11px;color:var(--ink-dim);cursor:pointer;padding:2px 6px;border-radius:4px;border:1px dashed var(--line);white-space:nowrap;}
+.nota-badge:hover{border-color:var(--ink-dim);}
+.nota-badge.tiene{color:var(--ink-soft);border-color:var(--line);background:var(--bg);}
+.nota-texto{font-size:11px;color:var(--ink-dim);margin-top:2px;font-style:italic;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* MODAL EDITAR */
+.modal-section-title{font-size:11px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:2px;}
+
+/* ── MOBILE ──────────────────────────────────────────────────── */
+@media(max-width:640px){
+  .app.show{flex-direction:column;}
+
+  .sidebar{
+    width:100%;height:auto;
+    flex-direction:row;align-items:center;
+    position:sticky;top:0;z-index:100;
+    padding:0;
+  }
+  .sidebar-logo{
+    padding:12px 16px;
+    border-bottom:none;
+    border-right:1px solid rgba(255,255,255,.08);
+    flex-shrink:0;
+  }
+  .sidebar-logo-sub{display:none;}
+  .sidebar-logo-text{font-size:16px;}
+
+  .sidebar-nav{
+    flex:1;padding:0 8px;
+    display:flex;flex-direction:row;
+    overflow-x:auto;gap:2px;
+    scrollbar-width:none;
+  }
+  .sidebar-nav::-webkit-scrollbar{display:none;}
+  .nav-item{
+    flex-direction:column;gap:3px;
+    padding:8px 12px;margin-bottom:0;
+    font-size:10px;white-space:nowrap;
+    border-radius:6px;
+    min-width:fit-content;
+  }
+  .nav-icon{font-size:16px;width:auto;}
+
+  .sidebar-footer{
+    padding:0 8px;
+    border-top:none;
+    border-left:1px solid rgba(255,255,255,.08);
+    flex-shrink:0;
+  }
+  .btn-logout-side{
+    padding:8px 12px;font-size:10px;
+    flex-direction:column;gap:2px;
+    border-radius:6px;
+  }
+
+  .main{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .section{padding:16px;}
+  .section-title{font-size:20px;}
+
+  .stats-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+  .stat-card{padding:14px 12px;}
+  .stat-num{font-size:26px;}
+  .stat-label{font-size:10px;}
+
+  table{font-size:12px;}
+  th,td{padding:10px 12px;}
+
+  .pago-row{flex-wrap:wrap;gap:8px;padding:12px 14px;}
+  .pago-info{flex:1;min-width:120px;}
+  .pago-monto{font-size:15px;}
+  .btn-action{font-size:11px;padding:6px 12px;}
+
+  .modal-bg{padding:0;align-items:flex-end;}
+  .modal-box{border-radius:16px 16px 0 0;max-width:100%;}
+  .modal-row{grid-template-columns:1fr;}
+
+  .card-head{flex-wrap:wrap;gap:8px;}
+}
 </style>
 </head>
 <body>
@@ -351,6 +431,49 @@ tr:hover td{background:#faf9f8;}
   </div>
 </div>
 
+<!-- MODAL EDITAR PROFESIONAL -->
+<div class="modal-bg" id="modal-editar" onclick="if(event.target===this)closeEditar()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Editar profesional</h3>
+      <button class="modal-close" onclick="closeEditar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="modal-section-title">Datos del perfil</div>
+      <div class="modal-row">
+        <div>
+          <label class="modal-label">Nombre completo</label>
+          <input type="text" class="modal-input" id="edit-nombre" placeholder="Dra. Ana López">
+        </div>
+        <div>
+          <label class="modal-label">Profesión</label>
+          <input type="text" class="modal-input" id="edit-profesion" placeholder="Psicóloga">
+        </div>
+      </div>
+      <div>
+        <label class="modal-label">Email</label>
+        <input type="email" class="modal-input" id="edit-email" placeholder="ana@ejemplo.com">
+      </div>
+      <div>
+        <label class="modal-label">Slug (URL pública)</label>
+        <input type="text" class="modal-input" id="edit-slug" placeholder="ana-lopez" oninput="document.getElementById('edit-slug-preview').textContent=this.value||'—'">
+        <div class="modal-hint">teresaarauz.vercel.app/paciente?p=<strong id="edit-slug-preview">—</strong></div>
+      </div>
+      <div class="modal-section-title" style="margin-top:4px;">Nota interna</div>
+      <div>
+        <textarea class="modal-input" id="edit-nota" rows="3" placeholder="Ej: avisada el 5/5, duda si renueva..." style="resize:vertical;line-height:1.5;"></textarea>
+        <div class="modal-hint">Solo visible para el admin. No la ve el profesional.</div>
+      </div>
+      <div class="modal-error" id="edit-error"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeEditar()">Cancelar</button>
+      <button class="btn-save" id="btn-save-editar" onclick="saveEditar()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML;}
 
@@ -503,7 +626,11 @@ function renderProfesionales(){
     const toggleLabel=p.activo?'Desactivar':'Activar';
     const toggleClass=p.activo?'danger':'success';
     return `<tr>
-      <td><strong>${esc(p.nombre||'—')}</strong><br><span style="font-size:11px;color:var(--ink-dim);">${esc(p.profesion||'')}</span></td>
+      <td>
+        <strong>${esc(p.nombre||'—')}</strong><br>
+        <span style="font-size:11px;color:var(--ink-dim);">${esc(p.profesion||'')}</span>
+        ${p.nota?`<div class="nota-texto">📝 ${esc(p.nota)}</div>`:''}
+      </td>
       <td style="font-size:12px;">${esc(p.email||'—')}</td>
       <td><code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;">${esc(p.slug||'—')}</code></td>
       <td>${planBadge(p.plan)}</td>
@@ -513,6 +640,7 @@ function renderProfesionales(){
         <div class="actions-cell">
           <button class="btn-action pay" onclick="openModalPago('${p.id}','${esc(p.nombre)}')">💳 Pago</button>
           <button class="btn-action ${toggleClass}" onclick="toggleActivo('${p.id}',${p.activo})">${toggleLabel}</button>
+        <button class="btn-action" onclick="openEditar('${p.id}')" style="border-color:#c4b5fd;color:#7c3aed;">✏ Editar</button>
         </div>
       </td>
     </tr>`;
@@ -679,6 +807,57 @@ async function saveNuevoPro(){
     errEl.classList.add('show');
     btn.disabled=false;btn.textContent='Crear profesional';
   }
+}
+
+// ── EDITAR PROFESIONAL ───────────────────────────────────────
+function openEditar(id){
+  const p=allPros.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('edit-id').value=p.id;
+  document.getElementById('edit-nombre').value=p.nombre||'';
+  document.getElementById('edit-profesion').value=p.profesion||'';
+  document.getElementById('edit-email').value=p.email||'';
+  document.getElementById('edit-slug').value=p.slug||'';
+  document.getElementById('edit-slug-preview').textContent=p.slug||'—';
+  document.getElementById('edit-nota').value=p.nota||'';
+  document.getElementById('edit-error').classList.remove('show');
+  document.getElementById('modal-editar').classList.add('open');
+}
+function closeEditar(){document.getElementById('modal-editar').classList.remove('open');}
+
+async function saveEditar(){
+  const id=document.getElementById('edit-id').value;
+  const nombre=document.getElementById('edit-nombre').value.trim();
+  const profesion=document.getElementById('edit-profesion').value.trim()||null;
+  const email=document.getElementById('edit-email').value.trim();
+  const slug=document.getElementById('edit-slug').value.trim().toLowerCase().replace(/\s+/g,'-');
+  const nota=document.getElementById('edit-nota').value.trim()||null;
+  const btn=document.getElementById('btn-save-editar');
+  const errEl=document.getElementById('edit-error');
+  errEl.classList.remove('show');
+
+  if(!nombre||!slug){
+    errEl.textContent='Nombre y slug son obligatorios.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled=true;btn.textContent='Guardando...';
+
+  const{error}=await sb.from('profesionales')
+    .update({nombre,profesion,email,slug,nota})
+    .eq('id',id);
+
+  btn.disabled=false;btn.textContent='Guardar cambios';
+
+  if(error){
+    errEl.textContent='Error al guardar: '+error.message;
+    errEl.classList.add('show');
+    return;
+  }
+  closeEditar();
+  showNotif('Cambios guardados ✓');
+  await loadAll();
 }
 
 // ── INIT ──────────────────────────────────────────────────────
