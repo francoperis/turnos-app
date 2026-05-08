@@ -42,6 +42,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .login-btn:active{transform:scale(.98);}
 .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;display:none;font-weight:500;}
 .login-error.show{display:block;}
+/* TIMER SUSCRIPCION */
+.sub-banner{display:none;padding:8px 16px;font-size:12px;font-weight:600;text-align:center;border-bottom:1px solid transparent;}
+.sub-banner.warning{background:#fef3cd;color:#92400e;border-color:#f0d89a;display:block;}
+.sub-banner.danger{background:#fee2e2;color:#991b1b;border-color:#fca5a5;display:block;}
+.sub-banner.expired{background:#fee2e2;color:#991b1b;border-color:#fca5a5;display:block;}
 /* NAV */
 .app-nav{background:#ffffff;border-bottom:1px solid var(--line);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .logo{font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);display:flex;align-items:center;gap:8px;}
@@ -373,6 +378,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 
 <!-- PANEL -->
 <div id="panel" style="display:none;">
+  <div class="sub-banner" id="sub-banner"></div>
   <header class="app-nav">
     <div class="logo"><div class="logo-dot"></div>TurnosPai</div>
     <div class="nav-right">
@@ -745,7 +751,7 @@ async function showPanel(){
   const{data:{user}}=await sb.auth.getUser();
   if(!user){logout();return;}
   PRO_ID=user.id;
-  const{data:pro,error:proErr}=await sb.from('profesionales').select('slug,nombre,config,activo').eq('id',PRO_ID).single();
+  const{data:pro,error:proErr}=await sb.from('profesionales').select('slug,nombre,config,activo,subscription_end,plan').eq('id',PRO_ID).single();
   if(proErr||!pro){showNotif('Error al cargar perfil','red');showLoader(false);return;}
   if(pro.activo===false){
     await sb.auth.signOut();
@@ -764,6 +770,23 @@ async function showPanel(){
   document.getElementById('pro-profession').textContent=profMostrar;
   document.getElementById('pro-profession').style.display=profMostrar?'block':'none';
   document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
+  // Timer de suscripción
+  const banner=document.getElementById('sub-banner');
+  if(pro.subscription_end){
+    const diasRestantes=Math.ceil((new Date(pro.subscription_end)-new Date())/864e5);
+    if(diasRestantes<=0){
+      banner.className='sub-banner expired';
+      banner.textContent='⛔ Tu suscripción venció. Contactá al administrador para renovar.';
+    }else if(diasRestantes<=3){
+      banner.className='sub-banner danger';
+      banner.textContent=`⚠️ Tu suscripción vence en ${diasRestantes} día${diasRestantes!==1?'s':''}. Contactá al administrador para renovar.`;
+    }else if(diasRestantes<=7){
+      banner.className='sub-banner warning';
+      banner.textContent=`📅 Tu suscripción vence en ${diasRestantes} días.`;
+    }else{
+      banner.className='sub-banner';
+    }
+  }
   loadAll();startRealtime();
 }
 
