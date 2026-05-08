@@ -522,7 +522,17 @@ textarea.minput{resize:vertical;line-height:1.5;min-height:72px;}
       <input type="hidden" id="pg-id">
       <div class="minfo">Profesional: <strong id="pg-nombre"></strong><br><span style="font-size:12px;">La suscripción se extiende 30 días desde hoy.</span></div>
       <div><label class="mlabel">Monto ($)</label><input class="minput" type="number" id="pg-monto" placeholder="Ej: 15000" min="0"></div>
-      <div><label class="mlabel">Nota (opcional)</label><input class="minput" type="text" id="pg-nota" placeholder="Transferencia, efectivo..."></div>
+      <div>
+        <label class="mlabel">Método de pago</label>
+        <select class="minput" id="pg-metodo">
+          <option value="">— Seleccioná —</option>
+          <option value="Transferencia">Transferencia</option>
+          <option value="Efectivo">Efectivo</option>
+          <option value="MercadoPago">MercadoPago</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div><label class="mlabel">Nota adicional (opcional)</label><input class="minput" type="text" id="pg-nota" placeholder="Referencia, comprobante..."></div>
       <div class="merr" id="pg-err"></div>
     </div>
     <div class="modal-footer">
@@ -670,7 +680,7 @@ function renderInicio(){
         <div class="pago-meta">${esc(p.email||'—')}</div>
       </div>
       ${timerEl(p)}
-      <button class="btn-sm pay" onclick="openPago('${p.id}','${esc(p.nombre)}')">💳 Pago</button>
+      <button class="btn-sm pay" data-action="pago" data-id="${p.id}" data-nombre="${esc(p.nombre)}">💳 Pago</button>
     </div>
   `).join('');
 }
@@ -700,9 +710,9 @@ function renderPros(){
         <span style="font-size:11px;color:var(--ink3);">${p.subscription_end?new Date(p.subscription_end).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—'}</span>
       </div>
       <div class="pro-item-bot">
-        <button class="btn-sm pay" onclick="openPago('${p.id}','${esc(p.nombre)}')">💳 Registrar pago</button>
-        <button class="btn-sm edit" onclick="openEditar('${p.id}')">✏ Editar</button>
-        <button class="btn-sm ${p.activo?'on':'off'}" onclick="toggleActivo('${p.id}',${p.activo})">${p.activo?'Desactivar':'Activar'}</button>
+        <button class="btn-sm pay" data-action="pago" data-id="${p.id}" data-nombre="${esc(p.nombre)}">💳 Registrar pago</button>
+        <button class="btn-sm edit" data-action="editar" data-id="${p.id}">✏ Editar</button>
+        <button class="btn-sm ${p.activo?'on':'off'}" data-action="toggle" data-id="${p.id}" data-activo="${p.activo}">${p.activo?'Desactivar':'Activar'}</button>
       </div>
     </div>
   `).join('');
@@ -720,7 +730,7 @@ function renderSus(){
         <div class="pago-meta">${esc(p.email||'—')} · ${planBadge(p.plan)}</div>
       </div>
       ${timerEl(p)}
-      <button class="btn-sm pay" style="margin-left:4px;" onclick="openPago('${p.id}','${esc(p.nombre)}')">💳</button>
+      <button class="btn-sm pay" style="margin-left:4px;" data-action="pago" data-id="${p.id}" data-nombre="${esc(p.nombre)}">💳</button>
     </div>
   `).join('');
 }
@@ -813,6 +823,7 @@ function openPago(id,nombre){
   document.getElementById('pg-id').value=id;
   document.getElementById('pg-nombre').textContent=nombre;
   document.getElementById('pg-monto').value='';
+  document.getElementById('pg-metodo').value='';
   document.getElementById('pg-nota').value='';
   document.getElementById('pg-err').classList.remove('show');
   openModal('m-pago');
@@ -821,7 +832,9 @@ function openPago(id,nombre){
 async function savePago(){
   const id=document.getElementById('pg-id').value;
   const monto=document.getElementById('pg-monto').value||null;
-  const nota=document.getElementById('pg-nota').value.trim()||null;
+  const metodo=document.getElementById('pg-metodo').value||null;
+  const notaTexto=document.getElementById('pg-nota').value.trim()||null;
+  const nota=[metodo,notaTexto].filter(Boolean).join(' · ')||null;
   const btn=document.getElementById('pg-btn');
   const errEl=document.getElementById('pg-err');
   errEl.classList.remove('show');
@@ -947,6 +960,23 @@ async function saveNuevo(){
     btn.disabled=false;btn.textContent='Crear profesional';
   }
 }
+
+// ── EVENT DELEGATION ──────────────────────────────────────────
+// Captura clicks en botones con data-action desde cualquier sección
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+  if(action === 'pago'){
+    openPago(id, btn.dataset.nombre || '');
+  } else if(action === 'editar'){
+    openEditar(id);
+  } else if(action === 'toggle'){
+    const activo = btn.dataset.activo === 'true';
+    toggleActivo(id, activo);
+  }
+});
 
 // ── INIT ───────────────────────────────────────────────────────
 sb.auth.getSession().then(async({data:{session}})=>{
