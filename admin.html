@@ -499,6 +499,13 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
         <input class="mi" type="text" id="ed-slug" oninput="document.getElementById('ed-slug-prev').textContent=this.value||'—'">
         <div class="mhint">/paciente?p=<strong id="ed-slug-prev">—</strong></div>
       </div>
+      <div>
+        <label class="ml">Plan</label>
+        <select class="mi" id="ed-plan">
+          <option value="trial">Trial</option>
+          <option value="activo">Pago (activo)</option>
+        </select>
+      </div>
       <div><label class="ml">Nota interna</label><textarea class="mi" id="ed-nota" placeholder="Solo visible para el admin..."></textarea></div>
       <div class="merr" id="ed-err"></div>
     </div>
@@ -573,7 +580,7 @@ let pros=[],allPagos=[];
 const esc=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML;};
 const fmt$=n=>n?'$'+Math.round(Number(n)).toLocaleString('es-AR'):'—';
 const fmtDate=s=>new Date(s).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'});
-const fmtDT=s=>new Date(s).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+const fmtDT=s=>new Date(s).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
 const timeAgo=s=>{const d=Math.floor((Date.now()-new Date(s))/60000);if(d<1)return'ahora';if(d<60)return`${d}m`;if(d<1440)return`${Math.floor(d/60)}h`;return`${Math.floor(d/1440)}d`;};
 const diasRestantes=p=>{if(!p.subscription_end)return null;return Math.ceil((new Date(p.subscription_end)-new Date())/864e5);};
 const timerEl=p=>{const d=diasRestantes(p);if(d===null)return'<span class="timer a">Sin fecha</span>';if(d>15)return`<span class="timer g">✓ ${d}d</span>`;if(d>0)return`<span class="timer a">⚠ ${d}d</span>`;return'<span class="timer r">✕ Vencido</span>';};
@@ -667,7 +674,7 @@ function renderInicio(){
   document.getElementById('st-total').textContent=pros.length;
   document.getElementById('st-activos').textContent=pros.filter(p=>p.activo).length;
   document.getElementById('st-trial').textContent=pros.filter(p=>p.plan==='trial').length;
-  document.getElementById('st-venc').textContent=pros.filter(p=>(diasRestantes(p)||0)<=0).length;
+  document.getElementById('st-venc').textContent=pros.filter(p=>p.activo&&(diasRestantes(p)||0)<=0).length;
   const h24=new Date(Date.now()-86400000);
   const np=pros.filter(p=>p.created_at&&new Date(p.created_at)>h24);
   document.getElementById('new-pros').innerHTML=np.length
@@ -680,7 +687,11 @@ function renderInicio(){
   const acts=[];
   pros.forEach(p=>{
     if(p.created_at)acts.push({t:new Date(p.created_at),dot:'g',text:`<strong>${esc(p.nombre)}</strong> se registró`});
-    if(!p.activo)acts.push({t:new Date(p.updated_at||p.created_at),dot:'r',text:`<strong>${esc(p.nombre)}</strong> fue desactivado`});
+    // Solo agregar "desactivado" si fue en las últimas 48hs
+    if(!p.activo&&p.updated_at){
+      const updAt=new Date(p.updated_at);
+      if(Date.now()-updAt<172800000)acts.push({t:updAt,dot:'r',text:`<strong>${esc(p.nombre)}</strong> fue desactivado`});
+    }
   });
   allPagos.slice(0,30).forEach(p=>acts.push({t:new Date(p.fecha),dot:'b',text:`Pago de <strong>${esc(p.profesionales?.nombre||'—')}</strong>${p.monto?' — '+fmt$(p.monto):''}`}));
   acts.sort((a,b)=>b.t-a.t);
@@ -865,7 +876,14 @@ async function savePago(){
   const errEl=document.getElementById('pg-err');
   errEl.classList.remove('show');
   btn.textContent='Guardando...';btn.disabled=true;
-  const nuevaFecha=new Date();nuevaFecha.setDate(nuevaFecha.getDate()+30);
+  // Sumar 30 días desde hoy O desde subscription_end si todavía tiene días restantes
+  const proActual=pros.find(x=>x.id===id);
+  let baseDate=new Date();
+  if(proActual?.subscription_end){
+    const endDate=new Date(proActual.subscription_end);
+    if(endDate>baseDate)baseDate=endDate; // tiene días restantes, suma desde ahí
+  }
+  const nuevaFecha=new Date(baseDate);nuevaFecha.setDate(nuevaFecha.getDate()+30);
   const{error:e1}=await sb.from('pagos').insert([{profesional_id:id,monto,nota}]);
   const e2=await updatePro(id,{plan:'activo',subscription_end:nuevaFecha.toISOString()});
   btn.textContent='Confirmar pago';btn.disabled=false;
@@ -882,6 +900,7 @@ function openEditar(id){
   document.getElementById('ed-email').value=p.email||'';
   document.getElementById('ed-slug').value=p.slug||'';
   document.getElementById('ed-slug-prev').textContent=p.slug||'—';
+  document.getElementById('ed-plan').value=p.plan||'trial';
   document.getElementById('ed-nota').value=p.nota||'';
   document.getElementById('ed-err').classList.remove('show');
   openModal('m-editar');
@@ -892,13 +911,14 @@ async function saveEditar(){
   const profesion=document.getElementById('ed-prof').value.trim()||null;
   const email=document.getElementById('ed-email').value.trim();
   const slug=document.getElementById('ed-slug').value.trim().toLowerCase().replace(/\s+/g,'-');
+  const plan=document.getElementById('ed-plan').value;
   const nota=document.getElementById('ed-nota').value.trim()||null;
   const btn=document.getElementById('ed-btn');
   const errEl=document.getElementById('ed-err');
   errEl.classList.remove('show');
   if(!nombre||!slug){errEl.textContent='Nombre y slug son obligatorios.';errEl.classList.add('show');return;}
   btn.textContent='Guardando...';btn.disabled=true;
-  const error=await updatePro(id,{nombre,profesion,email,slug,nota});
+  const error=await updatePro(id,{nombre,profesion,email,slug,nota,plan});
   btn.textContent='Guardar cambios';btn.disabled=false;
   if(error){errEl.textContent='Error: '+error.message;errEl.classList.add('show');return;}
   closeModal('m-editar');notif('Cambios guardados ✓');await loadAll();
