@@ -5,7 +5,6 @@ export default async function handler(req) {
     return new Response('Method not allowed', { status: 405 });
   }
 
-  // Verificar origin (seguridad básica)
   const origin = req.headers.get('origin') || '';
   const allowed = ['https://teresaarauz.vercel.app', 'http://localhost:3000'];
   if (!allowed.some(o => origin.startsWith(o))) {
@@ -14,7 +13,6 @@ export default async function handler(req) {
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
-
   if (!SUPABASE_URL || !SERVICE_KEY) {
     return json({ error: 'Variables de entorno no configuradas' }, 500);
   }
@@ -23,12 +21,18 @@ export default async function handler(req) {
   try { body = await req.json(); }
   catch { return json({ error: 'Body inválido' }, 400); }
 
-  const { nombre, profesion, email, password, slug } = body;
+  const { nombre, profesion, email, password, slug, plan } = body;
   if (!nombre || !email || !password || !slug) {
     return json({ error: 'Faltan campos obligatorios' }, 400);
   }
 
-  // 1 — Crear usuario en Supabase Auth con service role
+  // Calcular subscription_end según el plan elegido
+  // trial  → +30 días desde hoy
+  // activo → +30 días desde hoy (primer período pago)
+  const planFinal = plan === 'activo' ? 'activo' : 'trial';
+  const subscriptionEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  // 1 — Crear usuario en Supabase Auth
   const authRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
     method: 'POST',
     headers: {
@@ -36,15 +40,10 @@ export default async function handler(req) {
       'apikey': SERVICE_KEY,
       'Authorization': `Bearer ${SERVICE_KEY}`,
     },
-    body: JSON.stringify({
-      email,
-      password,
-      email_confirm: true,  // confirmar email automáticamente
-    }),
+    body: JSON.stringify({ email, password, email_confirm: true }),
   });
 
   const authData = await authRes.json();
-
   if (!authRes.ok) {
     return json({ error: authData.message || 'Error al crear usuario en Auth' }, 400);
   }
@@ -62,27 +61,25 @@ export default async function handler(req) {
     },
     body: JSON.stringify({
       id: userId,
+      user_id: userId,
       slug: slug.toLowerCase().replace(/\s+/g, '-'),
       nombre,
       email,
       profesion: profesion || null,
       role: 'profesional',
       activo: true,
-      plan: 'trial',
+      plan: planFinal,
       trial_start: new Date().toISOString(),
-      subscription_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      subscription_end: subscriptionEnd,
     }),
   });
 
   if (!proRes.ok) {
     const proErr = await proRes.json().catch(() => ({}));
-    // Rollback: borrar el usuario de Auth si falló el insert
+    // Rollback: borrar usuario de Auth si falló el insert
     await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${userId}`, {
       method: 'DELETE',
-      headers: {
-        'apikey': SERVICE_KEY,
-        'Authorization': `Bearer ${SERVICE_KEY}`,
-      },
+      headers: { 'apikey': SERVICE_KEY, 'Authorization': `Bearer ${SERVICE_KEY}` },
     });
     return json({ error: proErr.message || 'Error al crear perfil' }, 400);
   }
