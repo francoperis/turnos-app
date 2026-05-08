@@ -47,21 +47,125 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .sub-banner.warning{background:#fef3cd;color:#92400e;border-color:#f0d89a;display:block;}
 .sub-banner.danger{background:#fee2e2;color:#991b1b;border-color:#fca5a5;display:block;}
 .sub-banner.expired{background:#fee2e2;color:#991b1b;border-color:#fca5a5;display:block;}
-/* NAV */
-.app-nav{background:#ffffff;border-bottom:1px solid var(--line);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.04);}
-.logo{font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);display:flex;align-items:center;gap:8px;}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
-.nav-right{display:flex;align-items:center;gap:6px;}
-.btn-settings{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
-.btn-settings:hover{border-color:var(--green);color:var(--green);}
-.btn-logout{border:1px solid var(--line);background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--ink-dim);padding:5px 12px;border-radius:6px;transition:all .15s;}
-.btn-logout:hover{border-color:var(--red);color:var(--red);}
-@media(max-width:500px){
-  .btn-settings{font-size:11px;padding:5px 9px;}
-  .btn-logout{font-size:11px;padding:5px 9px;}
+/* ── LAYOUT SHELL ── */
+:root{--sb-w:220px;--mob-nav-h:60px;}
+
+/* SIDEBAR desktop */
+.app-sidebar{
+  display:none;
+  position:fixed;top:0;left:0;bottom:0;
+  width:var(--sb-w);
+  background:#1a1a1a;
+  flex-direction:column;
+  z-index:100;
 }
+.sb-header{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;}
+.sb-logo{font-family:'Playfair Display',serif;font-size:20px;color:#fff;letter-spacing:-.2px;}
+.sb-logo span{color:#a3e6c8;}
+.sb-tagline{font-size:10px;color:rgba(255,255,255,.3);margin-top:3px;text-transform:uppercase;letter-spacing:.4px;}
+.sb-nav{flex:1;padding:10px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.sb-link{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,.45);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;width:100%;text-align:left;transition:all .15s;text-decoration:none;}
+.sb-link:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.sb-link.active{background:rgba(163,230,200,.12);color:#a3e6c8;}
+.sb-link-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;opacity:.8;}
+.sb-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;}
+.sb-logout-btn{width:100%;padding:8px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,.3);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px;transition:color .15s;}
+.sb-logout-btn:hover{color:rgba(255,255,255,.7);}
+
+/* TOPBAR mobile */
+.app-topbar{
+  display:none;
+  position:fixed;top:0;left:0;right:0;height:52px;
+  background:#1a1a1a;
+  align-items:center;padding:0 16px;
+  z-index:100;
+}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:18px;color:#fff;flex:1;}
+.topbar-logo span{color:#a3e6c8;}
+.topbar-right{display:flex;gap:8px;}
+.topbar-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-family:'Outfit',sans-serif;font-size:12px;padding:5px 11px;border-radius:6px;cursor:pointer;transition:all .15s;}
+.topbar-btn:hover{color:#fff;border-color:rgba(255,255,255,.5);}
+
+/* BOTTOM NAV mobile */
+.app-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--mob-nav-h);
+  background:#1a1a1a;
+  border-top:1px solid rgba(255,255,255,.06);
+  padding-bottom:env(safe-area-inset-bottom);
+  z-index:100;
+}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:rgba(255,255,255,.3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;transition:color .15s;padding-top:4px;}
+.bn-item.active{color:#a3e6c8;}
+.bn-icon{font-size:20px;line-height:1;}
+
+/* MAIN CONTENT */
+.app-main{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* DESKTOP ≥768px */
+@media(min-width:768px){
+  body{overflow:hidden;}
+  #panel{display:flex!important;flex-direction:row;height:100vh;}
+  .app-sidebar{display:flex;}
+  .app-topbar{display:none!important;}
+  .app-bottom-nav{display:none!important;}
+  .sub-banner{margin-left:var(--sb-w);}
+  .app-main{
+    position:fixed;top:0;left:var(--sb-w);right:0;bottom:0;
+  }
+  .pro-wrap{padding:24px 28px;}
+}
+
+/* MOBILE <768px */
+@media(max-width:767px){
+  .app-sidebar{display:none!important;}
+  .app-topbar{display:flex;}
+  .app-bottom-nav{display:flex;}
+  .app-main{
+    position:fixed;top:52px;left:0;right:0;bottom:var(--mob-nav-h);
+  }
+  .pro-wrap{padding:14px 14px;}
+  .sub-banner{top:52px;}
+}
+
+/* Ocultar el nav viejo */
+.app-nav{display:none!important;}
+
 /* MAIN */
-.pro-wrap{max-width:960px;margin:0 auto;padding:16px 20px 16px;}
+.pro-wrap{max-width:960px;margin:0 auto;}
+
+/* ── SECCIONES POR DATA-SECTION (mobile) ── */
+/* Desktop: siempre mostrar todo */
+@media(min-width:768px){
+  .pro-header,.link-card,.metrics-bar,.pro-grid{display:revert!important;}
+  .pro-grid{display:grid!important;}
+}
+
+/* Mobile: mostrar/ocultar según sección activa */
+@media(max-width:767px){
+  /* Inicio: todo visible */
+  #panel[data-section="inicio"] .pro-header,
+  #panel[data-section="inicio"] .link-card,
+  #panel[data-section="inicio"] .metrics-bar,
+  #panel[data-section="inicio"] .pro-grid{display:revert!important;}
+
+  /* Agenda: solo calendario (primer hijo del grid) */
+  #panel[data-section="agenda"] .pro-header,
+  #panel[data-section="agenda"] .link-card,
+  #panel[data-section="agenda"] .metrics-bar{display:none!important;}
+  #panel[data-section="agenda"] .pro-grid{display:block!important;}
+  #panel[data-section="agenda"] .pro-grid>div:last-child{display:none!important;}
+  #panel[data-section="agenda"] .pro-grid>div:first-child{display:block!important;}
+
+  /* Solicitudes: solo panel de requests */
+  #panel[data-section="solicitudes"] .pro-header,
+  #panel[data-section="solicitudes"] .link-card,
+  #panel[data-section="solicitudes"] .metrics-bar{display:none!important;}
+  #panel[data-section="solicitudes"] .pro-grid{display:block!important;}
+  #panel[data-section="solicitudes"] .pro-grid>div:first-child{display:none!important;}
+  #panel[data-section="solicitudes"] .pro-grid>div:last-child{display:block!important;}
+}
 .pro-header{margin-bottom:14px;}
 .pro-header-left{}
 .page-profession{font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px;letter-spacing:.8px;text-transform:uppercase;}
@@ -377,15 +481,55 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
 </div>
 
 <!-- PANEL -->
-<div id="panel" style="display:none;">
+<div id="panel" style="display:none;" data-section="inicio">
   <div class="sub-banner" id="sub-banner"></div>
-  <header class="app-nav">
-    <div class="logo"><div class="logo-dot"></div>TurnosPai</div>
-    <div class="nav-right">
-      <button class="btn-settings" onclick="openSettings()">⚙️ Ajustes</button>
-      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+
+  <!-- SIDEBAR desktop -->
+  <aside class="app-sidebar">
+    <div class="sb-header">
+      <div class="sb-logo">Turnos<span>Pai</span></div>
+      <div class="sb-tagline" id="sb-tagline-prof">Panel profesional</div>
     </div>
-  </header>
+    <nav class="sb-nav">
+      <button class="sb-link active" id="sb-inicio" onclick="sbNav('inicio')">
+        <span class="sb-link-icon">⬡</span>Inicio
+      </button>
+      <button class="sb-link" id="sb-agenda" onclick="sbNav('agenda')">
+        <span class="sb-link-icon">📅</span>Agenda
+      </button>
+      <button class="sb-link" id="sb-solicitudes" onclick="sbNav('solicitudes')">
+        <span class="sb-link-icon">✉️</span>Solicitudes
+        <span id="sb-badge" style="display:none;margin-left:auto;background:#2d7d5f;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;"></span>
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <button class="sb-link" onclick="openSettings()" style="margin-bottom:4px;">
+        <span class="sb-link-icon">⚙️</span>Ajustes
+      </button>
+      <button class="sb-logout-btn" onclick="logout()">↩ Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <!-- TOPBAR mobile -->
+  <div class="app-topbar">
+    <div class="topbar-logo">Turnos<span>Pai</span></div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="openSettings()">⚙️</button>
+      <button class="topbar-btn" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV mobile -->
+  <nav class="app-bottom-nav" style="display:flex;">
+    <button class="bn-item active" id="bn-inicio" onclick="sbNav('inicio')"><span class="bn-icon">⬡</span>Inicio</button>
+    <button class="bn-item" id="bn-agenda" onclick="sbNav('agenda')"><span class="bn-icon">📅</span>Agenda</button>
+    <button class="bn-item" id="bn-solicitudes" onclick="sbNav('solicitudes')">
+      <span class="bn-icon">✉️</span>Solicitudes
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="app-main">
   <div class="pro-wrap">
     <div class="pro-header">
       <div class="pro-header-left">
@@ -455,6 +599,7 @@ input[type="date"].modal-input{-webkit-appearance:none;appearance:none;max-width
       </div>
     </div>
   </div>
+  </div><!-- /app-main -->
 </div>
 
 <!-- MODAL CARGA MANUAL -->
@@ -745,7 +890,7 @@ function showLogin(){document.getElementById('recover-card').style.display='none
 
 async function showPanel(){
   document.getElementById('login-screen').classList.remove('show');
-  document.getElementById('panel').style.display='block';
+  document.getElementById('panel').style.display='flex';
   showLoader(true);
   // Cargar id y slug del profesional autenticado
   const{data:{user}}=await sb.auth.getUser();
@@ -763,6 +908,9 @@ async function showPanel(){
     return;
   }
   PRO_SLUG=pro.slug;
+  // Setear nombre en sidebar
+  const tagline=document.getElementById('sb-tagline-prof');
+  if(tagline)tagline.textContent=pro.nombre||'Panel profesional';
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
   const profMostrar=pro.profesion||'';
@@ -969,8 +1117,9 @@ function renderRequests(){
   const pending=[];
   Object.entries(allBookings).forEach(([key,list])=>{list.forEach(b=>{if(b.estado==='pending')pending.push({key,...b});});});
   const el=document.getElementById('req-list');const badge=document.getElementById('req-badge');
-  if(pending.length===0){badge.style.display='none';el.innerHTML=`<div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>`;return;}
+  if(pending.length===0){badge.style.display='none';updateSolicitudesBadge(0);el.innerHTML=`<div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div>`;return;}
   badge.style.display='inline-block';badge.textContent=`${pending.length} nueva${pending.length>1?'s':''}`;
+  updateSolicitudesBadge(pending.length);
   el.innerHTML=pending.map(b=>{
     const d=parseDate(b.fecha);
     const compBtn=b.comprobante_url?`<button onclick="verComprobante('${b.id}')" style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;border:1.5px solid var(--green-light);background:var(--green-bg);color:var(--green);cursor:pointer;font-family:'Outfit',sans-serif;">📎 Comprobante</button>`:'';
@@ -1330,6 +1479,33 @@ function onDurPacChange(sel){
   sel.classList.toggle('',val==='base');
   if(val==='base'){delete durPacData[tel];}
   else{durPacData[tel]=parseInt(val);}
+}
+
+// ── SIDEBAR NAV ────────────────────────────────────────────
+let _currentSection = 'inicio';
+
+function sbNav(section){
+  _currentSection = section;
+  // Activar nav items
+  document.querySelectorAll('.sb-link[id^="sb-"],.bn-item[id^="bn-"]').forEach(b=>b.classList.remove('active'));
+  const sbEl=document.getElementById('sb-'+section);if(sbEl)sbEl.classList.add('active');
+  const bnEl=document.getElementById('bn-'+section);if(bnEl)bnEl.classList.add('active');
+  // Setear data-section en el panel para que CSS maneje la visibilidad
+  document.getElementById('panel').setAttribute('data-section',section);
+  document.querySelector('.app-main')?.scrollTo(0,0);
+}
+
+// Actualizar badge de solicitudes en sidebar y bottom nav
+function updateSolicitudesBadge(count){
+  const sbB=document.getElementById('sb-badge');
+  const bnSol=document.getElementById('bn-solicitudes');
+  if(count>0){
+    if(sbB){sbB.style.display='inline-block';sbB.textContent=count;}
+    if(bnSol){bnSol.querySelector('.bn-icon').textContent='✉️';bnSol.style.color=_currentSection==='solicitudes'?'#a3e6c8':'#d97706';}
+  }else{
+    if(sbB)sbB.style.display='none';
+    if(bnSol)bnSol.style.color='';
+  }
 }
 
 sb.auth.getSession().then(({data:{session}})=>{
