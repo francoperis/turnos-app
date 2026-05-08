@@ -745,8 +745,17 @@ async function showPanel(){
   const{data:{user}}=await sb.auth.getUser();
   if(!user){logout();return;}
   PRO_ID=user.id;
-  const{data:pro,error:proErr}=await sb.from('profesionales').select('slug,nombre,config').eq('id',PRO_ID).single();
+  const{data:pro,error:proErr}=await sb.from('profesionales').select('slug,nombre,config,activo').eq('id',PRO_ID).single();
   if(proErr||!pro){showNotif('Error al cargar perfil','red');showLoader(false);return;}
+  if(pro.activo===false){
+    await sb.auth.signOut();
+    document.getElementById('panel').style.display='none';
+    document.getElementById('login-screen').classList.add('show');
+    document.getElementById('login-error').textContent='Tu cuenta está suspendida. Contactá al administrador.';
+    document.getElementById('login-error').classList.add('show');
+    showLoader(false);
+    return;
+  }
   PRO_SLUG=pro.slug;
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
