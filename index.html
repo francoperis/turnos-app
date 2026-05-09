@@ -89,13 +89,20 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     background:var(--green);
     min-height:100%;
   }
+  /* pro-grid: contenedor transparente posicionado sobre el verde */
   #sec-inicio .card-over-topbar{
-    margin:78px 0 0;
-    border-radius:20px 20px 0 0;
-    box-shadow:0 -6px 20px rgba(0,0,0,.12);
-    background:#fff;
-    overflow:hidden;
-    min-height:calc(100vh - 90px - var(--mob-bot));
+    margin:78px 0 0!important;
+    background:transparent!important;
+    display:block!important;
+    padding:0!important;
+  }
+  /* El card del calendario: es el card blanco que flota */
+  #sec-inicio .card-over-topbar>.card{
+    border-radius:20px 20px 0 0!important;
+    border:none!important;
+    box-shadow:0 -4px 12px rgba(0,0,0,.10)!important;
+    background:#fff!important;
+    min-height:calc(100vh - 78px - var(--mob-bot))!important;
   }
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
   .app-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--mob-bot);background:#fff;border-top:1px solid var(--line);box-shadow:0 -1px 8px rgba(0,0,0,.05);padding-bottom:env(safe-area-inset-bottom);z-index:100;}
