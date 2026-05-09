@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--green-light:#c8e6da;--amber:#d97706;--amber-bg:#fef3cd;--red:#dc2626;--red-bg:#fee2e2;--blue:#185FA5;--blue-bg:#e6f1fb;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.06);--shadow-md:0 2px 8px rgba(0,0,0,.07),0 8px 32px rgba(0,0,0,.10);--sb-w:220px;--mob-top:52px;--mob-bot:62px;}
+:root{--bg:#f7f5f2;--white:#fff;--ink:#1a1a1a;--ink-soft:#555;--ink-dim:#999;--line:#e8e4df;--green:#2d7d5f;--green-bg:#edf5f1;--green-light:#c8e6da;--amber:#d97706;--amber-bg:#fef3cd;--red:#dc2626;--red-bg:#fee2e2;--blue:#185FA5;--blue-bg:#e6f1fb;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.06);--shadow-md:0 2px 8px rgba(0,0,0,.07),0 8px 32px rgba(0,0,0,.10);--sb-w:220px;--mob-top:96px;--mob-bot:62px;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .loader-overlay{position:fixed;inset:0;background:rgba(247,245,242,.92);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .2s;}
@@ -69,31 +69,34 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 /* TOPBAR / BOTTOM NAV MOBILE */
 .app-topbar,.app-bottom-nav{display:none;}
 
-/* ─── MOBILE LAYOUT ─────────────────────────────────────────────────────────
-   Estrategia:
-   - Topbar: position:fixed, altura ~96px (var --mob-top)
-   - app-main: position:fixed, top:var(--mob-top), overflow-y:auto, bg crema
-   - Secciones normales: padding-top:16px (ya están debajo del topbar)
-   - Calendario (card-over-topbar): position:absolute, top:calc(var(--mob-top) - 28px)
-     → flota 28px POR ENCIMA del borde inferior del topbar, independiente del flujo
-   ─────────────────────────────────────────────────────────────────────────── */
-:root{ --mob-top:96px; }
-
 @media(max-width:767px){
-  #panel.visible{flex-direction:column;}
+  /*
+   * TÉCNICA DE OVERLAP CORRECTA:
+   * El topbar está DENTRO del flujo de scroll (no fixed).
+   * El panel mobile es un flex column que ocupa 100vh.
+   * app-main scrollea. El topbar scrollea con el contenido en sec-inicio,
+   * pero el card tiene margin-top negativo para subirse encima del verde.
+   * En otras secciones el topbar es sticky.
+   */
+
+  #panel.visible{
+    flex-direction:column;
+    height:100vh;
+    overflow:hidden;
+  }
   .app-sidebar{display:none;}
 
-  /* TOPBAR: fixed, verde, altura fija */
+  /* TOPBAR: dentro del flujo, NO fixed. Verde. */
   .app-topbar{
     display:flex;flex-direction:column;
     position:fixed;top:0;left:0;right:0;
     height:var(--mob-top);
     background:var(--green);
     padding:14px 16px 12px;
-    z-index:100;
+    z-index:200;
     box-sizing:border-box;
   }
-  .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
   .topbar-sec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;}
   .topbar-icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;}
   .topbar-icon-btn svg{width:16px;height:16px;}
@@ -102,7 +105,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
 
-  /* MAIN: empieza debajo del topbar, scrollea normalmente */
+  /* MAIN: fixed debajo del topbar, scrollea, fondo verde */
   .app-main{
     position:fixed;
     top:var(--mob-top);
@@ -110,69 +113,56 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     bottom:var(--mob-bot);
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
-    background:var(--bg);
+    background:var(--green);
   }
 
-  /* ── SECCIÓN AGENDA ──
-     sec-inicio tiene fondo verde en la parte superior (igual al topbar)
-     para dar continuidad visual, y el card flota encima con position:absolute */
+  /* AGENDA: sec-inicio ocupa el ancho completo, fondo verde continuo con el topbar */
   #sec-inicio{
     padding:0!important;
-    position:relative;
     background:var(--green);
     min-height:100%;
   }
-
-  /* Ocultar elementos desktop dentro de sec-inicio */
+  /* Ocultar elementos solo desktop */
   #sec-inicio .pro-header,
   #sec-inicio .link-card,
   #sec-inicio .metrics-bar,
   #sec-inicio .sec-desktop-only{display:none!important;}
   #sec-inicio .pro-grid{grid-template-columns:1fr!important;gap:0!important;}
 
-  /* card-over-topbar: posicionado relativo dentro de sec-inicio */
+  /* card-over-topbar: wrapper transparente con padding lateral para que el card
+     no llegue al borde de la pantalla, y padding-top para el overlap */
   #sec-inicio .card-over-topbar{
     display:block!important;
-    padding:0!important;
-    margin:0!important;
     background:transparent!important;
-    /* Empujar el contenido hacia abajo: el card arranca 28px antes del borde del topbar
-       → topbar tiene --mob-top (96px) de alto, el card empieza a 68px del top del main
-       → 68px = 96px - 28px overlap */
-    padding-top:68px!important;
-    position:relative;
+    padding:28px 12px 20px!important;
+    margin:0!important;
   }
 
-  /* EL CARD DEL CALENDARIO: box independiente flotante */
+  /* EL CARD DEL CALENDARIO: caja blanca flotante, tamaño justo a su contenido.
+     border-radius en todos los lados → no pinta de blanco más allá del card */
   #sec-inicio .card-over-topbar>.card{
-    border-radius:20px 20px 0 0!important;
+    border-radius:16px!important;
     border:none!important;
-    box-shadow:0 -6px 20px rgba(0,0,0,.15)!important;
+    box-shadow:0 4px 20px rgba(0,0,0,.15)!important;
     background:#fff!important;
-    min-height:calc(100vh - 68px - var(--mob-bot))!important;
-    position:relative;
-    z-index:10;
+    overflow:hidden!important;
   }
 
-  /* ── OTRAS SECCIONES ──
-     padding-top:16px porque ya están debajo del topbar (app-main empieza en --mob-top) */
+  /* OTRAS SECCIONES: fondo crema, padding cero (app-main ya empieza debajo del topbar) */
   .sec-wrap{
-    display:none;
     padding:16px 14px 20px!important;
     background:var(--bg);
     min-height:100%;
   }
-  .sec-wrap.active{display:block;}
-  #sec-solicitudes,#sec-pacientes,#sec-metricas{background:var(--bg);}
 
-  .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{
-    position:sticky;top:0;z-index:90;
-  }
+  .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
 
-  /* BOTTOM NAV */
+  /* BOTTOM NAV: fixed al fondo */
   .app-bottom-nav{
-    display:flex;position:fixed;bottom:0;left:0;right:0;
-    height:var(--mob-bot);background:#fff;
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;
+    height:var(--mob-bot);
+    background:#fff;
     border-top:1px solid var(--line);
     box-shadow:0 -1px 8px rgba(0,0,0,.05);
     padding-bottom:env(safe-area-inset-bottom);
@@ -186,9 +176,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .sec-desktop-only{display:none!important;}
 }
 
-/* SECCIONES desktop */
+/* SECCIONES */
 .sec-wrap{display:none;padding:22px 22px 32px;max-width:1000px;margin:0 auto;}
 .sec-wrap.active{display:block;}
+@media(min-width:768px){
+  /* En desktop sec-inicio es la home con todo el contenido */
+}
+
 .sec-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--ink);margin-bottom:4px;}
 .sec-sub{font-size:13px;color:var(--ink-dim);margin-bottom:20px;}
 /* INICIO */
@@ -1559,21 +1553,26 @@ function onDurPacChange(sel){
 let _currentSection = 'inicio';
 
 function sbNav(section){
-  _currentSection=section;
+  _currentSection = section;
   document.querySelectorAll('.sb-link,.bn-item').forEach(b=>b.classList.remove('active'));
   const sbEl=document.getElementById('sb-'+section);if(sbEl)sbEl.classList.add('active');
   const bnEl=document.getElementById('bn-'+section);if(bnEl)bnEl.classList.add('active');
-  // sec-inicio sirve tanto para 'inicio' como para 'agenda' en mobile
   document.querySelectorAll('.sec-wrap').forEach(s=>s.classList.remove('active'));
-  const secId=section==='agenda'?'inicio':section;
+  // 'agenda' en mobile = sec-inicio (mismo calendario)
+  const secId = section==='agenda' ? 'inicio' : section;
   const sec=document.getElementById('sec-'+secId);
   if(sec)sec.classList.add('active');
-  // Scroll al top
-  document.querySelector('.app-main')?.scrollTo(0,0);
+  // Actualizar data-section en el panel para el CSS del topbar sticky
+  const panel=document.getElementById('panel');
+  if(panel)panel.dataset.section=section==='agenda'?'inicio':section;
+  // scroll al top de la sección activa
+  const activeWrap=document.querySelector('.sec-wrap.active,#sec-inicio.active');
+  if(activeWrap)activeWrap.scrollTo(0,0);
   // Label topbar
   const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
   const lbl=document.getElementById('topbar-sec-label');
   if(lbl)lbl.textContent=secLabels[section]||section;
+
   if(section==='solicitudes'){updateSolicitudesBadge(0);syncReqListMobile();}
   if(section==='configuracion'){openSettings();return;}
   if(section==='pacientes')renderPacientes();
