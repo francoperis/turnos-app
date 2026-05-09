@@ -508,11 +508,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sb-tagline" id="sb-tagline-prof">Panel profesional</div>
     </div>
     <nav class="sb-nav">
-      <button class="sb-link active" id="sb-inicio" onclick="sbNav('inicio')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Inicio
-      </button>
-      <button class="sb-link" id="sb-agenda" onclick="sbNav('agenda')">
+      <button class="sb-link active" id="sb-agenda" onclick="sbNav('agenda')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Agenda
       </button>
@@ -528,6 +524,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <button class="sb-link" id="sb-metricas" onclick="sbNav('metricas')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         Métricas
+      </button>
+      <button class="sb-link" id="sb-redes" onclick="sbNav('redes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Redes
       </button>
     </nav>
     <div class="sb-foot">
@@ -582,15 +582,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     <div class="sec-wrap active" id="sec-inicio">
       <div class="pro-header sec-desktop-only">
         <div class="page-profession" id="pro-profession"></div>
-        <h1 class="page-title" id="pro-welcome-name">Hola</h1>
+        <h1 class="page-title">Agenda</h1>
         <p class="page-sub">Tu agenda. Tocá un horario libre para generar un link de turno.</p>
-      </div>
-      <div class="link-card sec-desktop-only">
-        <div class="link-card-left">
-          <span>Link para pacientes</span>
-          <div class="link-url" id="public-link-text"></div>
-        </div>
-        <button class="btn-copy" onclick="copyLink(this)">Copiar link</button>
       </div>
       <div class="metrics-bar sec-desktop-only">
         <div class="metric-card total"><div class="metric-accent"></div><div class="metric-num" id="metric-total">—</div><div class="metric-label">Este mes</div></div>
@@ -650,6 +643,23 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sec-title">Métricas</div>
       <div class="sec-sub">Resumen del mes actual</div>
       <div id="met-panel"><div class="empty-req" style="padding:32px"><div class="big">◉</div>Cargando...</div></div>
+    </div>
+
+    <!-- REDES -->
+    <div class="sec-wrap" id="sec-redes">
+      <div class="sec-title">Redes</div>
+      <div class="sec-sub">Compartí tu agenda con tus pacientes</div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head"><h3>Link para pacientes</h3></div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:13px;color:var(--ink-dim);margin-bottom:8px;">Compartí este link para que tus pacientes saquen turnos</div>
+          <div class="link-url" id="public-link-text" style="margin-bottom:10px;"></div>
+          <button class="btn-copy" onclick="copyLink(this)">Copiar link</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Generador de Historias</h3></div>
+      </div>
     </div>
 
   </div><!-- /app-main -->
@@ -1599,7 +1609,7 @@ function sbNav(section){
   const activeWrap=document.querySelector('.sec-wrap.active,#sec-inicio.active');
   if(activeWrap)activeWrap.scrollTo(0,0);
   // Label topbar
-  const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
+  const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',redes:'Redes',configuracion:'Configuración'};
   const lbl=document.getElementById('topbar-sec-label');
   if(lbl)lbl.textContent=secLabels[section]||section;
 
@@ -1607,6 +1617,7 @@ function sbNav(section){
   if(section==='configuracion'){openSettings();return;}
   if(section==='pacientes')renderPacientes();
   if(section==='metricas')renderMetricasPanel();
+  if(section==='redes')renderRedes();
 }
 
 
@@ -1751,6 +1762,11 @@ END:VCALENDAR`;
     a.download='turno.ics';a.click();
     showNotif('Turno enviado al calendario ✓');
   }catch{showNotif('Error al agendar','red');}
+}
+function renderRedes(){
+  const el=document.getElementById('redes-link-text');
+  const src=document.getElementById('public-link-text');
+  if(el&&src)el.textContent=src.textContent;
 }
 const _swipeObs=new MutationObserver(()=>{
   document.querySelectorAll('.slot-wrap:not([data-sw])').forEach(w=>{w.setAttribute('data-sw','1');initSwipe(w);});
