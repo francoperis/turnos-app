@@ -105,7 +105,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
 
-  /* MAIN: fixed debajo del topbar, scrollea, fondo verde */
+  /* MAIN: fixed debajo del topbar, fondo CREMA */
   .app-main{
     position:fixed;
     top:var(--mob-top);
@@ -113,13 +113,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     bottom:var(--mob-bot);
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
-    background:var(--green);
+    background:var(--bg);
   }
 
-  /* AGENDA: sec-inicio fondo verde continuo */
+  /* AGENDA: sec-inicio sin padding, fondo crema (igual al main) */
   #sec-inicio{
     padding:0!important;
-    background:var(--green);
+    background:var(--bg);
     min-height:100%;
   }
   #sec-inicio .pro-header,
@@ -127,24 +127,44 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   #sec-inicio .metrics-bar,
   #sec-inicio .sec-desktop-only{display:none!important;}
   #sec-inicio .pro-grid{grid-template-columns:1fr!important;gap:0!important;}
-  /* EL OVERLAP REAL: el card está dentro del mismo contexto de scroll que el topbar.
-     margin-top negativo sube el card sobre el área verde del padding-bottom del topbar. */
-  /* card-over-topbar: margen lateral y padding-top reducido */
+
+  /* card-over-topbar: wrapper con padding lateral y top para el overlap sobre el topbar verde */
   #sec-inicio .card-over-topbar{
     display:block!important;
     background:transparent!important;
     padding:14px 12px 0!important;
     margin:0!important;
-    position:relative;
   }
-  /* CARD CALENDARIO: caja blanca con border-radius en los 4 lados y borde visible */
+
+  /* CARD CALENDARIO: caja blanca con border-radius 16px en los 4 lados.
+     overflow:hidden para que los bordes del card corten limpio el contenido interno. */
   #sec-inicio .card-over-topbar>.card{
     border-radius:16px!important;
-    border:1.5px solid rgba(0,0,0,.08)!important;
-    box-shadow:0 4px 16px rgba(0,0,0,.10)!important;
+    border:1.5px solid var(--line)!important;
+    box-shadow:0 2px 12px rgba(0,0,0,.07)!important;
     background:#fff!important;
     overflow:hidden!important;
   }
+
+  /* pro-day-detail: está en el DOM dentro del .card pero lo sacamos visualmente.
+     Con overflow:hidden en el card, todo lo que esté dentro queda clippeado por el border-radius.
+     Para que parezca SEPARADO: background crema + margin negativo para tapar el borde inferior del card. */
+  #pro-day-detail{
+    background:var(--bg)!important;
+    border-top:none!important;
+    margin:0 -1px -1px!important;
+    padding:0!important;
+    /* El card-head y cal-grid quedan blancos; pro-day-detail es crema → 
+       visualmente el card "cierra" donde termina el cal-grid */
+  }
+
+  /* Slots */
+  .day-slots{padding:12px!important;}
+  .slots-list{gap:8px!important;max-height:none!important;}
+  .slot-wrap{border-radius:12px!important;overflow:hidden!important;}
+  .slot-row{border-radius:12px!important;background:#fff!important;border:1px solid var(--line)!important;}
+  .day-slots-header{padding:0 0 8px!important;}
+  .no-day-selected{padding:24px 16px!important;}
 
   /* OTRAS SECCIONES: fondo crema */
   .sec-wrap{
@@ -152,13 +172,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     background:var(--bg);
     min-height:100%;
   }
-  /* Área de slots: fondo verde-gris, slots con bordes redondeados */
-  #pro-day-detail{background:#edf2ee!important;border-top:none!important;padding:14px 0 0!important;}
-  .day-slots{padding:0 12px 16px!important;}
-  .slots-list{gap:8px!important;}
-  .slot-wrap{border-radius:12px!important;overflow:hidden!important;}
-  .slot-row{border-radius:12px!important;background:#fff!important;}
-  .day-slots-header{padding:0 12px 10px!important;}
 
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
 
