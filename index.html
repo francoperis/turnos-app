@@ -151,7 +151,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 
   /* SLOTS PANEL: elemento independiente debajo del card del calendario */
   .mob-slots-panel{
-    margin:0 13.5px 16px!important;
+    margin:0 12px 16px!important;
     background:transparent!important;
     border-top:none!important;
   }
@@ -249,11 +249,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .btn-add{background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;transition:opacity .15s;white-space:nowrap;}
 .btn-add:hover{opacity:.88;}
 /* CALENDARIO */
-.cal-grid{padding:6px 10px 8px;}
+.cal-grid{padding:10px 12px 12px;}
 .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
 .cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.4px;padding:4px 0;}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-day{height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);transition:all .12s;}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink);transition:all .12s;}
 .cal-day:hover:not(.empty):not(.selected){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
 .cal-day.past{color:#b0b0b0;background:#f0eeeb;cursor:pointer;}
@@ -274,14 +274,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .btn-block.unblock{border-color:var(--green);color:var(--green);}
 .btn-block.unblock:hover{background:var(--green-bg);}
 .blocked-msg{background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);text-align:center;margin-bottom:8px;}
-.slots-list{display:flex;flex-direction:column;gap:6px;max-height:380px;overflow-y:auto;}
+.slots-list{display:flex;flex-direction:column;gap:8px;}
 .slot-wrap{position:relative;border-radius:12px;}
 .slot-action-left,.slot-action-right{position:absolute;top:0;bottom:0;width:90px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;opacity:0;transition:opacity .1s;pointer-events:none;}
 .slot-action-left{left:0;background:#2563eb;border-radius:12px 0 0 12px;}
 .slot-action-right{right:0;background:var(--red);border-radius:0 12px 12px 0;}
 .slot-action-left .sa-icon,.slot-action-right .sa-icon{font-size:18px;line-height:1;}
 .slot-action-left span,.slot-action-right span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
-.slot-row{display:flex;align-items:center;gap:12px;padding:16px 16px;border-radius:12px;background:var(--bg);border:1.5px solid transparent;flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
+.slot-row{display:flex;align-items:center;gap:12px;padding:16px 14px;border-radius:12px;background:#fff;border:1.5px solid var(--line);flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
 .slot-row.booked{background:var(--green-bg);border-color:var(--green-light);}
 .slot-row.booked.unpaid{background:#fff8ed;border-color:#f0d89a;}
 .slot-time{font-size:14px;font-weight:700;width:48px;flex-shrink:0;color:var(--ink-soft);text-align:center;line-height:1.1;}
@@ -508,7 +508,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sb-tagline" id="sb-tagline-prof">Panel profesional</div>
     </div>
     <nav class="sb-nav">
-      <button class="sb-link active" id="sb-agenda" onclick="sbNav('agenda')">
+      <button class="sb-link active" id="sb-inicio" onclick="sbNav('inicio')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Inicio
+      </button>
+      <button class="sb-link" id="sb-agenda" onclick="sbNav('agenda')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Agenda
       </button>
@@ -524,10 +528,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <button class="sb-link" id="sb-metricas" onclick="sbNav('metricas')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         Métricas
-      </button>
-      <button class="sb-link" id="sb-redes" onclick="sbNav('redes')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Redes
       </button>
     </nav>
     <div class="sb-foot">
@@ -582,8 +582,15 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     <div class="sec-wrap active" id="sec-inicio">
       <div class="pro-header sec-desktop-only">
         <div class="page-profession" id="pro-profession"></div>
-        <h1 class="page-title">Agenda</h1>
+        <h1 class="page-title" id="pro-welcome-name">Hola</h1>
         <p class="page-sub">Tu agenda. Tocá un horario libre para generar un link de turno.</p>
+      </div>
+      <div class="link-card sec-desktop-only">
+        <div class="link-card-left">
+          <span>Link para pacientes</span>
+          <div class="link-url" id="public-link-text"></div>
+        </div>
+        <button class="btn-copy" onclick="copyLink(this)">Copiar link</button>
       </div>
       <div class="metrics-bar sec-desktop-only">
         <div class="metric-card total"><div class="metric-accent"></div><div class="metric-num" id="metric-total">—</div><div class="metric-label">Este mes</div></div>
@@ -606,15 +613,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
           </div>
         </div>
         <div id="pro-day-detail" class="mob-slots-panel"><div class="no-day-selected"><div class="big">📅</div>Seleccioná un día para ver los turnos</div></div>
-        <div class="sec-desktop-only" style="display:flex;flex-direction:column;gap:14px;">
-          <div class="card">
-            <div class="card-head">
-              <h3>Solicitudes <span id="req-badge" class="new-badge" style="display:none">0</span></h3>
-              <button class="icon-btn" onclick="loadAll()" title="Actualizar">↻</button>
-            </div>
-            <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
-          </div>
-        </div>
+
       </div>
     </div>
 
@@ -624,10 +623,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sec-sub">Turnos pendientes de confirmación</div>
       <div class="card">
         <div class="card-head">
-          <h3>Pendientes <span id="req-badge-m" class="new-badge" style="display:none">0</span></h3>
+          <h3>Pendientes <span id="req-badge" class="new-badge" style="display:none">0</span><span id="req-badge-m" class="new-badge" style="display:none">0</span></h3>
           <button class="icon-btn" onclick="loadAll()">↻</button>
         </div>
-        <div id="req-list-m" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
+        <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
+        <div id="req-list-m" class="req-list" style="display:none;"></div>
       </div>
     </div>
 
@@ -643,23 +643,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sec-title">Métricas</div>
       <div class="sec-sub">Resumen del mes actual</div>
       <div id="met-panel"><div class="empty-req" style="padding:32px"><div class="big">◉</div>Cargando...</div></div>
-    </div>
-
-    <!-- REDES -->
-    <div class="sec-wrap" id="sec-redes">
-      <div class="sec-title">Redes</div>
-      <div class="sec-sub">Compartí tu agenda con tus pacientes</div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-head"><h3>Link para pacientes</h3></div>
-        <div style="padding:14px 16px;">
-          <div style="font-size:13px;color:var(--ink-dim);margin-bottom:8px;">Compartí este link para que tus pacientes saquen turnos</div>
-          <div class="link-url" id="public-link-text" style="margin-bottom:10px;"></div>
-          <button class="btn-copy" onclick="copyLink(this)">Copiar link</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3>Generador de Historias</h3></div>
-      </div>
     </div>
 
   </div><!-- /app-main -->
@@ -877,8 +860,7 @@ const today=new Date();today.setHours(0,0,0,0);
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 let proMonth=new Date(today.getFullYear(),today.getMonth(),1);
-function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-let proSelectedDay=fmt(today),allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
+let proSelectedDay=null,allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
 
 let proConfig={
   duracion:60,
@@ -906,7 +888,7 @@ function generateSlots(){
   return slots;
 }
 
-
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
 function isPast(d){return d<today;}
 function isSunday(d){return d.getDay()===0;}
@@ -1000,9 +982,10 @@ async function showPanel(){
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
   const profMostrar=pro.profesion||'';
-  const _wn=document.getElementById('pro-welcome-name');if(_wn)_wn.textContent='Hola, '+nombreMostrar+' 👋';
-  const _pp=document.getElementById('pro-profession');if(_pp){_pp.textContent=profMostrar;_pp.style.display=profMostrar?'block':'none';}
-  const _plt=document.getElementById('public-link-text');if(_plt)_plt.textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
+  document.getElementById('pro-welcome-name').textContent='Hola, '+nombreMostrar+' \uD83D\uDC4B';
+  document.getElementById('pro-profession').textContent=profMostrar;
+  document.getElementById('pro-profession').style.display=profMostrar?'block':'none';
+  document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
   // Timer de suscripción
   const banner=document.getElementById('sub-banner');
   if(pro.subscription_end){
@@ -1168,14 +1151,11 @@ function renderProDayDetail(key,date){
   const isToday=date.getTime()===today.getTime();
   const nowHour=new Date().getHours();
   const nowMin=new Date().getMinutes();
-  const isMobileView=window.innerWidth<=767;
   slots.forEach(time=>{
     const bk=dayB.find(b=>b.hora===time);
     const slotHour=parseInt(time.split(':')[0]);
     const slotMin=parseInt(time.split(':')[1]);
     const isPastSlot=isToday&&(slotHour<nowHour||(slotHour===nowHour&&slotMin<=nowMin));
-    // En mobile+hoy: ocultar slots pasados sin turno (los con turno siempre se muestran)
-    if(isMobileView&&isToday&&isPastSlot&&!bk)return;
     if(bk){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
@@ -1608,7 +1588,7 @@ function sbNav(section){
   const activeWrap=document.querySelector('.sec-wrap.active,#sec-inicio.active');
   if(activeWrap)activeWrap.scrollTo(0,0);
   // Label topbar
-  const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',redes:'Redes',configuracion:'Configuración'};
+  const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
   const lbl=document.getElementById('topbar-sec-label');
   if(lbl)lbl.textContent=secLabels[section]||section;
 
@@ -1616,19 +1596,11 @@ function sbNav(section){
   if(section==='configuracion'){openSettings();return;}
   if(section==='pacientes')renderPacientes();
   if(section==='metricas')renderMetricasPanel();
-  if(section==='redes')renderRedes();
 }
 
 
 
-function syncReqListMobile(){
-  const main=document.getElementById('req-list');
-  const mob=document.getElementById('req-list-m');
-  if(mob&&main)mob.innerHTML=main.innerHTML;
-  const badge=document.getElementById('req-badge');
-  const badgeM=document.getElementById('req-badge-m');
-  if(badge&&badgeM){badgeM.textContent=badge.textContent;badgeM.style.display=badge.style.display;}
-}
+function syncReqListMobile(){}
 
 
 
@@ -1761,11 +1733,6 @@ END:VCALENDAR`;
     a.download='turno.ics';a.click();
     showNotif('Turno enviado al calendario ✓');
   }catch{showNotif('Error al agendar','red');}
-}
-function renderRedes(){
-  const el=document.getElementById('redes-link-text');
-  const src=document.getElementById('public-link-text');
-  if(el&&src)el.textContent=src.textContent;
 }
 const _swipeObs=new MutationObserver(()=>{
   document.querySelectorAll('.slot-wrap:not([data-sw])').forEach(w=>{w.setAttribute('data-sw','1');initSwipe(w);});
