@@ -104,21 +104,23 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
 
-  /* MAIN: ocupa el espacio restante entre topbar y bottom-nav, scrollea */
+  /* MAIN: ocupa el espacio restante, NO tiene overflow (para que el margin negativo funcione) */
   .app-main{
     flex:1;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
+    overflow:visible;
     background:var(--green);
     position:relative;
+    /* El scroll lo maneja cada sección internamente */
+    min-height:0;
   }
 
-  /* SECCIÓN AGENDA (sec-inicio):
-     El contenido empieza desde arriba del app-main (que es verde).
-     El card usa margin-top negativo para solaparse encima del topbar verde. */
+  /* Wrapper de scroll para sec-inicio: ocupa toda la altura disponible */
   #sec-inicio{
     padding:0!important;
     background:transparent;
+    height:100%;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
   }
   #sec-inicio .card-over-topbar{
     margin-top:0!important;
@@ -126,8 +128,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     display:block!important;
     padding:0!important;
   }
-  /* EL OVERLAP: margin-top negativo tira el card HACIA ARRIBA,
-     superponiéndolo sobre el verde del topbar */
+  /* EL OVERLAP REAL: el card está dentro del mismo contexto de scroll que el topbar.
+     margin-top negativo sube el card sobre el área verde del padding-bottom del topbar. */
   #sec-inicio .card-over-topbar>.card{
     margin-top:-28px!important;
     border-radius:20px 20px 0 0!important;
@@ -137,17 +139,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     min-height:calc(100vh - var(--mob-bot))!important;
   }
 
-  /* OTRAS SECCIONES: fondo crema, padding para compensar que el topbar no es fixed */
-  .sec-wrap{padding:16px 14px 20px!important;background:var(--bg);min-height:calc(100vh - var(--mob-bot));}
-
-  /* El topbar se vuelve sticky en otras secciones para mantenerse visible */
-  #panel[data-section="solicitudes"] .app-topbar,
-  #panel[data-section="pacientes"] .app-topbar,
-  #panel[data-section="metricas"] .app-topbar,
-  #panel[data-section="configuracion"] .app-topbar{
-    position:sticky;
-    top:0;
-    padding-bottom:12px;
+  /* OTRAS SECCIONES: scroll propio, fondo crema */
+  .sec-wrap{
+    padding:16px 14px 20px!important;
+    background:var(--bg);
+    height:100%;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    min-height:calc(100vh - var(--mob-bot));
   }
 
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
@@ -540,10 +539,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 
   <!-- BOTTOM NAV mobile -->
   <nav class="app-bottom-nav">
-    <button class="bn-item" id="bn-inicio" onclick="sbNav('inicio')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Inicio
-    </button>
     <button class="bn-item active" id="bn-agenda" onclick="sbNav('agenda')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Agenda
@@ -1579,7 +1574,9 @@ function sbNav(section){
   // Actualizar data-section en el panel para el CSS del topbar sticky
   const panel=document.getElementById('panel');
   if(panel)panel.dataset.section=section==='agenda'?'inicio':section;
-  document.querySelector('.app-main')?.scrollTo(0,0);
+  // scroll al top de la sección activa
+  const activeWrap=document.querySelector('.sec-wrap.active,#sec-inicio.active');
+  if(activeWrap)activeWrap.scrollTo(0,0);
   // Label topbar
   const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
   const lbl=document.getElementById('topbar-sec-label');
