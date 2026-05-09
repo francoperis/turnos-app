@@ -140,14 +140,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     margin:0!important;
   }
 
-  /* CARD CALENDARIO: altura fija, no se estira con los slots */
+  /* CARD CALENDARIO: elemento independiente, cerrado en 4 lados */
   #sec-inicio .card-over-topbar>.card{
     border-radius:16px!important;
     border:1.5px solid var(--line)!important;
     box-shadow:0 2px 12px rgba(0,0,0,.07)!important;
     background:#fff!important;
     overflow:hidden!important;
-    align-self:start!important;
   }
 
   /* SLOTS PANEL: elemento independiente debajo del card del calendario */
@@ -161,7 +160,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     display:flex;align-items:center;justify-content:space-between;
     padding:12px 0 8px!important;
   }
-  .mob-slots-panel .slots-list{gap:8px!important;max-height:420px!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;}
+  .mob-slots-panel .slots-list{gap:8px!important;max-height:none!important;}
   .mob-slots-panel .slot-wrap{border-radius:12px!important;overflow:hidden!important;}
   .mob-slots-panel .slot-row{
     border-radius:12px!important;
@@ -275,14 +274,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .btn-block.unblock{border-color:var(--green);color:var(--green);}
 .btn-block.unblock:hover{background:var(--green-bg);}
 .blocked-msg{background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);text-align:center;margin-bottom:8px;}
-.slots-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;}
+.slots-list{display:flex;flex-direction:column;gap:6px;max-height:380px;overflow-y:auto;}
 .slot-wrap{position:relative;border-radius:12px;}
 .slot-action-left,.slot-action-right{position:absolute;top:0;bottom:0;width:90px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;opacity:0;transition:opacity .1s;pointer-events:none;}
 .slot-action-left{left:0;background:#2563eb;border-radius:12px 0 0 12px;}
 .slot-action-right{right:0;background:var(--red);border-radius:0 12px 12px 0;}
 .slot-action-left .sa-icon,.slot-action-right .sa-icon{font-size:18px;line-height:1;}
 .slot-action-left span,.slot-action-right span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
-.slot-row{display:flex;align-items:center;gap:12px;padding:16px 14px;border-radius:12px;background:#fff;border:1.5px solid var(--line);flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
+.slot-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--bg);border:1.5px solid transparent;flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
 .slot-row.booked{background:var(--green-bg);border-color:var(--green-light);}
 .slot-row.booked.unpaid{background:#fff8ed;border-color:#f0d89a;}
 .slot-time{font-size:14px;font-weight:700;width:48px;flex-shrink:0;color:var(--ink-soft);text-align:center;line-height:1.1;}
@@ -509,7 +508,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sb-tagline" id="sb-tagline-prof">Panel profesional</div>
     </div>
     <nav class="sb-nav">
-      <button class="sb-link active" id="sb-agenda" onclick="sbNav('agenda')">
+      <button class="sb-link active" id="sb-inicio" onclick="sbNav('inicio')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Inicio
+      </button>
+      <button class="sb-link" id="sb-agenda" onclick="sbNav('agenda')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Agenda
       </button>
@@ -525,10 +528,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <button class="sb-link" id="sb-metricas" onclick="sbNav('metricas')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         Métricas
-      </button>
-      <button class="sb-link" id="sb-redes" onclick="sbNav('redes')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Redes
       </button>
     </nav>
     <div class="sb-foot">
@@ -547,9 +546,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   <div class="app-topbar" id="app-topbar">
     <div class="topbar-top-row">
       <div class="topbar-sec-label" id="topbar-sec-label">Agenda</div>
-      <button class="topbar-icon-btn" onclick="sbNav('configuracion')" title="Configuración">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      </button>
+      <button onclick="sbNav('configuracion')" style="background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;letter-spacing:.2px;">Ajustes</button>
     </div>
     <div class="topbar-pro-name" id="topbar-pro-name">Cargando...</div>
     <div class="topbar-pro-sub" id="topbar-pro-sub"></div>
@@ -574,10 +571,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Métricas
     </button>
-    <button class="bn-item" id="bn-redes" onclick="sbNav('redes')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      Redes
-    </button>
   </nav>
 
   <!-- MAIN -->
@@ -587,8 +580,15 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     <div class="sec-wrap active" id="sec-inicio">
       <div class="pro-header sec-desktop-only">
         <div class="page-profession" id="pro-profession"></div>
-        <h1 class="page-title">Agenda</h1>
+        <h1 class="page-title" id="pro-welcome-name">Hola</h1>
         <p class="page-sub">Tu agenda. Tocá un horario libre para generar un link de turno.</p>
+      </div>
+      <div class="link-card sec-desktop-only">
+        <div class="link-card-left">
+          <span>Link para pacientes</span>
+          <div class="link-url" id="public-link-text"></div>
+        </div>
+        <button class="btn-copy" onclick="copyLink(this)">Copiar link</button>
       </div>
       <div class="metrics-bar sec-desktop-only">
         <div class="metric-card total"><div class="metric-accent"></div><div class="metric-num" id="metric-total">—</div><div class="metric-label">Este mes</div></div>
@@ -611,7 +611,15 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
           </div>
         </div>
         <div id="pro-day-detail" class="mob-slots-panel"><div class="no-day-selected"><div class="big">📅</div>Seleccioná un día para ver los turnos</div></div>
-
+        <div class="sec-desktop-only" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card">
+            <div class="card-head">
+              <h3>Solicitudes <span id="req-badge" class="new-badge" style="display:none">0</span></h3>
+              <button class="icon-btn" onclick="loadAll()" title="Actualizar">↻</button>
+            </div>
+            <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -621,11 +629,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sec-sub">Turnos pendientes de confirmación</div>
       <div class="card">
         <div class="card-head">
-          <h3>Pendientes <span id="req-badge" class="new-badge" style="display:none">0</span></h3>
+          <h3>Pendientes <span id="req-badge-m" class="new-badge" style="display:none">0</span></h3>
           <button class="icon-btn" onclick="loadAll()">↻</button>
         </div>
-        <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
-        <div id="req-list-m" style="display:none"></div>
+        <div id="req-list-m" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
       </div>
     </div>
 
@@ -641,23 +648,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sec-title">Métricas</div>
       <div class="sec-sub">Resumen del mes actual</div>
       <div id="met-panel"><div class="empty-req" style="padding:32px"><div class="big">◉</div>Cargando...</div></div>
-    </div>
-
-    <!-- REDES -->
-    <div class="sec-wrap" id="sec-redes">
-      <div class="sec-title">Redes</div>
-      <div class="sec-sub">Compartí tu agenda con tus pacientes</div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-head"><h3>Link para pacientes</h3></div>
-        <div style="padding:14px 16px;">
-          <div style="font-size:13px;color:var(--ink-dim);margin-bottom:8px;">Compartí este link para que tus pacientes saquen turnos</div>
-          <div class="link-url" id="public-link-text" style="margin-bottom:10px;"></div>
-          <button class="btn-copy" onclick="copyLink(this)">Copiar link</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3>Generador de Historias</h3></div>
-      </div>
     </div>
 
   </div><!-- /app-main -->
@@ -997,9 +987,9 @@ async function showPanel(){
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
   const profMostrar=pro.profesion||'';
-  const _wn=document.getElementById('pro-welcome-name');if(_wn)_wn.textContent='Hola, '+nombreMostrar+' \uD83D\uDC4B';
-  const _pp=document.getElementById('pro-profession');if(_pp){_pp.textContent=profMostrar;
-  _pp.style.display=profMostrar?'block':'none';}
+  document.getElementById('pro-welcome-name').textContent='Hola, '+nombreMostrar+' \uD83D\uDC4B';
+  document.getElementById('pro-profession').textContent=profMostrar;
+  document.getElementById('pro-profession').style.display=profMostrar?'block':'none';
   document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
   // Timer de suscripción
   const banner=document.getElementById('sub-banner');
@@ -1393,7 +1383,17 @@ function openSettings(){
   document.getElementById('settings-modal-bg').classList.add('open');
 }
 
-function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
+function closeSettings(){
+  document.getElementById('settings-modal-bg').classList.remove('open');
+  // Restaurar sección activa anterior
+  document.querySelectorAll('.sec-wrap').forEach(s=>s.classList.remove('active'));
+  const secId=_lastSection==='agenda'?'inicio':_lastSection;
+  const sec=document.getElementById('sec-'+secId);
+  if(sec)sec.classList.add('active');
+  document.querySelectorAll('.sb-link,.bn-item').forEach(b=>b.classList.remove('active'));
+  const sbEl=document.getElementById('sb-'+_lastSection);if(sbEl)sbEl.classList.add('active');
+  const bnEl=document.getElementById('bn-'+_lastSection);if(bnEl)bnEl.classList.add('active');
+}
 function closeSettingsBg(e){if(e.target===document.getElementById('settings-modal-bg'))closeSettings();}
 
 function renderOSList(){
@@ -1586,23 +1586,21 @@ function onDurPacChange(sel){
 // ── SIDEBAR NAV ────────────────────────────────────────────
 let _currentSection = 'inicio';
 
+let _lastSection='agenda';
 function sbNav(section){
   _currentSection = section;
+  if(section!=='configuracion')_lastSection=section;
   document.querySelectorAll('.sb-link,.bn-item').forEach(b=>b.classList.remove('active'));
   const sbEl=document.getElementById('sb-'+section);if(sbEl)sbEl.classList.add('active');
   const bnEl=document.getElementById('bn-'+section);if(bnEl)bnEl.classList.add('active');
   document.querySelectorAll('.sec-wrap').forEach(s=>s.classList.remove('active'));
-  // 'agenda' en mobile = sec-inicio (mismo calendario)
   const secId = section==='agenda' ? 'inicio' : section;
   const sec=document.getElementById('sec-'+secId);
   if(sec)sec.classList.add('active');
-  // Actualizar data-section en el panel para el CSS del topbar sticky
   const panel=document.getElementById('panel');
   if(panel)panel.dataset.section=section==='agenda'?'inicio':section;
-  // scroll al top de la sección activa
   const activeWrap=document.querySelector('.sec-wrap.active,#sec-inicio.active');
   if(activeWrap)activeWrap.scrollTo(0,0);
-  // Label topbar
   const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',redes:'Redes',configuracion:'Configuración'};
   const lbl=document.getElementById('topbar-sec-label');
   if(lbl)lbl.textContent=secLabels[section]||section;
@@ -1616,8 +1614,14 @@ function sbNav(section){
 
 
 
-function renderRedes(){const el=document.getElementById('public-link-text');if(el&&window.PRO_SLUG)el.textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;}
-function syncReqListMobile(){}
+function syncReqListMobile(){
+  const main=document.getElementById('req-list');
+  const mob=document.getElementById('req-list-m');
+  if(mob&&main)mob.innerHTML=main.innerHTML;
+  const badge=document.getElementById('req-badge');
+  const badgeM=document.getElementById('req-badge-m');
+  if(badge&&badgeM){badgeM.textContent=badge.textContent;badgeM.style.display=badge.style.display;}
+}
 
 
 
