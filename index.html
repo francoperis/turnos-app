@@ -89,23 +89,26 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
 
-  .app-main{position:fixed;top:0;left:0;right:0;bottom:var(--mob-bot);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  /* app-main: fondo verde para que el overlap funcione en la sección agenda */
+  .app-main{
+    position:fixed;top:0;left:0;right:0;bottom:var(--mob-bot);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:var(--green);
+  }
 
-  /* Resto de secciones: padding para el topbar */
-  .sec-wrap{padding:110px 14px 20px!important;}
+  /* Resto de secciones: fondo crema propio + padding para el topbar */
+  .sec-wrap{padding:110px 14px 20px!important;background:var(--bg);min-height:100%;}
 
-  /* Sección agenda: fondo verde continuo detrás del card */
+  /* Sección agenda: sin padding, el verde del app-main es el fondo */
   #sec-inicio{
     padding:0!important;
-    background:var(--green);
+    background:transparent;
     min-height:100%;
   }
 
-  /* pro-grid: el wrapper transparente que sostiene el card flotante */
+  /* pro-grid: el wrapper que posiciona el card flotante */
   #sec-inicio .card-over-topbar{
-    /* margin-top negativo: el topbar tiene ~86px de alto visible (14+8+22+2+12+44padding-bot).
-       El card sube 28px dentro del área verde del padding-bottom del topbar */
-    margin:58px 0 0!important;
+    margin-top:0!important;
     background:transparent!important;
     display:block!important;
     padding:0!important;
@@ -113,13 +116,16 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     z-index:200;
   }
 
-  /* Card blanco flotante con overlap sobre el topbar verde */
+  /* Card blanco flotante — usa padding-top del topbar para el overlap */
   #sec-inicio .card-over-topbar>.card{
+    /* El topbar ocupa: 14px top + 8px gap + 22px nombre + 2px sub + 12px sub-height + 44px padding-bot = ~102px
+       El card empieza a 72px del top (solapando ~30px sobre el verde del topbar) */
+    margin-top:72px!important;
     border-radius:20px 20px 0 0!important;
     border:none!important;
-    box-shadow:0 -6px 20px rgba(0,0,0,.12)!important;
+    box-shadow:0 -8px 24px rgba(0,0,0,.15)!important;
     background:#fff!important;
-    min-height:calc(100vh - 58px - var(--mob-bot))!important;
+    min-height:calc(100vh - 72px - var(--mob-bot))!important;
   }
 
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
