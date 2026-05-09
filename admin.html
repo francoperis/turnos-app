@@ -81,16 +81,59 @@ html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color
   .sus-table{display:table;}
   .sus-cards{display:none;}
   .met-grid{grid-template-columns:repeat(4,1fr);}
+  /* En desktop section-inner no hace nada especial */
+  .section-inner{margin-top:0;background:transparent;border-radius:0;box-shadow:none;min-height:auto;padding:0;}
 }
 
 @media(max-width:767px){
   .sidebar{display:none;}
-  .mobile-topbar{position:fixed;top:0;left:0;right:0;height:52px;background:var(--ink);display:flex;align-items:center;padding:0 16px;z-index:50;}
-  .mobile-topbar-logo{font-family:'Playfair Display',serif;font-size:18px;color:#fff;flex:1;}
+
+  /* TOPBAR mobile — negro, con padding-bottom extra para el overlap */
+  .mobile-topbar{
+    position:fixed;top:0;left:0;right:0;
+    background:var(--ink);
+    display:flex;flex-direction:column;
+    padding:14px 16px 44px;
+    z-index:50;
+  }
+  .mob-topbar-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .mobile-topbar-logo{font-family:'Playfair Display',serif;font-size:20px;color:#fff;line-height:1;}
   .mobile-topbar-logo em{color:#a3e6c8;font-style:normal;}
-  .mobile-topbar-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-family:'Outfit',sans-serif;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;}
-  .main{position:fixed;top:52px;left:0;right:0;bottom:var(--nav-h);overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .section{padding:14px;}
+  .mob-sec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+  .mobile-topbar-btn{
+    background:transparent;border:1.5px solid rgba(255,255,255,.2);
+    color:rgba(255,255,255,.5);font-family:'Outfit',sans-serif;
+    font-size:11px;font-weight:600;padding:5px 12px;
+    border-radius:6px;cursor:pointer;
+  }
+
+  /* MAIN ocupa toda la pantalla — el scroll empieza desde arriba */
+  .main{
+    position:fixed;
+    top:0;left:0;right:0;
+    bottom:var(--nav-h);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+
+  /* Secciones: fondo negro continuo */
+  #s-inicio,#s-profesionales,#s-suscripciones,#s-pagos,#s-metricas{
+    padding:0!important;
+    background:var(--ink);
+    min-height:100%;
+  }
+
+  /* section-inner: card blanco flotante que se superpone al topbar */
+  .section-inner{
+    margin-top:58px;
+    position:relative;
+    z-index:60;
+    background:var(--bg);
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -6px 20px rgba(0,0,0,.20);
+    min-height:calc(100vh - 58px - var(--nav-h));
+    padding:16px 14px 24px;
+  }
+
   .sec-title{font-size:20px;}
   .stats-grid{grid-template-columns:repeat(2,1fr);}
   .inicio-grid{grid-template-columns:1fr;}
@@ -99,7 +142,17 @@ html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color
   .sus-table{display:none;}
   .sus-cards{display:block;}
   .met-grid{grid-template-columns:repeat(2,1fr);}
-  .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--ink);display:flex;border-top:1px solid rgba(255,255,255,.06);padding-bottom:env(safe-area-inset-bottom);z-index:50;}
+
+  /* BOTTOM NAV — negro con acento mint */
+  .bottom-nav{
+    position:fixed;bottom:0;left:0;right:0;
+    height:var(--nav-h);
+    background:var(--ink);
+    display:flex;
+    border-top:1px solid rgba(255,255,255,.06);
+    padding-bottom:env(safe-area-inset-bottom);
+    z-index:50;
+  }
 }
 
 .section{display:none;}
@@ -307,14 +360,18 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
   </aside>
 
   <div class="mobile-topbar">
-    <div class="mobile-topbar-logo">Pai<em>Pai</em></div>
-    <button class="mobile-topbar-btn" onclick="doLogout()">Salir</button>
+    <div class="mob-topbar-row">
+      <div class="mobile-topbar-logo">Pai<em>Pai</em></div>
+      <button class="mobile-topbar-btn" onclick="doLogout()">Salir</button>
+    </div>
+    <div class="mob-sec-label" id="mob-sec-label">Inicio</div>
   </div>
 
   <div class="main">
 
     <!-- INICIO -->
     <div class="section active" id="s-inicio">
+      <div class="section-inner">
       <div class="sec-title">Panel general</div>
       <div class="sec-sub" id="fecha-hoy"></div>
       <div class="stats-grid">
@@ -355,10 +412,12 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
         <div class="card-head"><h3>⚠️ Próximos a vencer (7 días)</h3></div>
         <div id="proximos"></div>
       </div>
+      </div><!-- /section-inner -->
     </div>
 
     <!-- PROFESIONALES -->
     <div class="section" id="s-profesionales">
+      <div class="section-inner">
       <div class="sec-title">Profesionales</div>
       <div class="sec-sub">Todos los registrados en la plataforma</div>
       <div class="card">
@@ -377,10 +436,12 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
         </div>
         <div class="pro-cards" id="pro-cards"></div>
       </div>
+      </div><!-- /section-inner -->
     </div>
 
     <!-- SUSCRIPCIONES -->
     <div class="section" id="s-suscripciones">
+      <div class="section-inner">
       <div class="sec-title">Suscripciones</div>
       <div class="sec-sub">Profesionales activos ordenados por urgencia</div>
       <div class="card">
@@ -396,10 +457,12 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
         </div>
         <div class="sus-cards" id="sus-cards"></div>
       </div>
+      </div><!-- /section-inner -->
     </div>
 
     <!-- PAGOS -->
     <div class="section" id="s-pagos">
+      <div class="section-inner">
       <div class="sec-title">Historial de pagos</div>
       <div class="sec-sub">Registro completo de pagos</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
@@ -418,10 +481,12 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
         </div>
         <div id="pagos-list"></div>
       </div>
+      </div><!-- /section-inner -->
     </div>
 
     <!-- METRICAS -->
     <div class="section" id="s-metricas">
+      <div class="section-inner">
       <div class="sec-title">Métricas</div>
       <div class="sec-sub">Performance e ingresos del negocio</div>
       <div class="met-grid" id="met-top"></div>
@@ -440,6 +505,7 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
         <div id="met-meses"></div>
       </div>
       <div class="met-grid" style="grid-template-columns:repeat(3,1fr);margin-top:0;" id="met-bot"></div>
+      </div><!-- /section-inner -->
     </div>
 
   </div><!-- /main -->
@@ -612,6 +678,10 @@ function goTo(sec,btn){
   document.getElementById('s-'+sec).classList.add('active');
   document.querySelectorAll(`[data-s="${sec}"]`).forEach(b=>b.classList.add('active'));
   document.querySelector('.main').scrollTo(0,0);
+  // Actualizar label del topbar mobile
+  const labels={inicio:'Inicio',profesionales:'Profesionales',suscripciones:'Suscripciones',pagos:'Pagos',metricas:'Métricas'};
+  const lbl=document.getElementById('mob-sec-label');
+  if(lbl)lbl.textContent=labels[sec]||sec;
 }
 
 function openModal(id){document.getElementById(id).classList.add('open');}
