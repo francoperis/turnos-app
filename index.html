@@ -71,8 +71,16 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 @media(max-width:767px){
   #panel.visible{flex-direction:column;}
   .app-sidebar{display:none;}
-  .app-topbar{display:flex;flex-direction:column;position:fixed;top:0;left:0;right:0;background:var(--green);padding:12px 16px 6px;z-index:100;}
-  .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+
+  /* TOPBAR: verde, con espacio extra abajo para que el card se solape */
+  .app-topbar{
+    display:flex;flex-direction:column;
+    position:fixed;top:0;left:0;right:0;
+    background:var(--green);
+    padding:14px 16px 44px;
+    z-index:100;
+  }
+  .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
   .topbar-sec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;}
   .topbar-icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;}
   .topbar-icon-btn svg{width:16px;height:16px;}
@@ -80,32 +88,53 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub{font-size:12px;color:rgba(255,255,255,.7);display:flex;gap:8px;flex-wrap:wrap;}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
+
   .app-main{position:fixed;top:0;left:0;right:0;bottom:var(--mob-bot);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
   /* Resto de secciones: padding para el topbar */
   .sec-wrap{padding:110px 14px 20px!important;}
-  /* Sección agenda: fondo verde detrás del card, card flota encima */
+
+  /* Sección agenda: fondo verde continuo detrás del card */
   #sec-inicio{
     padding:0!important;
     background:var(--green);
     min-height:100%;
   }
-  /* pro-grid: contenedor transparente posicionado sobre el verde */
+
+  /* pro-grid: el wrapper transparente que sostiene el card flotante */
   #sec-inicio .card-over-topbar{
-    margin:78px 0 0!important;
+    /* margin-top negativo: el topbar tiene ~86px de alto visible (14+8+22+2+12+44padding-bot).
+       El card sube 28px dentro del área verde del padding-bottom del topbar */
+    margin:58px 0 0!important;
     background:transparent!important;
     display:block!important;
     padding:0!important;
+    position:relative;
+    z-index:200;
   }
-  /* El card del calendario: es el card blanco que flota */
+
+  /* Card blanco flotante con overlap sobre el topbar verde */
   #sec-inicio .card-over-topbar>.card{
     border-radius:20px 20px 0 0!important;
     border:none!important;
-    box-shadow:0 -4px 12px rgba(0,0,0,.10)!important;
+    box-shadow:0 -6px 20px rgba(0,0,0,.12)!important;
     background:#fff!important;
-    min-height:calc(100vh - 78px - var(--mob-bot))!important;
+    min-height:calc(100vh - 58px - var(--mob-bot))!important;
   }
+
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
-  .app-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--mob-bot);background:#fff;border-top:1px solid var(--line);box-shadow:0 -1px 8px rgba(0,0,0,.05);padding-bottom:env(safe-area-inset-bottom);z-index:100;}
+
+  /* BOTTOM NAV */
+  .app-bottom-nav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;
+    height:var(--mob-bot);
+    background:#fff;
+    border-top:1px solid var(--line);
+    box-shadow:0 -1px 8px rgba(0,0,0,.05);
+    padding-bottom:env(safe-area-inset-bottom);
+    z-index:100;
+  }
   .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--ink-dim);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;transition:color .15s;padding-top:3px;position:relative;}
   .bn-item.active{color:var(--green);}
   .bn-item svg{width:20px;height:20px;}
