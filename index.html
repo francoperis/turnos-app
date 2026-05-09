@@ -105,7 +105,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
 
-  /* MAIN: fixed debajo del topbar, fondo VERDE (continuo con topbar) */
+  /* MAIN: fixed debajo del topbar, fondo crema */
   .app-main{
     position:fixed;
     top:var(--mob-top);left:0;right:0;
@@ -115,7 +115,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     background:var(--green);
   }
 
-  /* AGENDA — sec-inicio: fondo verde, para que el card flote sobre el verde */
+  /* AGENDA — sec-inicio: fondo verde arriba (topbar), crema abajo */
   #sec-inicio{
     padding:0!important;
     background:var(--green);
@@ -126,6 +126,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   #sec-inicio .metrics-bar,
   #sec-inicio .sec-desktop-only{display:none!important;}
   #sec-inicio .pro-grid{grid-template-columns:1fr!important;gap:0!important;}
+
+  /* sec-inicio: verde arriba (cubre el overlap del card), crema abajo */
+  #sec-inicio{
+    background:linear-gradient(to bottom, var(--green) 200px, var(--bg) 200px)!important;
+  }
 
   /* card-over-topbar: wrapper con padding para que el card no llegue a los bordes */
   #sec-inicio .card-over-topbar{
@@ -143,24 +148,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     background:#fff!important;
     overflow:hidden!important;
   }
-  /* Fondo crema que empieza desde la mitad del card hacia abajo,
-     tapando el verde. Se logra con un gradiente en el wrapper. */
-  #sec-inicio .card-over-topbar{
-    background:linear-gradient(
-      to bottom,
-      var(--green) 0%,
-      var(--green) calc(50% + 14px),
-      var(--bg) calc(50% + 14px),
-      var(--bg) 100%
-    )!important;
-  }
 
-  /* Área debajo del card: fondo crema para tapar el verde */
+  /* SLOTS PANEL: elemento independiente debajo del card del calendario */
   .mob-slots-panel{
-    background:var(--bg)!important;
+    margin:0 12px 16px!important;
+    background:transparent!important;
     border-top:none!important;
-    margin:0!important;
-    padding:0 12px 16px!important;
   }
   .mob-slots-panel .day-slots{padding:0!important;}
   .mob-slots-panel .day-slots-header{
