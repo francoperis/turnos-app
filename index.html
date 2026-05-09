@@ -105,18 +105,17 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
 
-  /* MAIN: fixed debajo del topbar, fondo CREMA */
+  /* MAIN: fixed debajo del topbar, fondo crema */
   .app-main{
     position:fixed;
-    top:var(--mob-top);
-    left:0;right:0;
+    top:var(--mob-top);left:0;right:0;
     bottom:var(--mob-bot);
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
     background:var(--bg);
   }
 
-  /* AGENDA: sec-inicio sin padding, fondo crema (igual al main) */
+  /* AGENDA — sec-inicio: fondo crema, sin padding */
   #sec-inicio{
     padding:0!important;
     background:var(--bg);
@@ -128,16 +127,15 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   #sec-inicio .sec-desktop-only{display:none!important;}
   #sec-inicio .pro-grid{grid-template-columns:1fr!important;gap:0!important;}
 
-  /* card-over-topbar: wrapper con padding lateral y top para el overlap sobre el topbar verde */
+  /* card-over-topbar: wrapper con padding para que el card no llegue a los bordes */
   #sec-inicio .card-over-topbar{
     display:block!important;
     background:transparent!important;
-    padding:14px 12px 0!important;
+    padding:14px 12px 12px!important;
     margin:0!important;
   }
 
-  /* CARD CALENDARIO: caja blanca con border-radius 16px en los 4 lados.
-     overflow:hidden para que los bordes del card corten limpio el contenido interno. */
+  /* CARD CALENDARIO: elemento independiente, cerrado en 4 lados */
   #sec-inicio .card-over-topbar>.card{
     border-radius:16px!important;
     border:1.5px solid var(--line)!important;
@@ -146,27 +144,32 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     overflow:hidden!important;
   }
 
-  /* pro-day-detail: está en el DOM dentro del .card pero lo sacamos visualmente.
-     Con overflow:hidden en el card, todo lo que esté dentro queda clippeado por el border-radius.
-     Para que parezca SEPARADO: background crema + margin negativo para tapar el borde inferior del card. */
-  #pro-day-detail{
-    background:var(--bg)!important;
+  /* SLOTS PANEL: elemento independiente debajo del card del calendario */
+  .mob-slots-panel{
+    margin:0 12px 16px!important;
+    background:transparent!important;
     border-top:none!important;
-    margin:0 -1px -1px!important;
-    padding:0!important;
-    /* El card-head y cal-grid quedan blancos; pro-day-detail es crema → 
-       visualmente el card "cierra" donde termina el cal-grid */
   }
+  .mob-slots-panel .day-slots{padding:0!important;}
+  .mob-slots-panel .day-slots-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 0 8px!important;
+  }
+  .mob-slots-panel .slots-list{gap:8px!important;max-height:none!important;}
+  .mob-slots-panel .slot-wrap{border-radius:12px!important;overflow:hidden!important;}
+  .mob-slots-panel .slot-row{
+    border-radius:12px!important;
+    background:#fff!important;
+    border:1px solid var(--line)!important;
+  }
+  .mob-slots-panel .no-day-selected{
+    padding:32px 16px!important;
+    text-align:center;
+    color:var(--ink-dim);
+  }
+  .mob-slots-panel .blocked-msg{border-radius:10px!important;}
 
-  /* Slots */
-  .day-slots{padding:12px!important;}
-  .slots-list{gap:8px!important;max-height:none!important;}
-  .slot-wrap{border-radius:12px!important;overflow:hidden!important;}
-  .slot-row{border-radius:12px!important;background:#fff!important;border:1px solid var(--line)!important;}
-  .day-slots-header{padding:0 0 8px!important;}
-  .no-day-selected{padding:24px 16px!important;}
-
-  /* OTRAS SECCIONES: fondo crema */
+  /* OTRAS SECCIONES */
   .sec-wrap{
     padding:16px 14px 20px!important;
     background:var(--bg);
@@ -603,8 +606,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
             <div class="cal-days-header"><div class="cal-day-name">D</div><div class="cal-day-name">L</div><div class="cal-day-name">M</div><div class="cal-day-name">X</div><div class="cal-day-name">J</div><div class="cal-day-name">V</div><div class="cal-day-name">S</div></div>
             <div class="cal-days" id="pro-cal-days"></div>
           </div>
-          <div id="pro-day-detail" style="border-top:1px solid var(--line);"><div class="no-day-selected"><div class="big">📅</div>Seleccioná un día para ver los turnos</div></div>
         </div>
+        <div id="pro-day-detail" class="mob-slots-panel"><div class="no-day-selected"><div class="big">📅</div>Seleccioná un día para ver los turnos</div></div>
         <div class="sec-desktop-only" style="display:flex;flex-direction:column;gap:14px;">
           <div class="card">
             <div class="card-head">
