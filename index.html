@@ -107,16 +107,32 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .sec-wrap{display:none;padding:22px 22px 32px;max-width:1000px;margin:0 auto;}
 .sec-wrap.active{display:block;}
 @media(max-width:767px){
-  #sec-agenda{display:none;}
-  #sec-agenda.active{display:block;}
+  /* Otras secciones tienen padding para el topbar */
+  #sec-solicitudes,#sec-pacientes,#sec-metricas{padding-top:116px!important;}
 }
 @media(min-width:768px){
-  #sec-agenda{display:none!important;}
-  /* En desktop sec-inicio es la home */
+  /* En desktop sec-inicio es la home con todo el contenido */
 }
 @media(max-width:767px){
-  /* En mobile sec-inicio no existe — agenda es la pantalla principal */
-  #sec-inicio{display:none!important;}
+  /* En mobile sec-inicio = Agenda: ocultar header, link, métricas y columna solicitudes */
+  #sec-inicio .pro-header,
+  #sec-inicio .link-card,
+  #sec-inicio .metrics-bar,
+  #sec-inicio .sec-desktop-only{display:none!important;}
+  /* El grid se vuelve una sola columna */
+  #sec-inicio .pro-grid{grid-template-columns:1fr!important;gap:0!important;}
+  /* Card del calendario se superpone al topbar */
+  #sec-inicio .card-over-topbar{
+    margin:88px 12px 0;
+    border-radius:16px;
+    box-shadow:0 -2px 12px rgba(0,0,0,.08),0 4px 20px rgba(0,0,0,.07);
+    background:#fff;
+    overflow:hidden;
+    position:relative;
+    z-index:5;
+  }
+  /* El sec-wrap de inicio no tiene padding en mobile */
+  #sec-inicio{padding:0 0 20px!important;}
 }
 .sec-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--ink);margin-bottom:4px;}
 .sec-sub{font-size:13px;color:var(--ink-dim);margin-bottom:20px;}
@@ -492,7 +508,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   <div class="app-main">
 
     <!-- INICIO -->
-    <div class="sec-wrap" id="sec-inicio">
+    <div class="sec-wrap active" id="sec-inicio">
       <div class="pro-header sec-desktop-only">
         <div class="page-profession" id="pro-profession"></div>
         <h1 class="page-title" id="pro-welcome-name">Hola</h1>
@@ -535,25 +551,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
             <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- AGENDA (solo mobile) -->
-    <div class="sec-wrap active" id="sec-agenda">
-      <div class="card">
-        <div class="card-head">
-          <h3 id="pro-month-label-m"></h3>
-          <div class="nav-row">
-            <button class="icon-btn" onclick="proChangeMonth(-1)">‹</button>
-            <button class="icon-btn" onclick="proChangeMonth(1)">›</button>
-            <button class="btn-add" onclick="openModal()">+ Cargar</button>
-          </div>
-        </div>
-        <div class="cal-grid">
-          <div class="cal-days-header"><div class="cal-day-name">D</div><div class="cal-day-name">L</div><div class="cal-day-name">M</div><div class="cal-day-name">X</div><div class="cal-day-name">J</div><div class="cal-day-name">V</div><div class="cal-day-name">S</div></div>
-          <div class="cal-days" id="pro-cal-days-m"></div>
-        </div>
-        <div id="pro-day-detail-m" style="border-top:1px solid var(--line);"><div class="no-day-selected"><div class="big">📅</div>Seleccioná un día</div></div>
       </div>
     </div>
 
@@ -1516,37 +1513,23 @@ function sbNav(section){
   const sbEl=document.getElementById('sb-'+section);if(sbEl)sbEl.classList.add('active');
   const bnEl=document.getElementById('bn-'+section);if(bnEl)bnEl.classList.add('active');
   document.querySelectorAll('.sec-wrap').forEach(s=>s.classList.remove('active'));
-  const sec=document.getElementById('sec-'+section);
+  // 'agenda' en mobile = sec-inicio (mismo calendario, sin header/link/métricas por CSS)
+  const secId = section==='agenda' ? 'inicio' : section;
+  const sec=document.getElementById('sec-'+secId);
   if(sec)sec.classList.add('active');
   document.querySelector('.app-main')?.scrollTo(0,0);
-  // Actualizar label del topbar mobile
+  // Label topbar
   const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
   const lbl=document.getElementById('topbar-sec-label');
   if(lbl)lbl.textContent=secLabels[section]||section;
   // Si entró a solicitudes, limpiar badge
-  if(section==='solicitudes'){
-    updateSolicitudesBadge(0);
-    syncReqListMobile();
-  }
+  if(section==='solicitudes'){updateSolicitudesBadge(0);syncReqListMobile();}
   if(section==='configuracion'){openSettings();return;}
   if(section==='pacientes')renderPacientes();
   if(section==='metricas')renderMetricasPanel();
-  if(section==='agenda')renderProCalMobile();
 }
 
-function renderProCalMobile(){
-  if(window.innerWidth>=768)return;
-  const label=document.getElementById('pro-month-label-m');
-  const grid=document.getElementById('pro-cal-days-m');
-  if(label)label.textContent=document.getElementById('pro-month-label').textContent;
-  if(grid)grid.innerHTML=document.getElementById('pro-cal-days').innerHTML;
-  // Re-attach click handlers
-  const origDays=[...document.querySelectorAll('#pro-cal-days .cal-day')];
-  const mobDays=[...document.querySelectorAll('#pro-cal-days-m .cal-day')];
-  mobDays.forEach((d,i)=>{if(origDays[i])d.onclick=origDays[i].onclick;});
-  const detM=document.getElementById('pro-day-detail-m');
-  if(detM)detM.innerHTML=document.getElementById('pro-day-detail').innerHTML;
-}
+
 
 function syncReqListMobile(){
   const main=document.getElementById('req-list');
