@@ -1159,11 +1159,14 @@ function renderProDayDetail(key,date){
   const isToday=date.getTime()===today.getTime();
   const nowHour=new Date().getHours();
   const nowMin=new Date().getMinutes();
+  const isMobileView=window.innerWidth<=767;
   slots.forEach(time=>{
     const bk=dayB.find(b=>b.hora===time);
     const slotHour=parseInt(time.split(':')[0]);
     const slotMin=parseInt(time.split(':')[1]);
     const isPastSlot=isToday&&(slotHour<nowHour||(slotHour===nowHour&&slotMin<=nowMin));
+    // En mobile+hoy: ocultar slots pasados sin turno (los con turno siempre se muestran)
+    if(isMobileView&&isToday&&isPastSlot&&!bk)return;
     if(bk){
       const bc=bk.estado==='pending'?'badge-new':'badge-booked';
       const bt=bk.estado==='pending'?'Nuevo':'Confirmado';
@@ -1187,25 +1190,6 @@ function renderProDayDetail(key,date){
   });
   html+=`</div></div>`;
   detail.innerHTML=html;
-  // Scroll al primer slot >= hora actual si es hoy
-  if(isToday&&window.innerWidth<=767){
-    const nowStr=String(nowHour).padStart(2,'0')+':'+String(nowMin).padStart(2,'0');
-    const firstCurrent=slots.find(t=>t>=nowStr);
-    if(firstCurrent){
-      setTimeout(()=>{
-        const target=detail.querySelector(`[data-hora="${firstCurrent}"], .slot-row .slot-time`);
-        // Buscar el slot-wrap o slot-row que corresponde al horario
-        const allSlotRows=detail.querySelectorAll('.slot-wrap, .slot-row');
-        for(const row of allSlotRows){
-          const timeEl=row.querySelector('.slot-time');
-          if(timeEl&&timeEl.textContent.trim().startsWith(firstCurrent)){
-            row.scrollIntoView({behavior:'smooth',block:'start'});
-            break;
-          }
-        }
-      },100);
-    }
-  }
 }
 
 function proChangeMonth(dir){proMonth=new Date(proMonth.getFullYear(),proMonth.getMonth()+dir,1);renderProCal();}
