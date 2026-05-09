@@ -140,13 +140,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     margin:0!important;
   }
 
-  /* CARD CALENDARIO: elemento independiente, cerrado en 4 lados */
+  /* CARD CALENDARIO: altura fija, no se estira con los slots */
   #sec-inicio .card-over-topbar>.card{
     border-radius:16px!important;
     border:1.5px solid var(--line)!important;
     box-shadow:0 2px 12px rgba(0,0,0,.07)!important;
     background:#fff!important;
     overflow:hidden!important;
+    align-self:start!important;
   }
 
   /* SLOTS PANEL: elemento independiente debajo del card del calendario */
@@ -160,7 +161,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     display:flex;align-items:center;justify-content:space-between;
     padding:12px 0 8px!important;
   }
-  .mob-slots-panel .slots-list{gap:8px!important;max-height:none!important;}
+  .mob-slots-panel .slots-list{gap:8px!important;max-height:420px!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;}
   .mob-slots-panel .slot-wrap{border-radius:12px!important;overflow:hidden!important;}
   .mob-slots-panel .slot-row{
     border-radius:12px!important;
@@ -274,14 +275,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .btn-block.unblock{border-color:var(--green);color:var(--green);}
 .btn-block.unblock:hover{background:var(--green-bg);}
 .blocked-msg{background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);text-align:center;margin-bottom:8px;}
-.slots-list{display:flex;flex-direction:column;gap:8px;}
+.slots-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;}
 .slot-wrap{position:relative;border-radius:12px;}
 .slot-action-left,.slot-action-right{position:absolute;top:0;bottom:0;width:90px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;opacity:0;transition:opacity .1s;pointer-events:none;}
 .slot-action-left{left:0;background:#2563eb;border-radius:12px 0 0 12px;}
 .slot-action-right{right:0;background:var(--red);border-radius:0 12px 12px 0;}
 .slot-action-left .sa-icon,.slot-action-right .sa-icon{font-size:18px;line-height:1;}
 .slot-action-left span,.slot-action-right span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
-.slot-row{display:flex;align-items:center;gap:12px;padding:16px 14px;border-radius:12px;background:#fff;border:1.5px solid var(--line);flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
+.slot-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--bg);border:1.5px solid transparent;flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
 .slot-row.booked{background:var(--green-bg);border-color:var(--green-light);}
 .slot-row.booked.unpaid{background:#fff8ed;border-color:#f0d89a;}
 .slot-time{font-size:14px;font-weight:700;width:48px;flex-shrink:0;color:var(--ink-soft);text-align:center;line-height:1.1;}
@@ -613,7 +614,15 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
           </div>
         </div>
         <div id="pro-day-detail" class="mob-slots-panel"><div class="no-day-selected"><div class="big">📅</div>Seleccioná un día para ver los turnos</div></div>
-
+        <div class="sec-desktop-only" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card">
+            <div class="card-head">
+              <h3>Solicitudes <span id="req-badge" class="new-badge" style="display:none">0</span></h3>
+              <button class="icon-btn" onclick="loadAll()" title="Actualizar">↻</button>
+            </div>
+            <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -623,11 +632,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sec-sub">Turnos pendientes de confirmación</div>
       <div class="card">
         <div class="card-head">
-          <h3>Pendientes <span id="req-badge" class="new-badge" style="display:none">0</span><span id="req-badge-m" class="new-badge" style="display:none">0</span></h3>
+          <h3>Pendientes <span id="req-badge-m" class="new-badge" style="display:none">0</span></h3>
           <button class="icon-btn" onclick="loadAll()">↻</button>
         </div>
-        <div id="req-list" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
-        <div id="req-list-m" class="req-list" style="display:none;"></div>
+        <div id="req-list-m" class="req-list"><div class="empty-req"><div class="big">✉️</div>Sin solicitudes nuevas.</div></div>
       </div>
     </div>
 
@@ -1600,7 +1608,14 @@ function sbNav(section){
 
 
 
-function syncReqListMobile(){}
+function syncReqListMobile(){
+  const main=document.getElementById('req-list');
+  const mob=document.getElementById('req-list-m');
+  if(mob&&main)mob.innerHTML=main.innerHTML;
+  const badge=document.getElementById('req-badge');
+  const badgeM=document.getElementById('req-badge-m');
+  if(badge&&badgeM){badgeM.textContent=badge.textContent;badgeM.style.display=badge.style.display;}
+}
 
 
 
