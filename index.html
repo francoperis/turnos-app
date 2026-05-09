@@ -81,19 +81,22 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   .topbar-pro-sub span{opacity:.8;}
   .topbar-pro-sub .sep{opacity:.4;}
   .app-main{position:fixed;top:0;left:0;right:0;bottom:var(--mob-bot);overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  /* Card que se superpone al topbar verde */
-  .card-over-topbar{
-    margin:72px 12px 0;
-    border-radius:16px;
-    box-shadow:0 -4px 16px rgba(0,0,0,.10),0 4px 20px rgba(0,0,0,.07);
+  /* Resto de secciones: padding para el topbar */
+  .sec-wrap{padding:110px 14px 20px!important;}
+  /* Sección agenda: fondo verde detrás del card, card flota encima */
+  #sec-inicio{
+    padding:0!important;
+    background:var(--green);
+    min-height:100%;
+  }
+  #sec-inicio .card-over-topbar{
+    margin:90px 0 0;
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -6px 20px rgba(0,0,0,.12);
     background:#fff;
     overflow:hidden;
-    position:relative;
-    z-index:5;
+    min-height:calc(100vh - 90px - var(--mob-bot));
   }
-  /* Resto de secciones tienen padding normal */
-  .sec-wrap{padding:108px 14px 20px!important;}
-  .sec-wrap:has(.card-over-topbar){padding:0 0 20px!important;}
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
   .app-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--mob-bot);background:#fff;border-top:1px solid var(--line);box-shadow:0 -1px 8px rgba(0,0,0,.05);padding-bottom:env(safe-area-inset-bottom);z-index:100;}
   .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--ink-dim);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;transition:color .15s;padding-top:3px;position:relative;}
@@ -122,15 +125,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   /* El grid se vuelve una sola columna */
   #sec-inicio .pro-grid{grid-template-columns:1fr!important;gap:0!important;}
   /* Card del calendario se superpone al topbar */
-  #sec-inicio .card-over-topbar{
-    margin:72px 12px 0;
-    border-radius:16px;
-    box-shadow:0 -4px 16px rgba(0,0,0,.10),0 4px 20px rgba(0,0,0,.07);
-    background:#fff;
-    overflow:hidden;
-    position:relative;
-    z-index:5;
-  }
+
   /* El sec-wrap de inicio no tiene padding en mobile */
   #sec-inicio{padding:0 0 20px!important;}
 }
