@@ -116,44 +116,49 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     background:var(--green);
   }
 
-  /* AGENDA: sec-inicio ocupa el ancho completo, fondo verde continuo con el topbar */
+  /* AGENDA: sec-inicio fondo verde continuo */
   #sec-inicio{
     padding:0!important;
     background:var(--green);
     min-height:100%;
   }
-  /* Ocultar elementos solo desktop */
   #sec-inicio .pro-header,
   #sec-inicio .link-card,
   #sec-inicio .metrics-bar,
   #sec-inicio .sec-desktop-only{display:none!important;}
   #sec-inicio .pro-grid{grid-template-columns:1fr!important;gap:0!important;}
-
-  /* card-over-topbar: wrapper transparente con padding lateral para que el card
-     no llegue al borde de la pantalla, y padding-top para el overlap */
+  /* EL OVERLAP REAL: el card está dentro del mismo contexto de scroll que el topbar.
+     margin-top negativo sube el card sobre el área verde del padding-bottom del topbar. */
+  /* card-over-topbar: margen lateral y padding-top reducido */
   #sec-inicio .card-over-topbar{
     display:block!important;
     background:transparent!important;
-    padding:28px 12px 20px!important;
+    padding:14px 12px 0!important;
     margin:0!important;
+    position:relative;
   }
-
-  /* EL CARD DEL CALENDARIO: caja blanca flotante, tamaño justo a su contenido.
-     border-radius en todos los lados → no pinta de blanco más allá del card */
+  /* CARD CALENDARIO: caja blanca con border-radius en los 4 lados y borde visible */
   #sec-inicio .card-over-topbar>.card{
     border-radius:16px!important;
-    border:none!important;
-    box-shadow:0 4px 20px rgba(0,0,0,.15)!important;
+    border:1.5px solid rgba(0,0,0,.08)!important;
+    box-shadow:0 4px 16px rgba(0,0,0,.10)!important;
     background:#fff!important;
     overflow:hidden!important;
   }
 
-  /* OTRAS SECCIONES: fondo crema, padding cero (app-main ya empieza debajo del topbar) */
+  /* OTRAS SECCIONES: fondo crema */
   .sec-wrap{
     padding:16px 14px 20px!important;
     background:var(--bg);
     min-height:100%;
   }
+  /* Área de slots: fondo verde-gris, slots con bordes redondeados */
+  #pro-day-detail{background:#edf2ee!important;border-top:none!important;padding:14px 0 0!important;}
+  .day-slots{padding:0 12px 16px!important;}
+  .slots-list{gap:8px!important;}
+  .slot-wrap{border-radius:12px!important;overflow:hidden!important;}
+  .slot-row{border-radius:12px!important;background:#fff!important;}
+  .day-slots-header{padding:0 12px 10px!important;}
 
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
 
