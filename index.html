@@ -249,11 +249,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .btn-add{background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;transition:opacity .15s;white-space:nowrap;}
 .btn-add:hover{opacity:.88;}
 /* CALENDARIO */
-.cal-grid{padding:10px 12px 12px;}
+.cal-grid{padding:6px 10px 8px;}
 .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
 .cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.4px;padding:4px 0;}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink);transition:all .12s;}
+.cal-day{height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);transition:all .12s;}
 .cal-day:hover:not(.empty):not(.selected){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
 .cal-day.past{color:#b0b0b0;background:#f0eeeb;cursor:pointer;}
@@ -281,7 +281,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .slot-action-right{right:0;background:var(--red);border-radius:0 12px 12px 0;}
 .slot-action-left .sa-icon,.slot-action-right .sa-icon{font-size:18px;line-height:1;}
 .slot-action-left span,.slot-action-right span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
-.slot-row{display:flex;align-items:center;gap:12px;padding:18px 16px;border-radius:12px;background:var(--bg);border:1.5px solid transparent;flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
+.slot-row{display:flex;align-items:center;gap:12px;padding:16px 16px;border-radius:12px;background:var(--bg);border:1.5px solid transparent;flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
 .slot-row.booked{background:var(--green-bg);border-color:var(--green-light);}
 .slot-row.booked.unpaid{background:#fff8ed;border-color:#f0d89a;}
 .slot-time{font-size:14px;font-weight:700;width:48px;flex-shrink:0;color:var(--ink-soft);text-align:center;line-height:1.1;}
@@ -573,6 +573,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Métricas
     </button>
+    <button class="bn-item" id="bn-redes" onclick="sbNav('redes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Redes
+    </button>
   </nav>
 
   <!-- MAIN -->
@@ -650,6 +654,31 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="sec-title">Métricas</div>
       <div class="sec-sub">Resumen del mes actual</div>
       <div id="met-panel"><div class="empty-req" style="padding:32px"><div class="big">◉</div>Cargando...</div></div>
+    </div>
+
+    <!-- REDES -->
+    <div class="sec-wrap" id="sec-redes">
+      <div class="sec-title">Redes</div>
+
+      <!-- Link para pacientes -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head">
+          <h3>Link para pacientes</h3>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Compartí este link para que tus pacientes saquen turnos</div>
+          <div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--green);font-weight:500;word-break:break-all;margin-bottom:10px;" id="redes-link-text"></div>
+          <button class="btn-copy" style="width:100%;" onclick="copyRedesLink(this)">📋 Copiar link</button>
+        </div>
+      </div>
+
+      <!-- Generador de Historias -->
+      <div class="card">
+        <div class="card-head">
+          <h3>Generador de Historias</h3>
+        </div>
+      </div>
+
     </div>
 
   </div><!-- /app-main -->
@@ -1596,7 +1625,7 @@ function sbNav(section){
   const activeWrap=document.querySelector('.sec-wrap.active,#sec-inicio.active');
   if(activeWrap)activeWrap.scrollTo(0,0);
   // Label topbar
-  const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
+  const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',redes:'Redes',configuracion:'Configuración'};
   const lbl=document.getElementById('topbar-sec-label');
   if(lbl)lbl.textContent=secLabels[section]||section;
 
@@ -1604,6 +1633,7 @@ function sbNav(section){
   if(section==='configuracion'){openSettings();return;}
   if(section==='pacientes')renderPacientes();
   if(section==='metricas')renderMetricasPanel();
+  if(section==='redes')renderRedes();
 }
 
 
@@ -1748,6 +1778,19 @@ END:VCALENDAR`;
     a.download='turno.ics';a.click();
     showNotif('Turno enviado al calendario ✓');
   }catch{showNotif('Error al agendar','red');}
+}
+function renderRedes(){
+  const el=document.getElementById('redes-link-text');
+  if(el){
+    const src=document.getElementById('public-link-text');
+    el.textContent=src?src.textContent:(window.location.origin+'/paciente.html?p='+PRO_SLUG);
+  }
+}
+function copyRedesLink(btn){
+  const el=document.getElementById('redes-link-text');
+  if(el)navigator.clipboard.writeText(el.textContent).catch(()=>{});
+  btn.textContent='✓ Copiado!';
+  setTimeout(()=>btn.textContent='📋 Copiar link',2000);
 }
 const _swipeObs=new MutationObserver(()=>{
   document.querySelectorAll('.slot-wrap:not([data-sw])').forEach(w=>{w.setAttribute('data-sw','1');initSwipe(w);});
