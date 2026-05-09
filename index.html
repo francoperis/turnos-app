@@ -73,70 +73,79 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   #panel.visible{flex-direction:column;}
   .app-sidebar{display:none;}
 
-  /* TOPBAR: fixed en la parte superior, verde, altura variable */
-  .app-topbar{
-    display:flex;flex-direction:column;
+  /* En mobile el topbar original está oculto — JS lo clona dentro del scroll */
+  .app-topbar{display:none!important;}
+
+  /* app-main: ocupa toda la pantalla, scrollea */
+  .app-main{
+    position:fixed;top:0;left:0;right:0;bottom:var(--mob-bot);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:var(--green);
+  }
+
+  /* ── AGENDA (sec-inicio) ──
+     El topbar clonado vive DENTRO del app-main (mismo contexto de scroll).
+     margin-top negativo en el card → overlap real garantizado. */
+  #sec-inicio{padding:0!important;background:transparent;}
+
+  /* topbar clonado que JS inserta antes de sec-inicio */
+  .mob-topbar-clone{
+    background:var(--green);
+    padding:14px 16px 46px;
+  }
+  .mob-topbar-clone .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .mob-topbar-clone .topbar-sec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;}
+  .mob-topbar-clone .topbar-icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;}
+  .mob-topbar-clone .topbar-icon-btn svg{width:16px;height:16px;}
+  .mob-topbar-clone .topbar-pro-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:#fff;margin-bottom:2px;}
+  .mob-topbar-clone .topbar-pro-sub{font-size:12px;color:rgba(255,255,255,.7);display:flex;gap:8px;flex-wrap:wrap;}
+  .mob-topbar-clone .topbar-pro-sub span{opacity:.8;}
+  .mob-topbar-clone .topbar-pro-sub .sep{opacity:.4;}
+
+  /* card del calendario: margin-top negativo para solaparse sobre el verde */
+  #sec-inicio .card-over-topbar{
+    background:transparent!important;display:block!important;padding:0!important;margin:0!important;
+  }
+  #sec-inicio .card-over-topbar>.card{
+    margin-top:-28px!important;
+    border-radius:20px 20px 0 0!important;
+    border:none!important;
+    box-shadow:0 -4px 20px rgba(0,0,0,.15)!important;
+    background:#fff!important;
+    min-height:calc(100vh - var(--mob-bot))!important;
+  }
+
+  /* ── OTRAS SECCIONES ──
+     El topbar fijo (fixed) aparece para estas secciones.
+     El fondo del app-main cambia a crema. */
+  .app-main.mob-other{background:var(--bg)!important;}
+  .mob-topbar-fixed{
+    display:none;
     position:fixed;top:0;left:0;right:0;
     background:var(--green);
     padding:14px 16px 14px;
     z-index:200;
   }
-  .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-  .topbar-sec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;}
-  .topbar-icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;}
-  .topbar-icon-btn svg{width:16px;height:16px;}
-  .topbar-pro-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:#fff;margin-bottom:2px;}
-  .topbar-pro-sub{font-size:12px;color:rgba(255,255,255,.7);display:flex;gap:8px;flex-wrap:wrap;}
-  .topbar-pro-sub span{opacity:.8;}
-  .topbar-pro-sub .sep{opacity:.4;}
+  .mob-topbar-fixed.show{display:flex;flex-direction:column;}
+  .mob-topbar-fixed .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .mob-topbar-fixed .topbar-sec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;}
+  .mob-topbar-fixed .topbar-icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;}
+  .mob-topbar-fixed .topbar-icon-btn svg{width:16px;height:16px;}
+  .mob-topbar-fixed .topbar-pro-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:#fff;margin-bottom:2px;}
+  .mob-topbar-fixed .topbar-pro-sub{font-size:12px;color:rgba(255,255,255,.7);display:flex;gap:8px;flex-wrap:wrap;}
+  .mob-topbar-fixed .topbar-pro-sub span{opacity:.8;}
+  .mob-topbar-fixed .topbar-pro-sub .sep{opacity:.4;}
 
-  /* MAIN: full screen, scroll vertical, fondo verde (continuo con topbar) */
-  .app-main{
-    position:fixed;
-    top:0;left:0;right:0;
-    bottom:var(--mob-bot);
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    background:var(--green);
-  }
-
-  /* AGENDA (sec-inicio): empieza desde arriba del main (verde),
-     el card usa padding-top para empujar su contenido debajo del topbar
-     pero el card en sí arranca antes — creando el overlap visual */
-  #sec-inicio{
-    padding:0!important;
-    background:transparent;
-    min-height:100%;
-  }
-  #sec-inicio .card-over-topbar{
-    /* padding-top = altura topbar (14+6+22+2+12 = ~78px) MENOS el overlap deseado (24px) = 54px */
-    padding-top:54px!important;
-    background:transparent!important;
-    display:block!important;
-    margin:0!important;
-  }
-  #sec-inicio .card-over-topbar>.card{
-    border-radius:20px 20px 0 0!important;
-    border:none!important;
-    box-shadow:0 -4px 16px rgba(0,0,0,.12)!important;
-    background:#fff!important;
-    min-height:calc(100vh - 54px - var(--mob-bot))!important;
-  }
-
-  /* OTRAS SECCIONES: padding-top = altura topbar completa, fondo crema */
   .sec-wrap{padding:96px 14px 20px!important;background:var(--bg);min-height:100%;}
 
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
 
-  /* BOTTOM NAV */
   .app-bottom-nav{
     display:flex;position:fixed;bottom:0;left:0;right:0;
-    height:var(--mob-bot);
-    background:#fff;
+    height:var(--mob-bot);background:#fff;
     border-top:1px solid var(--line);
     box-shadow:0 -1px 8px rgba(0,0,0,.05);
-    padding-bottom:env(safe-area-inset-bottom);
-    z-index:100;
+    padding-bottom:env(safe-area-inset-bottom);z-index:100;
   }
   .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--ink-dim);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;transition:color .15s;padding-top:3px;position:relative;}
   .bn-item.active{color:var(--green);}
@@ -533,6 +542,18 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
       Métricas
     </button>
   </nav>
+
+  <!-- TOPBAR FIJO para otras secciones mobile (JS lo activa) -->
+  <div class="mob-topbar-fixed" id="mob-topbar-fixed">
+    <div class="topbar-top-row">
+      <div class="topbar-sec-label" id="mob-fixed-sec-label">Solicitudes</div>
+      <button class="topbar-icon-btn" onclick="sbNav('configuracion')" title="Configuración">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+    <div class="topbar-pro-name" id="mob-fixed-pro-name"></div>
+    <div class="topbar-pro-sub" id="mob-fixed-pro-sub"></div>
+  </div>
 
   <!-- MAIN -->
   <div class="app-main">
@@ -945,6 +966,8 @@ async function showPanel(){
     topbarSub.innerHTML=(prof?'<span>'+esc(prof)+'</span>':'')+((mp||mn)&&prof?'<span class="sep">·</span>':'')+mp+mn;
   }
 
+  // En mobile, crear el clone del topbar dentro del app-main ahora que tenemos los datos
+  if(window.innerWidth<=767)mobUpdateClone();
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
   const profMostrar=pro.profesion||'';
@@ -1537,33 +1560,63 @@ function onDurPacChange(sel){
 // ── SIDEBAR NAV ────────────────────────────────────────────
 let _currentSection = 'inicio';
 
+function mobUpdateClone(){
+  const appMain=document.querySelector('.app-main');
+  const secInicio=document.getElementById('sec-inicio');
+  if(!appMain||!secInicio)return;
+  let clone=document.getElementById('mob-topbar-clone');
+  if(!clone){
+    clone=document.createElement('div');
+    clone.id='mob-topbar-clone';
+    clone.className='mob-topbar-clone';
+    appMain.insertBefore(clone,secInicio);
+  }
+  const srcName=document.getElementById('topbar-pro-name');
+  const srcSub=document.getElementById('topbar-pro-sub');
+  const cfgSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  clone.innerHTML=`<div class="topbar-top-row"><div class="topbar-sec-label">AGENDA</div><button class="topbar-icon-btn" onclick="sbNav('configuracion')">${cfgSvg}</button></div><div class="topbar-pro-name">${srcName?srcName.textContent:''}</div><div class="topbar-pro-sub">${srcSub?srcSub.innerHTML:''}</div>`;
+}
+
 function sbNav(section){
   _currentSection = section;
   document.querySelectorAll('.sb-link,.bn-item').forEach(b=>b.classList.remove('active'));
   const sbEl=document.getElementById('sb-'+section);if(sbEl)sbEl.classList.add('active');
   const bnEl=document.getElementById('bn-'+section);if(bnEl)bnEl.classList.add('active');
   document.querySelectorAll('.sec-wrap').forEach(s=>s.classList.remove('active'));
-  // 'agenda' en mobile = sec-inicio (mismo calendario)
-  const secId = section==='agenda' ? 'inicio' : section;
+  const secId=section==='agenda'?'inicio':section;
   const sec=document.getElementById('sec-'+secId);
   if(sec)sec.classList.add('active');
-  // Actualizar data-section en el panel para el CSS del topbar sticky
-  const panel=document.getElementById('panel');
-  if(panel)panel.dataset.section=section==='agenda'?'inicio':section;
   document.querySelector('.app-main')?.scrollTo(0,0);
-  // Label topbar
+
   const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
+  const label=secLabels[section]||section;
   const lbl=document.getElementById('topbar-sec-label');
-  if(lbl)lbl.textContent=secLabels[section]||section;
-  // Topbar padding: agenda tiene padding-bottom grande para el overlap, otras secciones no
-  const topbar=document.querySelector('.app-topbar');
-  if(topbar){
-    if(section==='agenda'||section==='inicio'){
-      topbar.style.paddingBottom='52px';
+  if(lbl)lbl.textContent=label;
+
+  if(window.innerWidth<=767){
+    const isAgenda=(section==='agenda'||section==='inicio');
+    const appMain=document.querySelector('.app-main');
+    const fixedTopbar=document.getElementById('mob-topbar-fixed');
+    if(isAgenda){
+      appMain.classList.remove('mob-other');
+      if(fixedTopbar)fixedTopbar.classList.remove('show');
+      mobUpdateClone();
     } else {
-      topbar.style.paddingBottom='12px';
+      appMain.classList.add('mob-other');
+      if(fixedTopbar){
+        fixedTopbar.classList.add('show');
+        const fl=document.getElementById('mob-fixed-sec-label');
+        if(fl)fl.textContent=label;
+        const fn=document.getElementById('mob-fixed-pro-name');
+        const fp=document.getElementById('mob-fixed-pro-sub');
+        const srcName=document.getElementById('topbar-pro-name');
+        const srcSub=document.getElementById('topbar-pro-sub');
+        if(fn&&srcName)fn.textContent=srcName.textContent;
+        if(fp&&srcSub)fp.innerHTML=srcSub.innerHTML;
+      }
     }
   }
+
   if(section==='solicitudes'){updateSolicitudesBadge(0);syncReqListMobile();}
   if(section==='configuracion'){openSettings();return;}
   if(section==='pacientes')renderPacientes();
