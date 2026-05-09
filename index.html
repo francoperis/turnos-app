@@ -71,14 +71,16 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 @media(max-width:767px){
   #panel.visible{flex-direction:column;}
   .app-sidebar{display:none;}
-  .app-topbar{display:flex;align-items:center;position:fixed;top:0;left:0;right:0;height:var(--mob-top);background:#fff;border-bottom:1px solid var(--line);padding:0 16px;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.04);}
-  .topbar-logo{font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);flex:1;display:flex;align-items:center;gap:7px;}
-  .topbar-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
-  .topbar-logo-text span{color:var(--green);}
-  .topbar-actions{display:flex;gap:6px;}
-  .topbar-icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+  .app-topbar{display:flex;flex-direction:column;position:fixed;top:0;left:0;right:0;background:var(--green);padding:14px 16px 12px;z-index:100;}
+  .topbar-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .topbar-sec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;}
+  .topbar-icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;}
   .topbar-icon-btn svg{width:16px;height:16px;}
-  .app-main{position:fixed;top:var(--mob-top);left:0;right:0;bottom:var(--mob-bot);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .topbar-pro-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:#fff;margin-bottom:2px;}
+  .topbar-pro-sub{font-size:12px;color:rgba(255,255,255,.7);display:flex;gap:8px;flex-wrap:wrap;}
+  .topbar-pro-sub span{opacity:.8;}
+  .topbar-pro-sub .sep{opacity:.4;}
+  .app-main{position:fixed;top:0;left:0;right:0;bottom:var(--mob-bot);overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:108px;}
   .sub-banner.warning,.sub-banner.danger,.sub-banner.expired{position:sticky;top:0;z-index:90;}
   .app-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:var(--mob-bot);background:#fff;border-top:1px solid var(--line);box-shadow:0 -1px 8px rgba(0,0,0,.05);padding-bottom:env(safe-area-inset-bottom);z-index:100;}
   .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--ink-dim);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;transition:color .15s;padding-top:3px;position:relative;}
@@ -433,16 +435,15 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   </aside>
 
   <!-- TOPBAR mobile -->
-  <div class="app-topbar">
-    <div class="topbar-logo">
-      <div class="topbar-logo-dot"></div>
-      <span class="topbar-logo-text">Turnos<span>Pai</span></span>
-    </div>
-    <div class="topbar-actions">
+  <div class="app-topbar" id="app-topbar">
+    <div class="topbar-top-row">
+      <div class="topbar-sec-label" id="topbar-sec-label">Agenda</div>
       <button class="topbar-icon-btn" onclick="sbNav('configuracion')" title="Configuración">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </div>
+    <div class="topbar-pro-name" id="topbar-pro-name">Cargando...</div>
+    <div class="topbar-pro-sub" id="topbar-pro-sub"></div>
   </div>
 
   <!-- BOTTOM NAV mobile -->
@@ -690,6 +691,16 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
             <input type="text" class="settings-input" id="cfg-alias" placeholder="teresa.turnos">
           </div>
         </div>
+        <div class="settings-row">
+          <div class="settings-field">
+            <label class="settings-label">Mat. Provincial (MP)</label>
+            <input type="text" class="settings-input" id="cfg-mp" placeholder="Ej: 12345">
+          </div>
+          <div class="settings-field">
+            <label class="settings-label">Mat. Nacional (MN)</label>
+            <input type="text" class="settings-input" id="cfg-mn" placeholder="Ej: 67890">
+          </div>
+        </div>
         <div class="settings-field">
           <label class="settings-label">CBU (opcional)</label>
           <input type="text" class="settings-input" id="cfg-cbu" placeholder="22 dígitos" maxlength="22">
@@ -875,9 +886,21 @@ async function showPanel(){
     return;
   }
   PRO_SLUG=pro.slug;
-  // Setear nombre en sidebar
+  // Sidebar desktop
   const tagline=document.getElementById('sb-tagline-prof');
   if(tagline)tagline.textContent=pro.nombre||'Panel profesional';
+  // Topbar mobile — nombre y datos profesionales
+  const topbarName=document.getElementById('topbar-pro-name');
+  if(topbarName)topbarName.textContent=pro.nombre||'TurnosPai';
+  const topbarSub=document.getElementById('topbar-pro-sub');
+  if(topbarSub){
+    const cfg=pro.config||{};
+    const prof=pro.profesion||'';
+    const mp=cfg.mp?'<span>MP '+esc(cfg.mp)+'</span><span class="sep">·</span>':'';
+    const mn=cfg.mn?'<span>MN '+esc(cfg.mn)+'</span>':'';
+    topbarSub.innerHTML=(prof?'<span>'+esc(prof)+'</span>':'')+((mp||mn)&&prof?'<span class="sep">·</span>':'')+mp+mn;
+  }
+
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
   const profMostrar=pro.profesion||'';
@@ -944,6 +967,7 @@ async function loadAll(){
 }
 
 function startRealtime(){
+  sb.removeChannel(sb.channel('turnos-rt'));
   sb.channel('turnos-rt')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'turnos'},payload=>{
       if(payload.new&&payload.new.profesional_id===PRO_ID){
@@ -1079,6 +1103,19 @@ function renderProDayDetail(key,date){
 }
 
 function proChangeMonth(dir){proMonth=new Date(proMonth.getFullYear(),proMonth.getMonth()+dir,1);renderProCal();}
+
+function updateSolicitudesBadge(count){
+  const sbB=document.getElementById('sb-badge');
+  const bnB=document.getElementById('bn-badge');
+  if(count>0){
+    if(sbB){sbB.style.display='inline-flex';sbB.textContent=count;}
+    if(bnB){bnB.classList.add('show');bnB.textContent=count;}
+  }else{
+    if(sbB)sbB.style.display='none';
+    if(bnB)bnB.classList.remove('show');
+  }
+  syncReqListMobile();
+}
 
 function renderRequests(){
   const pending=[];
@@ -1244,6 +1281,8 @@ function openSettings(){
   buildTimeOptions('cfg-inicio', proConfig.inicio||'08:00');
   buildTimeOptions('cfg-fin', proConfig.fin||'21:00');
   document.getElementById('cfg-precio').value=proConfig.precio||'';
+  document.getElementById('cfg-mp').value=proConfig.mp||'';
+  document.getElementById('cfg-mn').value=proConfig.mn||'';
   document.getElementById('cfg-alias').value=proConfig.alias||'';
   document.getElementById('cfg-cbu').value=proConfig.cbu||'';
   document.querySelectorAll('#cfg-dias .day-toggle-btn').forEach(btn=>{
@@ -1300,6 +1339,8 @@ async function saveSettings(){
     alias:document.getElementById('cfg-alias').value.trim()||null,
     cbu:document.getElementById('cfg-cbu').value.trim()||null,
     obras_sociales:[...osList],
+    mp:document.getElementById('cfg-mp').value.trim()||null,
+    mn:document.getElementById('cfg-mn').value.trim()||null,
     dur_pac_activo:durPacOn,
     dur_pac:{...durPacData}
   };
@@ -1460,7 +1501,16 @@ function sbNav(section){
   const sec=document.getElementById('sec-'+section);
   if(sec)sec.classList.add('active');
   document.querySelector('.app-main')?.scrollTo(0,0);
-  if(section==='configuracion'){openSettings();sbNav('inicio');return;}
+  // Actualizar label del topbar mobile
+  const secLabels={inicio:'Agenda',agenda:'Agenda',solicitudes:'Solicitudes',pacientes:'Pacientes',metricas:'Métricas',configuracion:'Configuración'};
+  const lbl=document.getElementById('topbar-sec-label');
+  if(lbl)lbl.textContent=secLabels[section]||section;
+  // Si entró a solicitudes, limpiar badge
+  if(section==='solicitudes'){
+    updateSolicitudesBadge(0);
+    syncReqListMobile();
+  }
+  if(section==='configuracion'){openSettings();return;}
   if(section==='pacientes')renderPacientes();
   if(section==='metricas')renderMetricasPanel();
   if(section==='agenda')renderProCalMobile();
