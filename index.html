@@ -1000,10 +1000,9 @@ async function showPanel(){
   if(pro.config)proConfig={...proConfig,...pro.config};
   const nombreMostrar=pro.nombre||'Profesional';
   const profMostrar=pro.profesion||'';
-  document.getElementById('pro-welcome-name').textContent='Hola, '+nombreMostrar+' \uD83D\uDC4B';
-  document.getElementById('pro-profession').textContent=profMostrar;
-  document.getElementById('pro-profession').style.display=profMostrar?'block':'none';
-  document.getElementById('public-link-text').textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
+  const _wn=document.getElementById('pro-welcome-name');if(_wn)_wn.textContent='Hola, '+nombreMostrar+' 👋';
+  const _pp=document.getElementById('pro-profession');if(_pp){_pp.textContent=profMostrar;_pp.style.display=profMostrar?'block':'none';}
+  const _plt=document.getElementById('public-link-text');if(_plt)_plt.textContent=window.location.origin+'/paciente.html?p='+PRO_SLUG;
   // Timer de suscripción
   const banner=document.getElementById('sub-banner');
   if(pro.subscription_end){
