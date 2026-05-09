@@ -151,7 +151,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 
   /* SLOTS PANEL: elemento independiente debajo del card del calendario */
   .mob-slots-panel{
-    margin:0 12px 16px!important;
+    margin:0 13.5px 16px!important;
     background:transparent!important;
     border-top:none!important;
   }
@@ -1187,6 +1187,25 @@ function renderProDayDetail(key,date){
   });
   html+=`</div></div>`;
   detail.innerHTML=html;
+  // Scroll al primer slot >= hora actual si es hoy
+  if(isToday&&window.innerWidth<=767){
+    const nowStr=String(nowHour).padStart(2,'0')+':'+String(nowMin).padStart(2,'0');
+    const firstCurrent=slots.find(t=>t>=nowStr);
+    if(firstCurrent){
+      setTimeout(()=>{
+        const target=detail.querySelector(`[data-hora="${firstCurrent}"], .slot-row .slot-time`);
+        // Buscar el slot-wrap o slot-row que corresponde al horario
+        const allSlotRows=detail.querySelectorAll('.slot-wrap, .slot-row');
+        for(const row of allSlotRows){
+          const timeEl=row.querySelector('.slot-time');
+          if(timeEl&&timeEl.textContent.trim().startsWith(firstCurrent)){
+            row.scrollIntoView({behavior:'smooth',block:'start'});
+            break;
+          }
+        }
+      },100);
+    }
+  }
 }
 
 function proChangeMonth(dir){proMonth=new Date(proMonth.getFullYear(),proMonth.getMonth()+dir,1);renderProCal();}
