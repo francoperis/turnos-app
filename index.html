@@ -879,7 +879,15 @@ const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto',
 const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 let proMonth=new Date(today.getFullYear(),today.getMonth(),1);
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-let proSelectedDay=fmt(today),allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
+function nextWorkDay(){
+  const d=new Date(today);
+  for(let i=0;i<14;i++){
+    if(proConfig.dias.includes(d.getDay()))return fmt(d);
+    d.setDate(d.getDate()+1);
+  }
+  return fmt(today);
+}
+let proSelectedDay=nextWorkDay(),allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
 
 let proConfig={
   duracion:60,
@@ -1058,6 +1066,10 @@ async function loadAll(){
       const tel=(r.telefono||'').replace(/\D/g,'');
       if(tel&&!pacienteNombre[r.telefono])pacienteNombre[r.telefono]=r.nombre_paciente;
     });
+    // Al cargar, recalcular el próximo día hábil (por si proConfig.dias ya se cargó)
+    if(proSelectedDay===fmt(today)&&!proConfig.dias.includes(today.getDay())){
+      proSelectedDay=nextWorkDay();
+    }
     renderProCal();renderRequests();
     if(proSelectedDay)renderProDayDetail(proSelectedDay,parseDate(proSelectedDay));
   }catch(e){showNotif('Error al cargar datos','red');console.error(e);}
@@ -1198,22 +1210,31 @@ function renderProDayDetail(key,date){
   });
   html+=`</div></div>`;
   detail.innerHTML=html;
+  // Scroll al slot de la hora actual — funciona tanto para hoy como para cualquier día
+  // Solo scrollea si es hoy
   if(isToday){
     setTimeout(()=>{
       const nowStr=String(nowHour).padStart(2,'0')+':'+String(nowMin).padStart(2,'0');
-      const allRows=detail.querySelectorAll('.slot-row');
+      const list=detail.querySelector('.slots-list');
+      if(!list)return;
+      const allWraps=list.querySelectorAll('.slot-wrap,.slot-row');
       let target=null;
-      allRows.forEach(row=>{
+      allWraps.forEach(row=>{
+        if(target)return;
         const t=row.querySelector('.slot-time');
-        if(!t||target)return;
-        const slotTime=t.textContent.trim().split('\n')[0].trim();
+        if(!t)return;
+        // slot-time tiene el texto "17:30
+hs" — tomar solo la hora
+        const slotTime=t.firstChild&&t.firstChild.nodeType===3
+          ? t.firstChild.textContent.trim()
+          : t.textContent.trim().split('\n')[0].trim();
         if(slotTime>=nowStr.slice(0,5))target=row;
       });
       if(target){
-        const list=detail.querySelector('.slots-list');
-        if(list)list.scrollTop=target.offsetTop-8;
+        // offsetTop relativo al slots-list
+        list.scrollTop=target.offsetTop;
       }
-    },50);
+    },80);
   }
 }
 
