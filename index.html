@@ -1175,7 +1175,7 @@ function renderProDayDetail(key,date){
   html+=`<div class="slots-list">`;
   const slots=generateSlots();
   // Agregar horarios fuera de grilla al array de slots para que se rendericen
-  dayB.forEach(b=>{const h=(b.hora||'').slice(0,5);if(!slots.includes(h)){slots.push(h);}});
+  dayB.forEach(b=>{if(!slots.includes(b.hora)){slots.push(b.hora);}});
   slots.sort();
   const isToday=date.getTime()===today.getTime();
   const nowHour=new Date().getHours();
@@ -1208,13 +1208,14 @@ function renderProDayDetail(key,date){
   });
   html+=`</div></div>`;
   detail.innerHTML=html;
-  if(isToday){
-    setTimeout(()=>{
+  setTimeout(()=>{
+    const list=detail.querySelector('.slots-list');
+    if(!list)return;
+    let target=null;
+    if(isToday){
+      // Hoy: scroll al slot de la hora actual
       const nowStr=String(nowHour).padStart(2,'0')+':'+String(nowMin).padStart(2,'0');
-      const list=detail.querySelector('.slots-list');
-      if(!list)return;
       const allWraps=list.querySelectorAll('.slot-wrap,.slot-row');
-      let target=null;
       allWraps.forEach(row=>{
         if(target)return;
         const t=row.querySelector('.slot-time');
@@ -1224,9 +1225,12 @@ function renderProDayDetail(key,date){
           :t.textContent.trim().split('\n')[0].trim();
         if(slotTime>=nowStr.slice(0,5))target=row;
       });
-      if(target)list.scrollTop=target.offsetTop;
-    },80);
-  }
+    } else if(dayB.length>0){
+      // Otro día con turnos: scroll al primer turno
+      target=list.querySelector('.slot-wrap');
+    }
+    if(target)list.scrollTop=target.offsetTop;
+  },80);
 }
 
 function proChangeMonth(dir){proMonth=new Date(proMonth.getFullYear(),proMonth.getMonth()+dir,1);renderProCal();}
