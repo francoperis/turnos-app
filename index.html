@@ -1181,7 +1181,7 @@ function renderProDayDetail(key,date){
   const nowHour=new Date().getHours();
   const nowMin=new Date().getMinutes();
   slots.forEach(time=>{
-    const bk=dayB.find(b=>b.hora===time);
+    const bk=dayB.find(b=>(b.hora||'').slice(0,5)===time);
     const slotHour=parseInt(time.split(':')[0]);
     const slotMin=parseInt(time.split(':')[1]);
     const isPastSlot=isToday&&(slotHour<nowHour||(slotHour===nowHour&&slotMin<=nowMin));
