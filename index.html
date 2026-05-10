@@ -1175,7 +1175,7 @@ function renderProDayDetail(key,date){
   html+=`<div class="slots-list">`;
   const slots=generateSlots();
   // Agregar horarios fuera de grilla al array de slots para que se rendericen
-  dayB.forEach(b=>{if(!slots.includes(b.hora)){slots.push(b.hora);}});
+  dayB.forEach(b=>{const h=(b.hora||'').slice(0,5);if(!slots.includes(h)){slots.push(h);}});
   slots.sort();
   const isToday=date.getTime()===today.getTime();
   const nowHour=new Date().getHours();
