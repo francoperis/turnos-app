@@ -547,9 +547,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
   <div class="app-topbar" id="app-topbar">
     <div class="topbar-top-row">
       <div class="topbar-sec-label" id="topbar-sec-label">Agenda</div>
+      <div style="display:flex;gap:6px;align-items:center;">
+      <button onclick="logout()" style="background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.7);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer;">Salir</button>
       <button class="topbar-icon-btn" onclick="sbNav('configuracion')" title="Configuración">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
+      </div>
     </div>
     <div class="topbar-pro-name" id="topbar-pro-name">Cargando...</div>
     <div class="topbar-pro-sub" id="topbar-pro-sub"></div>
@@ -875,7 +878,8 @@ const today=new Date();today.setHours(0,0,0,0);
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 let proMonth=new Date(today.getFullYear(),today.getMonth(),1);
-let proSelectedDay=null,allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+let proSelectedDay=fmt(today),allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
 
 let proConfig={
   duracion:60,
@@ -903,7 +907,7 @@ function generateSlots(){
   return slots;
 }
 
-function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
 function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
 function isPast(d){return d<today;}
 function isSunday(d){return d.getDay()===0;}
@@ -1194,6 +1198,23 @@ function renderProDayDetail(key,date){
   });
   html+=`</div></div>`;
   detail.innerHTML=html;
+  if(isToday){
+    setTimeout(()=>{
+      const nowStr=String(nowHour).padStart(2,'0')+':'+String(nowMin).padStart(2,'0');
+      const allRows=detail.querySelectorAll('.slot-row');
+      let target=null;
+      allRows.forEach(row=>{
+        const t=row.querySelector('.slot-time');
+        if(!t||target)return;
+        const slotTime=t.textContent.trim().split('\n')[0].trim();
+        if(slotTime>=nowStr.slice(0,5))target=row;
+      });
+      if(target){
+        const list=detail.querySelector('.slots-list');
+        if(list)list.scrollTop=target.offsetTop-8;
+      }
+    },50);
+  }
 }
 
 function proChangeMonth(dir){proMonth=new Date(proMonth.getFullYear(),proMonth.getMonth()+dir,1);renderProCal();}
@@ -1393,7 +1414,16 @@ function openSettings(){
   document.getElementById('settings-modal-bg').classList.add('open');
 }
 
-function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
+function closeSettings(){
+  document.getElementById('settings-modal-bg').classList.remove('open');
+  document.querySelectorAll('.sec-wrap').forEach(s=>s.classList.remove('active'));
+  const secId=_lastSection==='agenda'?'inicio':_lastSection;
+  const sec=document.getElementById('sec-'+secId);
+  if(sec)sec.classList.add('active');
+  document.querySelectorAll('.sb-link,.bn-item').forEach(b=>b.classList.remove('active'));
+  const sbEl=document.getElementById('sb-'+_lastSection);if(sbEl)sbEl.classList.add('active');
+  const bnEl=document.getElementById('bn-'+_lastSection);if(bnEl)bnEl.classList.add('active');
+}
 function closeSettingsBg(e){if(e.target===document.getElementById('settings-modal-bg'))closeSettings();}
 
 function renderOSList(){
@@ -1417,13 +1447,9 @@ function renderOSList(){
     </div>`;
   }).join('');
 }
-
-function updateOSPrecio(i, val){
-  if(typeof osList[i]==='object'){
-    osList[i].precio_os = val ? parseInt(val) : null;
-  } else {
-    osList[i] = {nombre: osList[i], cobertura:0, precio_os: val ? parseInt(val) : null};
-  }
+function updateOSPrecio(i,val){
+  if(typeof osList[i]==='object'){osList[i].precio_os=val?parseInt(val):null;}
+  else{osList[i]={nombre:osList[i],cobertura:0,precio_os:val?parseInt(val):null};}
 }
 
 function addOS(){
@@ -1606,8 +1632,10 @@ function onDurPacChange(sel){
 
 // ── SIDEBAR NAV ────────────────────────────────────────────
 let _currentSection = 'inicio';
+let _lastSection='agenda';
 
 function sbNav(section){
+  if(section!=='configuracion')_lastSection=section;
   _currentSection = section;
   document.querySelectorAll('.sb-link,.bn-item').forEach(b=>b.classList.remove('active'));
   const sbEl=document.getElementById('sb-'+section);if(sbEl)sbEl.classList.add('active');
@@ -1670,119 +1698,44 @@ function pacRow(p,isRec){
   return`<div class="pac-row"><div class="pac-avatar">${ini}</div><div class="pac-info"><div class="pac-name">${esc(p.nombre)}</div><div class="pac-meta">${esc(p.tel)} · ${p.count} turno${p.count!==1?'s':''}</div></div><span class="pac-badge ${isRec?'rec':'new'}">${isRec?'Recurrente':'Nuevo'}</span></div>`;
 }
 
-// ── MÉTRICAS ─────────────────────────────────────────────
-let _metPeriodo='mes'; // 'mes' | '3m' | '6m' | '9m' | '12m' | 'total'
-
+let _metPeriodo='mes';
 function metFiltrarTurnos(periodo){
   const now=new Date();
   const todos=Object.entries(allBookings).flatMap(([k,v])=>v.map(b=>({...b,_fecha:k})));
   if(periodo==='total')return todos;
   const meses={'mes':1,'3m':3,'6m':6,'9m':9,'12m':12}[periodo]||1;
   const desde=new Date(now.getFullYear(),now.getMonth()-(meses-1),1);
-  return todos.filter(b=>{
-    const[y,m,d]=b._fecha.split('-').map(Number);
-    return new Date(y,m-1,d)>=desde;
-  });
+  return todos.filter(b=>{const[y,m,d]=b._fecha.split('-').map(Number);return new Date(y,m-1,d)>=desde;});
 }
-
 function renderMetricasPanel(){
   const el=document.getElementById('met-panel');
   if(!el)return;
-
-  const periodos=[
-    {k:'mes',label:'Este mes'},
-    {k:'3m',label:'3 meses'},
-    {k:'6m',label:'6 meses'},
-    {k:'9m',label:'9 meses'},
-    {k:'12m',label:'12 meses'},
-    {k:'total',label:'Total'},
-  ];
-
+  const periodos=[{k:'mes',label:'Este mes'},{k:'3m',label:'3 meses'},{k:'6m',label:'6 meses'},{k:'9m',label:'9 meses'},{k:'12m',label:'12 meses'},{k:'total',label:'Total'}];
   const todos=metFiltrarTurnos(_metPeriodo);
   const conf=todos.filter(b=>b.estado==='confirmed');
   const canc=todos.filter(b=>b.estado==='cancelled'||b.estado==='rejected').length;
-
-  // Particulares: obra_social null o vacío
   const confPart=conf.filter(b=>!b.obra_social);
   const confOS=conf.filter(b=>!!b.obra_social);
-
   const precio=proConfig.precio||0;
-
-  // Cobrado: particulares pagados
-  const cobrado=confPart.filter(b=>b.pagado).length * precio;
-  // Por cobrar: particulares confirmados sin pagar
-  const porCobrar=confPart.filter(b=>!b.pagado).length * precio;
-
-  // Estimado OS: suma precio_os de cada obra social por cantidad de turnos
+  const cobrado=confPart.filter(b=>b.pagado).length*precio;
+  const porCobrar=confPart.filter(b=>!b.pagado).length*precio;
   const osMap={};
-  (proConfig.obras_sociales||[]).forEach(os=>{
-    if(typeof os==='object')osMap[os.nombre.toLowerCase()]=(os.precio_os||0);
-  });
+  (proConfig.obras_sociales||[]).forEach(os=>{if(typeof os==='object')osMap[os.nombre.toLowerCase()]=os.precio_os||0;});
   let estOS=0;
-  confOS.forEach(b=>{
-    const k=(b.obra_social||'').toLowerCase();
-    estOS+=osMap[k]||0;
-  });
-
-  const fmtPesos=n=>n?'$'+n.toLocaleString('es-AR'):'$0';
-
+  confOS.forEach(b=>{estOS+=osMap[(b.obra_social||'').toLowerCase()]||0;});
+  const fp=n=>n?'$'+n.toLocaleString('es-AR'):'$0';
   el.innerHTML=`
-    <!-- Filtros período -->
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
-      ${periodos.map(p=>`
-        <button onclick="_metPeriodo='${p.k}';renderMetricasPanel()"
-          style="padding:6px 12px;border-radius:20px;border:1.5px solid ${_metPeriodo===p.k?'var(--green)':'var(--line)'};
-          background:${_metPeriodo===p.k?'var(--green)':'transparent'};
-          color:${_metPeriodo===p.k?'#fff':'var(--ink-dim)'};
-          font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
-          ${p.label}
-        </button>`).join('')}
+      ${periodos.map(p=>`<button onclick="_metPeriodo='${p.k}';renderMetricasPanel()" style="padding:6px 12px;border-radius:20px;border:1.5px solid ${_metPeriodo===p.k?'var(--green)':'var(--line)'};background:${_metPeriodo===p.k?'var(--green)':'transparent'};color:${_metPeriodo===p.k?'#fff':'var(--ink-dim)'};font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">${p.label}</button>`).join('')}
     </div>
-
     <div class="met-grid-panel">
-      <!-- Turnos particulares confirmados -->
-      <div class="met-card">
-        <div class="met-card-label">Turnos</div>
-        <div class="met-card-num" style="color:var(--ink);">${conf.length}</div>
-        <div class="met-card-sub">${confPart.length} particulares · ${confOS.length} obra social</div>
-      </div>
-
-      <!-- Confirmados -->
-      <div class="met-card green">
-        <div class="met-card-label">Confirmados</div>
-        <div class="met-card-num">${conf.length}</div>
-        <div class="met-card-sub">${conf.length+canc?Math.round(conf.length/(conf.length+canc)*100):0}% del total</div>
-      </div>
-
-      <!-- Cancelados -->
-      <div class="met-card amber">
-        <div class="met-card-label">Cancelados</div>
-        <div class="met-card-num">${canc}</div>
-        <div class="met-card-sub">En el período</div>
-      </div>
-
-      <!-- Estimado OS -->
-      <div class="met-card blue">
-        <div class="met-card-label">Estimado obra social</div>
-        <div class="met-card-num">${fmtPesos(estOS)}</div>
-        <div class="met-card-sub">${confOS.length} sesiones · próximo cheque</div>
-      </div>
-
-      <!-- Cobrado particular -->
-      <div class="met-card green">
-        <div class="met-card-label">Cobrado</div>
-        <div class="met-card-num">${fmtPesos(cobrado)}</div>
-        <div class="met-card-sub">${confPart.filter(b=>b.pagado).length} particulares pagados</div>
-      </div>
-
-      <!-- Por cobrar particular -->
-      <div class="met-card">
-        <div class="met-card-label">Por cobrar</div>
-        <div class="met-card-num" style="color:var(--amber);">${fmtPesos(porCobrar)}</div>
-        <div class="met-card-sub">${confPart.filter(b=>!b.pagado).length} particulares sin pagar</div>
-      </div>
+      <div class="met-card"><div class="met-card-label">Turnos</div><div class="met-card-num">${conf.length}</div><div class="met-card-sub">${confPart.length} particulares · ${confOS.length} obra social</div></div>
+      <div class="met-card green"><div class="met-card-label">Confirmados</div><div class="met-card-num">${conf.length}</div><div class="met-card-sub">${conf.length+canc?Math.round(conf.length/(conf.length+canc)*100):0}% del total</div></div>
+      <div class="met-card amber"><div class="met-card-label">Cancelados</div><div class="met-card-num">${canc}</div><div class="met-card-sub">En el período</div></div>
+      <div class="met-card blue"><div class="met-card-label">Estimado obra social</div><div class="met-card-num">${fp(estOS)}</div><div class="met-card-sub">${confOS.length} sesiones · próximo cheque</div></div>
+      <div class="met-card green"><div class="met-card-label">Cobrado</div><div class="met-card-num">${fp(cobrado)}</div><div class="met-card-sub">${confPart.filter(b=>b.pagado).length} particulares pagados</div></div>
+      <div class="met-card"><div class="met-card-label">Por cobrar</div><div class="met-card-num" style="color:var(--amber);">${fp(porCobrar)}</div><div class="met-card-sub">${confPart.filter(b=>!b.pagado).length} sin pagar</div></div>
     </div>
-
     ${!precio?'<div style="margin-top:12px;padding:12px;background:var(--amber-bg);border-radius:10px;font-size:12px;color:#92400e;font-weight:500;">⚠️ Configurá el precio por sesión en Ajustes para ver los montos.</div>':''}
     ${confOS.length>0&&estOS===0?'<div style="margin-top:12px;padding:12px;background:var(--blue-bg);border-radius:10px;font-size:12px;color:var(--blue);font-weight:500;">💡 Tenés turnos de obra social. Configurá el monto por sesión en Ajustes → Obras sociales.</div>':''}
   `;
