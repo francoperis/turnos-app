@@ -887,7 +887,7 @@ function nextWorkDay(){
   }
   return fmt(today);
 }
-let proSelectedDay=nextWorkDay(),allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
+let proSelectedDay=fmt(today),allBookings={},blockedDays=new Set(),modalSelectedTime=null,generatedLink='';
 
 let proConfig={
   duracion:60,
