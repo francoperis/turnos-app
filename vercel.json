@@ -1,8 +1,10 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
     { "source": "/panel", "destination": "/index.html" },
     { "source": "/paciente", "destination": "/paciente.html" },
-    { "source": "/admin", "destination": "/admin.html" }
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/reset", "destination": "/reset.html" },
+    { "source": "/:slug([a-z0-9-]+)", "destination": "/paciente.html" },
+    { "source": "/", "destination": "/index.html" }
   ]
 }
