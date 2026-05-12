@@ -6,8 +6,11 @@ export default async function handler(req) {
   }
 
   const origin = req.headers.get('origin') || '';
-  const allowed = ['https://teresaarauz.vercel.app', 'http://localhost:3000'];
-  if (!allowed.some(o => origin.startsWith(o))) {
+  // Permitir solo turnos.paipai.ar (todos los clientes viven en rutas /:slug) y localhost
+  const isAllowed =
+    origin === 'https://turnos.paipai.ar' ||
+    origin.startsWith('http://localhost');
+  if (!isAllowed) {
     return new Response('Forbidden', { status: 403 });
   }
 
