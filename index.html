@@ -1084,16 +1084,16 @@ async function loadAll(){
 function startRealtime(){
   sb.removeChannel(sb.channel('turnos-rt'));
   sb.channel('turnos-rt')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'turnos'},payload=>{
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'turnos',filter:`profesional_id=eq.${PRO_ID}`},payload=>{
       if(payload.new&&payload.new.profesional_id===PRO_ID){
         showNotif('Nueva solicitud: '+payload.new.nombre_paciente);
         loadAll();
       }
     })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'turnos'},payload=>{
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'turnos',filter:`profesional_id=eq.${PRO_ID}`},payload=>{
       if(payload.new&&payload.new.profesional_id===PRO_ID)loadAll();
     })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'turnos'},()=>{loadAll();})
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'turnos',filter:`profesional_id=eq.${PRO_ID}`},()=>{loadAll();})
     .subscribe();
 }
 
