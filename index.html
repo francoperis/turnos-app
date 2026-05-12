@@ -208,7 +208,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 }
 
 /* SECCIONES */
-.sec-wrap{display:none;padding:22px 22px 32px;max-width:1000px;margin:0 auto;}
+.sec-wrap{display:none;padding:16px 16px 24px;}
 .sec-wrap.active{display:block;}
 @media(min-width:768px){
   /* En desktop sec-inicio es la home con todo el contenido */
@@ -242,7 +242,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .metric-card.pend .metric-accent{background:var(--amber);}
 @media(max-width:480px){.metric-num{font-size:22px;}.metric-card{padding:13px 12px;}}
 /* GRID */
-.pro-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;}
+.pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media(max-width:900px){.pro-grid{grid-template-columns:1fr;}}
 /* CARDS */
 .card{background:#fff;border-radius:12px;border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;}
@@ -286,7 +286,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .slot-action-right{right:0;background:var(--red);border-radius:0 12px 12px 0;}
 .slot-action-left .sa-icon,.slot-action-right .sa-icon{font-size:18px;line-height:1;}
 .slot-action-left span,.slot-action-right span{font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;}
-.slot-row{display:flex;align-items:center;gap:8px;padding:14px 12px;border-radius:12px;background:#fff;border:1.5px solid var(--line);flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
+.slot-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;border:1.5px solid var(--line);flex-wrap:nowrap;position:relative;z-index:1;transition:transform .2s ease,border-color .15s,background .15s;touch-action:pan-y;user-select:none;}
 .slot-row.booked{background:var(--green-bg);border-color:var(--green-light);}
 .slot-row.booked.unpaid{background:#fff8ed;border-color:#f0d89a;}
 .slot-time{font-size:14px;font-weight:700;width:48px;flex-shrink:0;color:var(--ink-soft);text-align:center;line-height:1.1;}
@@ -296,7 +296,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .slot-divider{width:1.5px;height:32px;background:var(--green-light);flex-shrink:0;border-radius:2px;}
 .slot-row.booked.unpaid .slot-divider{background:#f0d89a;}
 .slot-patient{flex:1;min-width:0;overflow:hidden;}
-.slot-patient strong{font-size:13px;font-weight:600;display:block;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slot-patient strong{font-size:13px;font-weight:600;display:block;color:var(--ink);}
 .slot-patient span{font-size:11px;color:var(--ink-dim);margin-top:1px;display:block;}
 .slot-patient .phone-row{display:flex;align-items:center;gap:5px;margin-top:2px;}
 .slot-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
@@ -1203,7 +1203,7 @@ function renderProDayDetail(key,date){
       const pagadoBadgeClass=bk.pagado?'slot-badge badge-booked':'slot-badge badge-unpaid';
       const pagadoLabel=bk.pagado?'Pagado':'Sin pagar';
       const pagadoBadgeEl=`<div class="${pagadoBadgeClass}" style="cursor:pointer;" onclick="togglePagado(this)" data-id="${bk.id}" data-pagado="${bk.pagado}">${pagadoLabel}</div>`;
-      html+=`<div class="slot-wrap" data-id="${bk.id}" data-nombre="${nombreSafe}" data-fecha="${key}" data-hora="${time}"><div class="slot-action-left"><div class="sa-icon">🕐</div><span>Agendar</span></div><div class="slot-action-right"><div class="sa-icon">🗑️</div><span>Eliminar</span></div><div class="slot-row booked ${unpaidClass}" data-id="${bk.id}"><div class="slot-time">${time}<small>hs</small></div><div class="slot-divider"></div><div class="slot-patient"><strong>${nombreSafe}</strong><div class="phone-row"><span>${telSafe}</span><button class="btn-copy-phone" onclick="copyPhone('${telSafe}',this)">Copiar</button></div><span>${modalidadText}</span></div>${deleteBtn}<div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadgeEl}</div></div></div>`;
+      html+=`<div class="slot-wrap" data-id="${bk.id}" data-nombre="${nombreSafe}" data-fecha="${key}" data-hora="${time}"><div class="slot-action-left"><div class="sa-icon">🕐</div><span>Agendar</span></div><div class="slot-action-right"><div class="sa-icon">🗑️</div><span>Eliminar</span></div><div class="slot-row booked ${unpaidClass}" data-id="${bk.id}"><div class="slot-time">${time}<small>hs</small></div><div class="slot-divider"></div><div class="slot-patient"><strong>${nombreSafe}</strong><div class="phone-row"><span>${telSafe}</span><button class="btn-copy-phone" onclick="copyPhone('${telSafe}',this)">Copiar</button><span style="color:var(--ink-dim);font-size:11px;margin-left:4px;">· ${modalidadText}</span></div></div>${deleteBtn}<div class="slot-badges"><div class="slot-badge ${bc}">${bt}</div>${pagadoBadgeEl}</div></div></div>`;
     }else if(isPastDay||isPastSlot){
       html+=`<div class="slot-row"><div class="slot-time" style="color:var(--line)">${time}</div><div class="slot-patient"><span style="color:var(--line)">—</span></div></div>`;
     }else if(!isBlocked){
