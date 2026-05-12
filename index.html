@@ -297,9 +297,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .slot-divider{width:1.5px;height:32px;background:var(--green-light);flex-shrink:0;border-radius:2px;}
 .slot-row.booked.unpaid .slot-divider{background:#f0d89a;}
 .slot-patient{flex:1;min-width:0;overflow:hidden;}
-.slot-patient strong{font-size:13px;font-weight:600;display:block;color:var(--ink);}
+.slot-patient strong{font-size:13px;font-weight:600;display:block;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .slot-patient span{font-size:11px;color:var(--ink-dim);margin-top:1px;display:block;}
-.slot-patient .phone-row{display:flex;align-items:center;gap:5px;margin-top:2px;}
+.slot-patient .phone-row{display:flex;align-items:center;gap:5px;margin-top:2px;flex-wrap:nowrap;min-width:0;}
+.slot-patient .phone-row>span:first-child{font-size:11px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex-shrink:1;}
+.slot-patient .phone-row>span:last-child{font-size:11px;color:var(--ink-dim);white-space:nowrap;flex-shrink:0;}
 .slot-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
 .slot-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;white-space:nowrap;}
 .badge-free{background:#fff;color:var(--ink-dim);border:1px solid var(--line);}
@@ -324,7 +326,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .req-meta{font-size:11px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:3px;}
 .req-tag{font-size:10px;font-weight:500;padding:1px 6px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;}
 .req-tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-light);font-weight:700;}
-.btn-copy-phone{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
+.btn-copy-phone{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;flex-shrink:0;white-space:nowrap;}
 .btn-copy-phone:hover{border-color:var(--green);color:var(--green);}
 .req-actions{display:flex;gap:6px;margin-top:8px;}
 .btn-confirm{flex:2;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 0;border-radius:7px;transition:opacity .15s;touch-action:manipulation;}
