@@ -211,7 +211,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .sec-wrap{display:none;padding:16px 16px 24px;}
 .sec-wrap.active{display:block;}
 @media(min-width:768px){
-  /* En desktop sec-inicio es la home con todo el contenido */
+  #sec-inicio .pro-grid>.card .card-head{padding:8px 12px;}
+  #sec-inicio .pro-grid>.card .cal-grid{padding:4px 8px 8px;}
 }
 
 .sec-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--ink);margin-bottom:4px;}
@@ -254,11 +255,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .btn-add{background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;transition:opacity .15s;white-space:nowrap;}
 .btn-add:hover{opacity:.88;}
 /* CALENDARIO */
-.cal-grid{padding:10px 12px 12px;}
+.cal-grid{padding:6px 8px 8px;}
 .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
-.cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.4px;padding:4px 0;}
-.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink);transition:all .12s;}
+.cal-day-name{text-align:center;font-size:10px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.4px;padding:2px 0;}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;color:var(--ink);transition:all .12s;}
 .cal-day:hover:not(.empty):not(.selected){background:var(--bg);}
 .cal-day.empty{pointer-events:none;opacity:0;}
 .cal-day.past{color:#b0b0b0;background:#f0eeeb;cursor:pointer;}
