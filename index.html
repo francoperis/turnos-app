@@ -957,7 +957,7 @@ async function doLogin(){
     btn.textContent='Entrar';btn.disabled=false;
     return;
   }
-  showPanel();
+  showPanel(data.user);
 }
 
 async function doRecover(){
@@ -977,12 +977,13 @@ async function doRecover(){
 function showRecover(){document.getElementById('login-card-wrap').style.display='none';document.getElementById('recover-card').style.display='block';}
 function showLogin(){document.getElementById('recover-card').style.display='none';document.getElementById('login-card-wrap').style.display='block';}
 
-async function showPanel(){
+async function showPanel(userArg){
   document.getElementById('login-screen').classList.remove('show');
   document.getElementById('panel').classList.add('visible');
   showLoader(true);
   // Cargar id y slug del profesional autenticado
-  const{data:{user}}=await sb.auth.getUser();
+  let user=userArg;
+  if(!user){const r=await sb.auth.getUser();user=r.data?.user;}
   if(!user){logout();return;}
   PRO_ID=user.id;
   const{data:pro,error:proErr}=await sb.from('profesionales').select('slug,nombre,config,activo,subscription_end,plan').eq('id',PRO_ID).single();
