@@ -359,8 +359,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .pac-badge.rec{background:var(--green-bg);color:var(--green);}
 .pac-badge.new{background:var(--amber-bg);color:var(--amber);}
 /* MÉTRICAS PANEL */
-.met-grid-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-@media(max-width:600px){.met-grid-panel{grid-template-columns:repeat(2,1fr);}}
+.met-grid-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+
 .met-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
 .met-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--line);border-radius:12px 0 0 12px;}
 .met-card.green::before{background:var(--green);}
@@ -839,12 +839,21 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 
       <div class="settings-section">
         <div class="settings-section-title">🏥 Obras sociales</div>
-        <div style="font-size:12px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">Agregá las obras sociales que aceptás. Los porcentajes de cobertura los configuramos cuando los tengas.</div>
-        <div class="os-list" id="os-list"></div>
-        <div class="os-add-row">
-          <input type="text" class="os-add-input" id="os-input" placeholder="Nombre (ej: IOSCOR)" onkeydown="if(event.key==='Enter')addOS()">
-          <button class="os-add-btn" type="button" onclick="addOS()">+ Agregar</button>
+        <div class="dur-toggle-row" style="margin-bottom:12px;">
+          <div>
+            <div class="dur-toggle-label">Acepto obras sociales</div>
+            <div class="dur-toggle-sub">Si está desactivado, los pacientes no verán el selector</div>
+          </div>
+          <div class="sw-toggle" id="acepta-os-toggle" onclick="toggleAceptaOS()"></div>
         </div>
+        <div id="os-config-section">
+          <div style="font-size:12px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">Agregá las obras sociales que aceptás y el monto que te pagan por sesión.</div>
+          <div class="os-list" id="os-list"></div>
+          <div class="os-add-row">
+            <input type="text" class="os-add-input" id="os-input" placeholder="Nombre (ej: IOSCOR)" onkeydown="if(event.key==='Enter')addOS()">
+            <button class="os-add-btn" type="button" onclick="addOS()">+ Agregar</button>
+          </div>
+        </div><!-- /os-config-section -->
       </div>
 
       <div class="settings-section" id="dur-pac-section">
@@ -1458,6 +1467,9 @@ function openSettings(){
   document.getElementById('cfg-alias').value=proConfig.alias||'';
   document.getElementById('cfg-cbu').value=proConfig.cbu||'';
   document.getElementById('cfg-direccion').value=proConfig.direccion||'';
+  const aceptaOS=proConfig.acepta_os!==false;
+  document.getElementById('acepta-os-toggle').classList.toggle('on',aceptaOS);
+  document.getElementById('os-config-section').style.display=aceptaOS?'block':'none';
   if(proConfig.direccion)previewDireccion();
   document.querySelectorAll('#cfg-dias .day-toggle-btn').forEach(btn=>{
     btn.classList.toggle('on',proConfig.dias.includes(parseInt(btn.getAttribute('data-day'))));
@@ -1542,6 +1554,7 @@ async function saveSettings(){
     mp:document.getElementById('cfg-mp').value.trim()||null,
     mn:document.getElementById('cfg-mn').value.trim()||null,
     direccion:document.getElementById('cfg-direccion').value.trim()||null,
+    acepta_os:document.getElementById('acepta-os-toggle').classList.contains('on'),
     dur_pac_activo:durPacOn,
     dur_pac:{...durPacData}
   };
@@ -1657,6 +1670,12 @@ function previewDireccion(){
   },600);
 }
 
+function toggleAceptaOS(){
+  const toggle=document.getElementById('acepta-os-toggle');
+  toggle.classList.toggle('on');
+  const on=toggle.classList.contains('on');
+  document.getElementById('os-config-section').style.display=on?'block':'none';
+}
 function toggleDurPac(){
   durPacOn=!durPacOn;
   renderDurPacToggle();
@@ -1748,24 +1767,35 @@ function syncReqListMobile(){}
 function renderPacientes(){
   const todos=Object.values(allBookings).flat();
   const confirmed=todos.filter(b=>b.estado==='confirmed');
+  // Construir mapa por teléfono incluyendo obra_social
   const map={};
   confirmed.forEach(b=>{
     const tel=b.telefono||'';
-    if(!map[tel]){map[tel]={nombre:b.nombre_paciente,tel,count:0};}
+    if(!map[tel]){map[tel]={nombre:b.nombre_paciente,tel,count:0,obra_social:b.obra_social||null};}
     map[tel].count++;
+    if(b.obra_social&&!map[tel].obra_social)map[tel].obra_social=b.obra_social;
   });
   const lista=Object.values(map).sort((a,b)=>b.count-a.count);
-  const nuevos=lista.filter(p=>p.count<=1);
-  const rec=lista.filter(p=>p.count>1);
   const el=document.getElementById('pac-list');
   if(!el)return;
   if(!lista.length){el.innerHTML='<div class="empty-req" style="padding:32px"><div class="big">◎</div>Sin pacientes todavía</div>';return;}
+  // Stats
+  const nuevos=lista.filter(p=>p.count<=1);
+  const rec=lista.filter(p=>p.count>1);
   const statsHtml=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px;border-bottom:1px solid var(--line);">
     <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--ink);">${lista.length}</div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-dim);margin-top:3px;">Total</div></div>
     <div style="background:var(--green-bg);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--green);">${rec.length}</div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--green);margin-top:3px;">Recurrentes</div></div>
     <div style="background:#fef3cd;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--amber);">${nuevos.length}</div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--amber);margin-top:3px;">Nuevos</div></div>
   </div>`;
-  const rows=(rec.length?'<div class="pac-section-title">Recurrentes</div>'+rec.map(p=>pacRow(p,true)).join(''):'')+(nuevos.length?'<div class="pac-section-title">Nuevos</div>'+nuevos.map(p=>pacRow(p,false)).join(''):'');
+  // Agrupar por obra social
+  const osNames=[...new Set(lista.map(p=>p.obra_social||'Particular'))];
+  let rows='';
+  osNames.forEach(os=>{
+    const grupo=lista.filter(p=>(p.obra_social||'Particular')===os);
+    if(!grupo.length)return;
+    rows+=`<div class="pac-section-title">${os==='Particular'?'👤 Particular':'🏥 '+os}</div>`;
+    rows+=grupo.map(p=>pacRow(p,p.count>1)).join('');
+  });
   el.innerHTML=statsHtml+rows;
 }
 function pacRow(p,isRec){
@@ -1804,7 +1834,16 @@ function renderMetricasPanel(){
     <div class="met-card"><div class="met-card-label">Turnos</div><div class="met-card-num">${conf.length}</div><div class="met-card-sub">${confPart.length} particulares · ${confOS.length} obra social</div></div>
     <div class="met-card green"><div class="met-card-label">Confirmados</div><div class="met-card-num">${conf.length}</div><div class="met-card-sub">${conf.length+canc?Math.round(conf.length/(conf.length+canc)*100):0}% del total</div></div>
     <div class="met-card amber"><div class="met-card-label">Cancelados</div><div class="met-card-num">${canc}</div><div class="met-card-sub">En el período</div></div>
-    <div class="met-card blue"><div class="met-card-label">Estimado obra social</div><div class="met-card-num">${fp(estOS)}</div><div class="met-card-sub">${confOS.length} sesiones · próximo cheque</div></div>
+    ${(proConfig.obras_sociales&&proConfig.obras_sociales.length>0)?
+      (proConfig.obras_sociales||[]).map(os=>{
+        const nombre=typeof os==='object'?os.nombre:os;
+        const precio_os=typeof os==='object'?os.precio_os||0:0;
+        const sesiones=confOS.filter(b=>(b.obra_social||'').toLowerCase()===nombre.toLowerCase()).length;
+        const est=sesiones*precio_os;
+        return `<div class="met-card blue"><div class="met-card-label">Estimado ${nombre}</div><div class="met-card-num">${fp(est)}</div><div class="met-card-sub">${sesiones} sesiones · próximo cheque</div></div>`;
+      }).join('')
+      :`<div class="met-card blue"><div class="met-card-label">Estimado obra social</div><div class="met-card-num">${fp(estOS)}</div><div class="met-card-sub">${confOS.length} sesiones · próximo cheque</div></div>`
+    }
     <div class="met-card green"><div class="met-card-label">Cobrado</div><div class="met-card-num">${fp(cobrado)}</div><div class="met-card-sub">${confPart.filter(b=>b.pagado).length} particulares pagados</div></div>
     <div class="met-card"><div class="met-card-label">Por cobrar</div><div class="met-card-num" style="color:var(--amber);">${fp(porCobrar)}</div><div class="met-card-sub">${confPart.filter(b=>!b.pagado).length} sin pagar</div></div>
   </div>
