@@ -432,6 +432,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .settings-section{padding:14px 16px;border-bottom:1px solid var(--line);}
 @media(min-width:600px){.settings-section{padding:16px 20px;}}
 .settings-section:last-of-type{border-bottom:none;}
+.dir-preview{margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--line);display:none;}
+.dir-preview.show{display:block;}
+.dir-preview iframe{width:100%;height:160px;border:none;display:block;}
+.dir-preview-label{font-size:11px;color:var(--ink-dim);padding:7px 10px;background:var(--bg);display:flex;align-items:center;gap:6px;}
 .settings-section-title{font-size:11px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
 .settings-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 @media(max-width:400px){.settings-row{grid-template-columns:1fr;}}
@@ -817,6 +821,19 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
         <div class="settings-field">
           <label class="settings-label">CBU (opcional)</label>
           <input type="text" class="settings-input" id="cfg-cbu" placeholder="22 dígitos" maxlength="22">
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">📍 Ubicación del consultorio</div>
+        <div style="font-size:12px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">Se muestra al paciente cuando elige modalidad Presencial.</div>
+        <div class="settings-field">
+          <label class="settings-label">Dirección</label>
+          <input type="text" class="settings-input" id="cfg-direccion" placeholder="Ej: Av. Corrientes 1234, Buenos Aires" oninput="previewDireccion()">
+        </div>
+        <div class="dir-preview" id="dir-preview">
+          <iframe id="dir-map" src="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="dir-preview-label">📍 <span id="dir-preview-label-text"></span></div>
         </div>
       </div>
 
@@ -1440,6 +1457,8 @@ function openSettings(){
   document.getElementById('cfg-mn').value=proConfig.mn||'';
   document.getElementById('cfg-alias').value=proConfig.alias||'';
   document.getElementById('cfg-cbu').value=proConfig.cbu||'';
+  document.getElementById('cfg-direccion').value=proConfig.direccion||'';
+  if(proConfig.direccion)previewDireccion();
   document.querySelectorAll('#cfg-dias .day-toggle-btn').forEach(btn=>{
     btn.classList.toggle('on',proConfig.dias.includes(parseInt(btn.getAttribute('data-day'))));
   });
@@ -1522,6 +1541,7 @@ async function saveSettings(){
     obras_sociales:[...osList],
     mp:document.getElementById('cfg-mp').value.trim()||null,
     mn:document.getElementById('cfg-mn').value.trim()||null,
+    direccion:document.getElementById('cfg-direccion').value.trim()||null,
     dur_pac_activo:durPacOn,
     dur_pac:{...durPacData}
   };
@@ -1620,6 +1640,21 @@ function renderDurPacToggle(){
   tog.classList.toggle('on',durPacOn);
   off.style.display=durPacOn?'none':'block';
   on.style.display=durPacOn?'block':'none';
+}
+
+function previewDireccion(){
+  const val=document.getElementById('cfg-direccion').value.trim();
+  const preview=document.getElementById('dir-preview');
+  const iframe=document.getElementById('dir-map');
+  const label=document.getElementById('dir-preview-label-text');
+  if(val.length<8){preview.classList.remove('show');return;}
+  clearTimeout(window._dirTimer);
+  window._dirTimer=setTimeout(()=>{
+    const q=encodeURIComponent(val);
+    iframe.src=`https://maps.google.com/maps?q=${q}&output=embed&z=15`;
+    label.textContent=val;
+    preview.classList.add('show');
+  },600);
 }
 
 function toggleDurPac(){
