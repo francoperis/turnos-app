@@ -317,27 +317,30 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .no-day-selected{text-align:center;padding:24px 20px;font-size:13px;color:var(--ink-dim);}
 .no-day-selected .big{font-size:28px;margin-bottom:8px;}
 /* SOLICITUDES */
-.req-list{padding:0;}
-.req-item{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px;}
-.req-item:last-child{border-bottom:none;}
+.req-list{padding:10px 12px;display:flex;flex-direction:column;gap:10px;}
+.req-item{background:#fff;border:1px solid var(--line);border-radius:14px;border-left:4px solid var(--amber);overflow:hidden;display:flex;flex-direction:column;gap:0;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.req-item-body{padding:14px 16px 10px;display:flex;flex-direction:column;gap:8px;}
 .req-header{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;}
-.req-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.2;flex:1;min-width:0;}
-.req-time{font-size:11px;font-weight:600;color:var(--green);white-space:nowrap;flex-shrink:0;}
-.req-meta{font-size:11px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:3px;}
-.req-tag{font-size:10px;font-weight:500;padding:1px 6px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;}
-.req-tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-light);font-weight:700;}
+.req-name{font-size:15px;font-weight:700;color:var(--ink);line-height:1.2;flex:1;min-width:0;}
+.req-date-badge{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;}
+.req-date-day{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;}
+.req-date-hora{font-size:12px;font-weight:600;color:var(--green);white-space:nowrap;}
+.req-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.req-tag{font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;display:inline-flex;align-items:center;gap:4px;}
+.req-tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-light);font-weight:600;}
+.req-tag.amber{background:var(--amber-bg);color:var(--amber);border-color:#f8d47a;font-weight:700;}
 .btn-copy-phone{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;flex-shrink:0;white-space:nowrap;}
 .btn-copy-phone:hover{border-color:var(--green);color:var(--green);}
-.req-actions{display:flex;gap:6px;margin-top:8px;}
-.btn-confirm{flex:2;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 0;border-radius:7px;transition:opacity .15s;touch-action:manipulation;}
-.btn-confirm:hover{opacity:.85;}
-.btn-decline{flex:1;background:transparent;color:var(--ink-soft);border:1.5px solid #d0ccc7;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
-.btn-decline:hover{border-color:var(--red);color:var(--red);}
-.btn-details{flex:1;background:transparent;color:var(--green);border:1.5px solid var(--green-light);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:8px 0;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
+.req-actions{display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--line);}
+.btn-confirm{background:var(--green);color:#fff;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:12px 0;transition:opacity .15s;touch-action:manipulation;border-radius:0 0 0 10px;}
+.btn-confirm:hover{opacity:.88;}
+.btn-decline{background:transparent;color:var(--ink-soft);border:none;border-left:1px solid var(--line);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;padding:12px 0;cursor:pointer;transition:all .15s;text-align:center;}
+.btn-decline:hover{background:#fef2f2;color:var(--red);}
+.btn-details{background:transparent;color:var(--green);border:none;border-left:1px solid var(--line);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;padding:12px 0;cursor:pointer;transition:all .15s;text-align:center;border-radius:0 0 10px 0;}
 .btn-details:hover{background:var(--green-bg);}
-.req-warning{font-size:11px;font-weight:600;color:#b45309;background:#fef9ec;border:1px solid #f8e4b0;border-radius:6px;padding:4px 8px;margin-top:4px;display:flex;align-items:center;gap:5px;}
-.empty-req{padding:24px 16px;text-align:center;font-size:13px;color:var(--ink-dim);}
-.empty-req .big{font-size:26px;margin-bottom:8px;}
+.req-warning{font-size:11px;font-weight:600;color:#b45309;background:#fef9ec;border:1px solid #f8e4b0;border-radius:6px;padding:4px 8px;display:flex;align-items:center;gap:5px;}
+.empty-req{padding:36px 16px;text-align:center;font-size:13px;color:var(--ink-dim);}
+.empty-req .big{font-size:32px;margin-bottom:10px;}
 .new-badge{display:inline-block;background:var(--green-bg);color:var(--green);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;margin-left:6px;}
 /* PACIENTES */
 .pac-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-dim);padding:12px 16px 8px;border-top:1px solid var(--line);}
@@ -1273,13 +1276,25 @@ function renderRequests(){
       ?`<div class="req-warning">⚠️ Teléfono registrado como <strong>${esc(nombreRegistrado)}</strong></div>`
       :'';
     const bNombreSafe=esc(b.nombre_paciente);
+    const telSafeReq=esc(b.telefono||'');
+    const modalidadTag=b.modalidad==='virtual'?'<span class="req-tag">💻 Virtual</span>':b.modalidad==='presencial'?'<span class="req-tag">📍 Presencial</span>':'';
+    const osTag=b.obra_social?`<span class="req-tag">${esc(b.obra_social)}</span>`:'';
+    const telTag=telSafeReq?`<span class="req-tag">📞 ${telSafeReq}</span>`:'';
+    const nuevoTagFinal=sesiones<2?'<span class="req-tag amber">✨ Nuevo</span>':'';
     return `<div class="req-item">
-      <div class="req-header">
-        <span class="req-name">${bNombreSafe}</span>
-        <span class="req-time">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} · ${b.hora}</span>
+      <div class="req-item-body">
+        <div class="req-header">
+          <span class="req-name">${bNombreSafe}</span>
+          <div class="req-date-badge">
+            <span class="req-date-day">${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}</span>
+            <span class="req-date-hora">${b.hora}hs</span>
+          </div>
+        </div>
+        <div class="req-meta">
+          ${nuevoTagFinal}${modalidadTag}${osTag}${telTag}${compBtn}
+        </div>
+        ${warningTel}
       </div>
-      ${nuevoTag?`<div style="display:flex;align-items:center;gap:6px;">${nuevoTag}${compBtn}</div>`:`${compBtn}`}
-      ${warningTel}
       <div class="req-actions">
         <button class="btn-confirm" onclick="confirmBooking('${b.id}')">✓ Confirmar</button>
         <button class="btn-decline" onclick="declineBooking('${b.id}')">Rechazar</button>
