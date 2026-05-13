@@ -32,6 +32,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .divider{border:none;border-top:1px solid var(--line);margin:20px 0;}
 /* Modalidad */
 .mod-btns{display:flex;gap:8px;margin-top:4px;}
+.dir-block{background:#f7f5f2;border:1px solid var(--line,#e8e4df);border-radius:12px;overflow:hidden;margin-top:10px;display:none;}
+.dir-block.show{display:block;}
+.dir-block-map{width:100%;height:140px;border:none;display:block;}
+.dir-block-footer{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;}
+.dir-block-text{font-size:12px;color:#555;flex:1;line-height:1.4;}
+.dir-block-btn{font-size:11px;font-weight:600;color:var(--green,#2d7d5f);background:var(--green-bg,#edf5f1);border:none;border-radius:7px;padding:6px 12px;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;}
 .mod-btn{flex:1;padding:10px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink-soft);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
 .mod-btn.on{background:var(--green);color:#fff;border-color:var(--green);}
 /* FIXED SLOT */
@@ -143,6 +149,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
           <button type="button" class="mod-btn" id="mod-virtual" onclick="setMod('virtual')">Virtual</button>
         </div>
       </div>
+      <!-- Dirección presencial -->
+      <div class="dir-block" id="dir-block">
+        <iframe class="dir-block-map" id="dir-block-map" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="dir-block-footer">
+          <div class="dir-block-text" id="dir-block-text"></div>
+          <button class="dir-block-btn" onclick="abrirMaps()">📍 Cómo llegar</button>
+        </div>
+      </div>
 
       <hr class="divider">
 
@@ -173,7 +187,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
           <div class="time-grid" id="time-grid"></div>
         </div>
       </div>
-
       <hr class="divider">
 
       <!-- Método de pago -->
@@ -424,6 +437,20 @@ function setMod(m){
   selectedMod=m;
   document.getElementById('mod-presencial').classList.toggle('on',m==='presencial');
   document.getElementById('mod-virtual').classList.toggle('on',m==='virtual');
+  const dir=proConfig&&proConfig.direccion;
+  const block=document.getElementById('dir-block');
+  if(m==='presencial'&&dir){
+    const q=encodeURIComponent(dir);
+    document.getElementById('dir-block-map').src=`https://maps.google.com/maps?q=${q}&output=embed&z=15`;
+    document.getElementById('dir-block-text').textContent=dir;
+    block.classList.add('show');
+  } else {
+    block.classList.remove('show');
+  }
+}
+function abrirMaps(){
+  const dir=proConfig&&proConfig.direccion;
+  if(dir)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(dir),'_blank');
 }
 
 function setPago(p){
