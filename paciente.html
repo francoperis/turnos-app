@@ -14,7 +14,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 .loader-overlay.hide{opacity:0;pointer-events:none;}
 .spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--green);animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 20px 60px;}
+.page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px 80px;}
 .card{background:var(--white);border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow-md);width:100%;max-width:440px;overflow:hidden;}
 .card-header{background:var(--green);padding:22px 28px 20px;}
 .header-label{font-size:11px;font-weight:500;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;}
@@ -24,7 +24,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
 /* Obras sociales en header */
 .header-os{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
 .header-os-chip{font-size:10px;font-weight:600;color:rgba(255,255,255,.8);background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:2px 8px;}
-.card-body{padding:24px 28px;}
+.card-body{padding:28px 32px;}
 .form-group{margin-bottom:16px;}
 .form-label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
 .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:9px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
@@ -201,7 +201,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);min-h
       <!-- Método de pago -->
       <div class="pago-section" id="pago-section">
 
-        <div class="form-group">
+        <div class="form-group" id="os-field-wrap">
           <label class="form-label">Obra social</label>
           <select class="form-input" id="p-os" onchange="onOSChange()">
             <option value="particular">No tengo / Particular</option>
@@ -394,16 +394,21 @@ function renderConfig(){
       return `<span class="header-os-chip">${nombre}</span>`;
     }).join('');
   }
-  // Selector OS — siempre visible, particular por default
+  // Selector OS — solo visible si el profesional tiene OS configuradas
+  const osSection=document.getElementById('os-field-wrap');
   const sel=document.getElementById('p-os');
+  const tieneOS=proConfig.obras_sociales&&proConfig.obras_sociales.length>0&&proConfig.acepta_os!==false;
+  if(osSection)osSection.style.display=tieneOS?'block':'none';
   sel.innerHTML='<option value="particular">No tengo / Particular</option>';
-  (proConfig.obras_sociales||[]).forEach(os=>{
-    const nombre=typeof os==='object'?os.nombre:os;
-    const opt=document.createElement('option');
-    opt.value=nombre;
-    opt.textContent=nombre;
-    sel.appendChild(opt);
-  });
+  if(tieneOS){
+    (proConfig.obras_sociales||[]).forEach(os=>{
+      const nombre=typeof os==='object'?os.nombre:os;
+      const opt=document.createElement('option');
+      opt.value=nombre;
+      opt.textContent=nombre;
+      sel.appendChild(opt);
+    });
+  }
   renderTransferenciaDatos();
 }
 
