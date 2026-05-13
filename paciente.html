@@ -334,6 +334,7 @@ async function loadTaken(){
       proConfig={...proConfig,...pro.config};
     }
     renderConfig();
+    setMod(selectedMod); // mostrar mapa si tiene dirección y modalidad es presencial
 
     // 2 — Cargar turnos y días bloqueados usando profesional_id
     const[t,b]=await Promise.all([
