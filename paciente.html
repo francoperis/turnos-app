@@ -637,7 +637,16 @@ async function submitForm(){
       (precioFinal?'<div><strong>Total a pagar:</strong> $'+precioFinal.toLocaleString('es-AR')+'</div>':'')+
       '<div><strong>Pago:</strong> '+pagoText+'</div>'+
       '<div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:600;">Pendiente de confirmación</div>';
-  }catch(e){errEl.classList.add('show');btn.disabled=false;btn.textContent='Solicitar turno';console.error(e);}
+  }catch(e){
+    const isDoubleBooking=e?.code==='23505'||e?.message?.includes('unique_turno_slot');
+    errEl.textContent=isDoubleBooking
+      ?'Este horario acaba de ser reservado por otra persona. Por favor elegí otro.'
+      :'Hubo un error. Por favor intentá de nuevo.';
+    errEl.classList.add('show');
+    if(isDoubleBooking)await loadTaken();
+    btn.disabled=false;btn.textContent='Solicitar turno';
+    console.error(e);
+  }
 }
 
 loadTaken();
