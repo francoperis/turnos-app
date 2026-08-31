@@ -228,6 +228,20 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
 .link-url{font-size:12px;font-weight:500;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:500px;}
 .btn-copy{background:var(--green);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;transition:opacity .15s;white-space:nowrap;flex-shrink:0;}
 .btn-copy:hover{opacity:.88;}
+/* REDES — tarjeta Link para pacientes */
+.redes-head{display:flex;align-items:center;gap:12px;padding:16px;}
+.redes-icon{width:40px;height:40px;border-radius:11px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.redes-icon svg{width:20px;height:20px;stroke:var(--green);}
+.redes-htxt h3{margin:0;font-size:15px;font-weight:600;color:var(--ink);}
+.redes-htxt p{margin:2px 0 0;font-size:12px;color:var(--ink-dim);}
+.redes-body{padding:0 16px 16px;}
+.redes-desc{font-size:13px;color:var(--ink-soft);line-height:1.45;margin:0 0 12px;}
+.redes-linkbox{display:flex;align-items:center;gap:10px;background:var(--green-bg);border:1px solid var(--green-light);border-radius:10px;padding:11px 13px;margin-bottom:12px;min-width:0;}
+.redes-linkbox svg{width:16px;height:16px;stroke:var(--green);flex-shrink:0;}
+.redes-linkbox .redes-url{font-size:13px;font-weight:600;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.redes-copy{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--green);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;padding:12px;border-radius:10px;cursor:pointer;transition:opacity .15s;}
+.redes-copy:hover{opacity:.88;}
+.redes-copy svg{width:16px;height:16px;stroke:#fff;flex-shrink:0;}
 /* MÉTRICAS */
 .metrics-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
 .metric-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative;overflow:hidden;}
@@ -671,16 +685,27 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);}
     <div class="sec-wrap" id="sec-redes">
       <div class="sec-title">Redes</div>
       <div class="sec-sub">Compartí tu agenda con tus pacientes</div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-head"><h3>Link para pacientes</h3></div>
-        <div style="padding:14px 16px;">
-          <div style="font-size:13px;color:var(--ink-dim);margin-bottom:8px;">Compartí este link para que tus pacientes saquen turnos</div>
-          <div class="link-url" id="public-link-text" style="margin-bottom:10px;"></div>
-          <button class="btn-copy" onclick="copyLink(this)">Copiar link</button>
-        </div>
-      </div>
       <div class="card">
-        <div class="card-head"><h3>Generador de Historias</h3></div>
+        <div class="redes-head">
+          <div class="redes-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div class="redes-htxt">
+            <h3>Link para pacientes</h3>
+            <p>Tu página de reservas</p>
+          </div>
+        </div>
+        <div class="redes-body">
+          <p class="redes-desc">Compartí este link para que tus pacientes saquen turnos solos.</p>
+          <div class="redes-linkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg>
+            <span class="redes-url" id="public-link-text"></span>
+          </div>
+          <button class="redes-copy" onclick="copyLink(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copy-label">Copiar link</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1437,7 +1462,7 @@ function copyPhone(phone,btn){
   btn.textContent='✓';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
   setTimeout(()=>{btn.textContent='Copiar';btn.style.borderColor='';btn.style.color='';},2000);
 }
-function copyLink(btn){navigator.clipboard.writeText(document.getElementById('public-link-text').textContent).catch(()=>{});btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar link',2000);}
+function copyLink(btn){navigator.clipboard.writeText(document.getElementById('public-link-text').textContent).catch(()=>{});const lbl=btn.querySelector('.copy-label')||btn;const orig=lbl.getAttribute('data-orig')||lbl.textContent;lbl.setAttribute('data-orig',orig);lbl.textContent='✓ ¡Copiado!';setTimeout(()=>lbl.textContent=orig,2000);}
 
 // ── AJUSTES ────────────────────────────────────────────────
 let osList=[];
