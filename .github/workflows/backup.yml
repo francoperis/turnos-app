@@ -45,17 +45,6 @@ jobs:
             echo "ERROR: falta el secret SUPABASE_DB_PASSWORD." >&2
             exit 1
           fi
-          # Diagnóstico seguro (no revela la contraseña, solo su forma):
-          echo "Diagnóstico SUPABASE_DB_PASSWORD → longitud=${#PGPASSWORD}"
-          trimmed="$(printf '%s' "$PGPASSWORD" | tr -d '[:space:]')"
-          echo "  longitud sin espacios/saltos=${#trimmed}"
-          if printf '%s' "$PGPASSWORD" | grep -q '[^A-Za-z0-9]'; then
-            echo "  contiene símbolos o espacios: SI"
-          else
-            echo "  solo letras y números: SI"
-          fi
-          echo "  usuario de conexión=$PGUSER"
-          echo "  huella (sha256, no reversible)=$(printf '%s' "$PGPASSWORD" | sha256sum | cut -c1-16)"
           ./scripts/backup-db.sh
 
       # Cifrado simétrico AES-256 en el propio runner. El .sql.gz en claro se
