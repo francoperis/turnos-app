@@ -55,6 +55,7 @@ jobs:
             echo "  solo letras y números: SI"
           fi
           echo "  usuario de conexión=$PGUSER"
+          echo "  huella (sha256, no reversible)=$(printf '%s' "$PGPASSWORD" | sha256sum | cut -c1-16)"
           ./scripts/backup-db.sh
 
       # Cifrado simétrico AES-256 en el propio runner. El .sql.gz en claro se
