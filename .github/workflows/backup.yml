@@ -1,0 +1,62 @@
+name: Backup diario de la base
+
+# Corre todos los días a las 07:00 UTC (~04:00 Argentina), hora de bajo tráfico,
+# y también se puede disparar a mano desde la pestaña Actions.
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+# Evita que dos backups se pisen si uno tarda.
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # El pg_dump debe ser >= al Postgres de Supabase (15/17). El runner trae
+      # 16 por defecto, así que instalamos el cliente 17 desde el repo oficial.
+      - name: Instalar postgresql-client 17
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Generar dump
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BACKUP_SCHEMAS: 'public,auth'   # datos de la app + logins de Supabase Auth
+          BACKUP_RETENTION: '0'           # sin poda local: cada corrida sube 1 artifact
+        run: ./scripts/backup-db.sh
+
+      # Cifrado simétrico AES-256 en el propio runner. El .sql.gz en claro se
+      # borra: solo el .gpg sale de este job.
+      - name: Cifrar dump
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "ERROR: falta el secret BACKUP_PASSPHRASE." >&2
+            exit 1
+          fi
+          for f in backups/*.sql.gz; do
+            gpg --batch --yes --symmetric --cipher-algo AES256 \
+                --passphrase "$BACKUP_PASSPHRASE" "$f"
+            rm -f "$f"
+          done
+          ls -lh backups/
+
+      - name: Subir backup cifrado
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: backups/*.gpg
+          retention-days: 90
+          if-no-files-found: error

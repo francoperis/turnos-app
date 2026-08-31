@@ -132,6 +132,46 @@ Notas de restauración:
 - Verificá siempre un backup restaurándolo alguna vez en un proyecto de prueba:
   un backup sin probar no es un backup.
 
+### Backup automático diario (GitHub Actions)
+
+El workflow `.github/workflows/backup.yml` corre **todos los días a las 07:00 UTC**
+(~04:00 AR) y también se puede disparar a mano desde la pestaña **Actions →
+Backup diario de la base → Run workflow**. Qué hace y por qué:
+
+- Reutiliza `scripts/backup-db.sh` para hacer el dump de `public` + `auth`
+  (datos de la app **y** los logins de los profesionales).
+- **Cifra el dump con GPG (AES-256) dentro del runner**, antes de guardarlo. El
+  `.sql.gz` en claro se borra: solo sale del job el archivo `.gpg`. Ni GitHub ni
+  nadie sin la passphrase puede leer los datos de pacientes. **Requisito legal/de
+  confianza, no opcional.**
+- Guarda el `.gpg` como **artifact con 90 días de retención** (≈90 backups
+  diarios). GitHub te **avisa por email si el workflow falla** (un backup que
+  falla en silencio es el peor escenario).
+
+**Setup (una sola vez):** en GitHub → **Settings → Secrets and variables →
+Actions → New repository secret**, cargá:
+
+| Secret | Valor |
+|---|---|
+| `DATABASE_URL` | La misma cadena del **Session pooler** (puerto 5432). |
+| `BACKUP_PASSPHRASE` | Una passphrase larga y aleatoria para cifrar los backups. **Guardala en tu gestor de contraseñas: sin ella los backups son irrecuperables.** |
+
+**Descargar y restaurar un backup automático:**
+```bash
+# 1) Bajá el artifact desde Actions → (la corrida) → Artifacts, y descomprimí el zip.
+# 2) Descifrá + restaurá en un proyecto Supabase nuevo/vacío:
+gpg -d turnos-AAAAMMDD-HHMMSS.sql.gz.gpg \
+  | gunzip -c \
+  | psql "postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"
+# (te pide la BACKUP_PASSPHRASE al descifrar)
+```
+
+> **Durabilidad a futuro:** los backups viven en GitHub (cifrados) con 90 días de
+> retención. Si querés retención más larga o copia fuera de GitHub, el paso
+> natural es agregar un `upload` a object storage barato (Cloudflare R2 /
+> Backblaze B2) al final del workflow — como ya sale cifrado, subirlo a
+> cualquier lado es seguro.
+
 ## Desarrollo local
 
 Al no haber build, alcanza con servir la carpeta. Para probar también las
