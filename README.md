@@ -73,6 +73,65 @@ Si el deploy se cayó tras un tiempo de inactividad, seguí este orden:
 - [ ] Redeploy verde en Vercel
 - [ ] `turnos.paipai.ar` resuelve y el certificado es válido
 
+## 💾 Backups de la base (Supabase / Postgres)
+
+Supabase es Postgres, así que el respaldo se hace con `pg_dump`. El script
+`scripts/backup-db.sh` genera un dump completo comprimido (`.sql.gz`).
+
+### Requisitos (una sola vez)
+- **`postgresql-client` v17** (el `pg_dump` debe ser ≥ que el Postgres del
+  servidor, o falla con *"server version mismatch"*).
+  - macOS: `brew install postgresql@17`
+  - Ubuntu/Debian: `sudo apt install postgresql-client-17`
+- `gzip` (ya viene en macOS/Linux).
+
+### Configurar la conexión
+En `.env` cargá `DATABASE_URL` con la cadena del **Session pooler** (puerto
+5432): Dashboard → **Project Settings → Database → Connection string →
+Session pooler**. Ver `.env.example`.
+
+> ⚠️ Usá el **Session pooler (5432)**, no la conexión directa (en el free tier
+> hoy es solo IPv6) ni el pooler *transaction* (6543, no sirve para `pg_dump`).
+
+### Hacer un backup a mano
+```bash
+./scripts/backup-db.sh
+# → backups/turnos-AAAAMMDD-HHMMSS.sql.gz
+```
+Variables opcionales:
+- `BACKUP_DIR=/ruta` — dónde guardar (default `backups/`).
+- `BACKUP_SCHEMAS="public,auth"` — esquemas a incluir (default `public`).
+- `BACKUP_RETENTION=14` — cuántos dumps conservar (0 = no borrar).
+
+Por defecto respalda el esquema **`public`** (todos los datos de la app:
+`profesionales`, `pacientes`, `turnos`, `pagos`, etc.). Los **logins** de los
+profesionales viven en el esquema `auth` de Supabase (Supabase Auth): si querés
+respaldarlos también, corré con `BACKUP_SCHEMAS="public,auth"`. Restaurar `auth`
+es más delicado (ver abajo).
+
+### Restaurar
+El dump es SQL plano comprimido. Para restaurarlo en un proyecto Supabase
+**nuevo/vacío** (recuperación ante desastre):
+
+```bash
+gunzip -c backups/turnos-AAAAMMDD-HHMMSS.sql.gz \
+  | psql "postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"
+```
+
+Notas de restauración:
+- El dump se genera con `--no-owner --no-privileges`, así que no arrastra los
+  roles internos de Supabase.
+- Restaurar el esquema **`public`** sobre uno ya existente puede chocar con
+  objetos presentes; lo más limpio es restaurar en un proyecto nuevo. Para
+  restaurar solo los datos sobre un esquema ya creado, revisá/aplicá partes del
+  `.sql` a mano.
+- El esquema **`auth`**: no lo pises entero en un proyecto ya en uso. Si migraste
+  a un proyecto nuevo, lo habitual es recrear los profesionales con el panel de
+  admin (que ya crea el usuario en Auth), o importar solo `auth.users` con
+  cuidado. Los `profesional_id`/`user_id` de `public` referencian esos usuarios.
+- Verificá siempre un backup restaurándolo alguna vez en un proyecto de prueba:
+  un backup sin probar no es un backup.
+
 ## Desarrollo local
 
 Al no haber build, alcanza con servir la carpeta. Para probar también las

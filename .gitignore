@@ -6,6 +6,11 @@
 # Vercel
 .vercel
 
+# Backups de la base — nunca commitear datos de pacientes
+backups/
+*.sql
+*.sql.gz
+
 # Sistema operativo / editores
 .DS_Store
 Thumbs.db
