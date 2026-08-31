@@ -153,8 +153,12 @@ Actions → New repository secret**, cargá:
 
 | Secret | Valor |
 |---|---|
-| `DATABASE_URL` | La misma cadena del **Session pooler** (puerto 5432). |
+| `SUPABASE_DB_PASSWORD` | **Solo la contraseña** de la base (Settings → Database → Reset database password). Nada de armar URLs: los datos de host/usuario ya están en el workflow. |
 | `BACKUP_PASSPHRASE` | Una passphrase larga y aleatoria para cifrar los backups. **Guardala en tu gestor de contraseñas: sin ella los backups son irrecuperables.** |
+
+> El host, puerto y usuario de conexión están escritos directamente en
+> `.github/workflows/backup.yml` (no son secretos). Si algún día migrás de
+> proyecto/región en Supabase, actualizá ahí los valores `PGHOST` / `PGUSER`.
 
 **Descargar y restaurar un backup automático:**
 ```bash

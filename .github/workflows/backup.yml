@@ -31,10 +31,21 @@ jobs:
 
       - name: Generar dump
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Datos de conexión fijos (no son secretos). Confirmados como válidos
+          # en la conexión: solo la contraseña va aparte, como secret.
+          PGHOST: aws-1-sa-east-1.pooler.supabase.com
+          PGPORT: '5432'
+          PGUSER: postgres.sqqetiycodpfhoeqwguv
+          PGDATABASE: postgres
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           BACKUP_SCHEMAS: 'public,auth'   # datos de la app + logins de Supabase Auth
           BACKUP_RETENTION: '0'           # sin poda local: cada corrida sube 1 artifact
-        run: ./scripts/backup-db.sh
+        run: |
+          if [ -z "$PGPASSWORD" ]; then
+            echo "ERROR: falta el secret SUPABASE_DB_PASSWORD." >&2
+            exit 1
+          fi
+          ./scripts/backup-db.sh
 
       # Cifrado simétrico AES-256 en el propio runner. El .sql.gz en claro se
       # borra: solo el .gpg sale de este job.
