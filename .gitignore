@@ -1,0 +1,13 @@
+# Entorno local — nunca commitear claves reales
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
