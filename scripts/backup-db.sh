@@ -2,14 +2,16 @@
 #
 # backup-db.sh — Dump completo de la base Supabase (Postgres) a un .sql.gz
 #
+# Dos formas de indicar la conexión:
+#   A) DATABASE_URL="postgresql://..."  (cómodo para uso local, ver .env.example)
+#   B) Variables PG* estándar de Postgres: PGHOST, PGPORT, PGUSER, PGDATABASE
+#      y PGPASSWORD. Así la contraseña va sola (sin encodear en una URL), que es
+#      como lo usa el workflow de GitHub Actions.
+#
 # Uso:
 #   DATABASE_URL="postgresql://..." ./scripts/backup-db.sh
 #   ./scripts/backup-db.sh                 # toma DATABASE_URL de .env si existe
 #   BACKUP_DIR=/ruta ./scripts/backup-db.sh
-#
-# DATABASE_URL: cadena del "Session pooler" de Supabase (puerto 5432).
-#   Dashboard → Project Settings → Database → Connection string → Session pooler.
-#   Formato: postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
 #
 # Requisitos: pg_dump (postgresql-client >= 17) y gzip.
 #
@@ -23,16 +25,22 @@ RETENTION="${BACKUP_RETENTION:-14}"      # cuántos dumps conservar (0 = no borr
 # ── Cargar .env si no viene DATABASE_URL en el entorno ───────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-if [[ -z "${DATABASE_URL:-}" && -f "$ROOT_DIR/.env" ]]; then
+if [[ -z "${DATABASE_URL:-}" && -z "${PGHOST:-}" && -f "$ROOT_DIR/.env" ]]; then
   # Exporta solo DATABASE_URL desde .env, sin ejecutar el archivo entero
   DATABASE_URL="$(grep -E '^\s*DATABASE_URL=' "$ROOT_DIR/.env" | tail -1 | cut -d= -f2- | sed 's/^["'\'']//; s/["'\'']$//')"
 fi
 
-# ── Validaciones ─────────────────────────────────────────────────────────
-if [[ -z "${DATABASE_URL:-}" ]]; then
-  echo "ERROR: falta DATABASE_URL (pasala por entorno o ponela en .env)." >&2
+# ── Resolver cómo se conecta pg_dump ─────────────────────────────────────
+# Si hay DATABASE_URL, se pasa como argumento. Si no, se usan las PG* del entorno
+# (pg_dump las lee solo cuando no recibe una cadena de conexión).
+CONN=()
+if [[ -n "${DATABASE_URL:-}" ]]; then
+  CONN=("$DATABASE_URL")
+elif [[ -z "${PGHOST:-}" ]]; then
+  echo "ERROR: falta la conexión: definí DATABASE_URL, o las variables PGHOST/PGUSER/PGPASSWORD." >&2
   exit 1
 fi
+
 if ! command -v pg_dump >/dev/null 2>&1; then
   echo "ERROR: pg_dump no está instalado (necesitás postgresql-client >= 17)." >&2
   exit 1
@@ -53,8 +61,8 @@ done
 
 echo "→ Respaldando esquema(s) [$SCHEMAS] a $OUT ..."
 # --no-owner / --no-privileges: evita errores por roles propios de Supabase al restaurar.
-# --no-comments: dumps más limpios. Formato plano (SQL) para poder leerlo y restaurar con psql.
-pg_dump "$DATABASE_URL" \
+# Formato plano (SQL) para poder leerlo y restaurar con psql.
+pg_dump "${CONN[@]+"${CONN[@]}"}" \
   "${SCHEMA_FLAGS[@]}" \
   --no-owner \
   --no-privileges \
