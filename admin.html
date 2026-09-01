@@ -142,6 +142,10 @@ html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color
   .sus-table{display:none;}
   .sus-cards{display:block;}
   .met-grid{grid-template-columns:repeat(2,1fr);}
+  /* Simplificación mobile: 3 pestañas, Inicio más limpio, MRR visible */
+  .bn-item[data-s="suscripciones"],.bn-item[data-s="metricas"]{display:none;}
+  .inicio-grid{display:none;}
+  .mrr-mobile{display:block;}
 
   /* BOTTOM NAV — negro con acento mint */
   .bottom-nav{
@@ -241,7 +245,14 @@ html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color
 .pro-card-sub{font-size:12px;color:var(--ink3);}
 .pro-card-nota{font-size:11px;color:var(--ink2);font-style:italic;padding:5px 8px;background:var(--bg);border-radius:5px;border-left:2px solid var(--line);}
 .pro-card-mid{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-.pro-card-bot{display:flex;gap:6px;flex-wrap:wrap;}
+.pro-card-bot{display:flex;gap:8px;align-items:stretch;}
+.pro-card-bot .pay{flex:1;text-align:center;justify-content:center;padding:9px 12px;font-size:12px;}
+.pro-menu{position:relative;flex-shrink:0;}
+.pro-menu .more{height:100%;padding:0 14px;font-size:16px;line-height:1;color:var(--ink2);}
+.pro-menu-list{position:absolute;right:0;bottom:calc(100% + 6px);min-width:170px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:6px;display:none;flex-direction:column;gap:4px;z-index:40;}
+.pro-menu.open .pro-menu-list{display:flex;}
+.pro-menu-list .btn{width:100%;text-align:left;padding:9px 12px;font-size:12px;}
+.mrr-mobile{display:none;}
 
 /* SUSCRIPCIONES tabla */
 .sus-table{width:100%;border-collapse:collapse;}
@@ -391,6 +402,9 @@ textarea.mi{resize:vertical;line-height:1.5;min-height:68px;}
           <div class="stat-l">Vencidos <span class="tip" title="Suscripción expirada, sin acceso">?</span></div>
           <div class="stat-n" id="st-venc">—</div>
         </div>
+      </div>
+      <div class="card mrr-mobile" style="margin-bottom:14px;">
+        <div class="row"><div class="row-info"><div class="row-name">💰 Ingresos del mes</div><div class="row-sub">Total cobrado en el mes actual</div></div><div class="row-right" id="st-mrr" style="font-size:18px;font-weight:700;color:var(--green);">—</div></div>
       </div>
       <div class="inicio-grid">
         <div>
@@ -687,6 +701,8 @@ function goTo(sec,btn){
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.addEventListener('click',e=>{if(e.target.classList.contains('modal-bg'))e.target.classList.remove('open');});
+function toggleProMenu(e,btn){e.stopPropagation();const m=btn.closest('.pro-menu');const wasOpen=m.classList.contains('open');document.querySelectorAll('.pro-menu.open').forEach(x=>x.classList.remove('open'));if(!wasOpen)m.classList.add('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.pro-menu .more'))document.querySelectorAll('.pro-menu.open').forEach(x=>x.classList.remove('open'));});
 
 // Event delegation — UN SOLO listener para todos los botones dinámicos
 document.addEventListener('click',e=>{
@@ -745,6 +761,9 @@ function renderInicio(){
   document.getElementById('st-activos').textContent=pros.filter(p=>p.activo).length;
   document.getElementById('st-trial').textContent=pros.filter(p=>p.plan==='trial').length;
   document.getElementById('st-venc').textContent=pros.filter(p=>p.activo&&(diasRestantes(p)||0)<=0).length;
+  const _now=new Date();
+  const _totMes=(allPagos||[]).filter(p=>{const d=new Date(p.fecha);return d.getMonth()===_now.getMonth()&&d.getFullYear()===_now.getFullYear();}).reduce((s,p)=>s+(Number(p.monto)||0),0);
+  const _mrrEl=document.getElementById('st-mrr');if(_mrrEl)_mrrEl.textContent=fmt$(_totMes);
   const h24=new Date(Date.now()-86400000);
   const np=pros.filter(p=>p.created_at&&new Date(p.created_at)>h24);
   document.getElementById('new-pros').innerHTML=np.length
@@ -801,10 +820,15 @@ function renderPros(){
       ${p.nota?`<div class="pro-card-nota">📝 ${esc(p.nota)}</div>`:''}
       <div class="pro-card-mid">${planBadge(p.plan)} ${p.activo?'<span class="badge bg">Activo</span>':'<span class="badge bgray">Inactivo</span>'}</div>
       <div class="pro-card-bot">
-        <button class="btn pay" data-action="pago" data-id="${p.id}" data-nombre="${esc(p.nombre)}">💳 Pago</button>
-        <button class="btn edit" data-action="editar" data-id="${p.id}">✏ Editar</button>
-        <button class="btn ${p.activo?'on':'off'}" data-action="toggle" data-id="${p.id}" data-activo="${p.activo}">${p.activo?'Desactivar':'Activar'}</button>
-        <button class="btn del" data-action="eliminar" data-id="${p.id}" data-nombre="${esc(p.nombre)}">🗑 Eliminar</button>
+        <button class="btn pay" data-action="pago" data-id="${p.id}" data-nombre="${esc(p.nombre)}">💳 Registrar pago</button>
+        <div class="pro-menu">
+          <button class="btn more" type="button" onclick="toggleProMenu(event,this)">⋯</button>
+          <div class="pro-menu-list">
+            <button class="btn edit" data-action="editar" data-id="${p.id}">✏ Editar</button>
+            <button class="btn ${p.activo?'on':'off'}" data-action="toggle" data-id="${p.id}" data-activo="${p.activo}">${p.activo?'Desactivar':'Activar'}</button>
+            <button class="btn del" data-action="eliminar" data-id="${p.id}" data-nombre="${esc(p.nombre)}">🗑 Eliminar</button>
+          </div>
+        </div>
       </div>
     </div>`).join('');
 }
